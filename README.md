@@ -3,6 +3,12 @@ Container for all configuration files, extensions, or experiments done to Ubuntu
 
 Currently **not** designed or prepared for personal usage by anyone other than myself. I claim no liability over anything this project may do to your system as of now.
 
+## Quick Start
+- Status: Setup in progress, early development (Ubuntu-adjacent)
+- Target OS: Ubuntu 26.04 LTS
+- Target Audience: Ubuntu Desktop, Windows 11, macOS users
+- Usage: Run compiled script or install ISO to get an enhanced version of Ubuntu with quality-of-life and aesthetic improvements
+
 ## Why?
 'Codeswallop Linux' is not a real name meant to be something that people say alongside 'Ubuntu' or 'Linux Mint' or 'Fedora'. Codeswallop is simply the name of my YouTube channel. And, before the end of this year, I plan to release a series of video essays related to Linux system and user experience design to research and address various pain points (tiny or large) in the Linux desktop - particularly Ubuntu as a starting point - that accumulate to slowly cause a total result of frustration for a user transitioning from another OS. The YouTube videos are meant to talk from a technically-free perspective, meaning that I'm going to provide my points on what could be done to solve a problem without always looking into why it is or isn't realistic from a technical/backend perspective, this gives me more opportunity to address the significant majority of pain points as much as I can from a UX perspective, so that a technical organisation could theoretically come and deduce a list of everything that's recommended to do, and then think about the technical possibilities or implementation of each of them to determine which are worth pursuing first.
 But, in the meantime, I'm going to act as that theoretical organisation, and will use this repository to create fixes and 'patches' (more on that later) that I find are easy enough for me to implement before, during, or after the production of my YouYube video essays.
