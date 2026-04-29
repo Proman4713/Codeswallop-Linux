@@ -45,9 +45,8 @@ WP_DIR="/usr/share/backgrounds/codeswallop"
 PROP_DIR="/usr/share/gnome-background-properties"
 mkdir -p "$WP_DIR" "$PROP_DIR"
 
-# TODO: Add correct wallpaper URLs
-wget -qO "$WP_DIR/light.jpg" ""
-wget -qO "$WP_DIR/dark.jpg" ""
+wget -qO "$WP_DIR/light.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Light.png?raw=true"
+wget -qO "$WP_DIR/dark.jpg" "https://github.com/Proman4713/Codeswallop-Linux/blob/main/resources/Codeswallop%20Linux%20Wallpaper%20Dark.png?raw=true"
 
 #! XML file content got through Google & AI, not truly reliable
 cat << EOF > "$WP_DIR/adaptive.xml"
