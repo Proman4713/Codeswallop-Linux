@@ -1,6 +1,7 @@
 # Apps
 # TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
-install_packages gdebi gnome-tweaks gnome-shell-extension-manager gnome-calendar gnome-clocks gnome-music
+# Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu
+install_packages gdebi gnome-tweaks gnome-shell-extension-manager gnome-calendar gnome-clocks gnome-music showtime loupe
 
 # Tools
 install_packages htop fastfetch curl wget git unzip
