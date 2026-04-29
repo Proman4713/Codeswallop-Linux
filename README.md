@@ -37,6 +37,7 @@ If it isn't already clear:
 * This repository will build on top of Ubuntu Desktop, as it is, in my opinion, a balanced distribution, as well as the closest distro to what I'm trying to achieve.
 * The script(s) in this repository will assume that it is the first thing you run on your system, even though the patch-like design should be mostly safe for any customisations that you apply before running the script.
 * The script(s) assume a specific Ubuntu version. Again, even though the patch-like approach should avoid issues with upgrading. More info on versioning will be cleared up once there is actually something in this repository.
+* The script(s) assume a Minimal/Default Ubuntu installation. If you chose the `Extended` option and used this project after installing your system, or chose `Extended` while installing one of my ISO, then know that you are in untested territory.
 
 ## Plan
 In an ideal world, this would be its own Linux distribution. But the trouble, responsibility, and resources needed to achieve that obviously make it a task better left for those who can handle it (i.e. distribution maintainers). But, if I were to lay out a long-term plan that assumes unlimited resources, it would go like this:
