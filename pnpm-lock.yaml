@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      javascript-console-styling:
+        specifier: ^1.1.3
+        version: 1.1.3
+
+packages:
+
+  javascript-console-styling@1.1.3:
+    resolution: {integrity: sha512-oUPRWNf+soKiEcpk45/P/h6KfUGM4EO+QFdN+Lf8Jh2y2nyQSfcuBN4GWW38rzvwUw1p3gNNuGKnZ5GvE9PshQ==}
+
+snapshots:
+
+  javascript-console-styling@1.1.3: {}

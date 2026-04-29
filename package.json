@@ -1,0 +1,13 @@
+{
+  "name": "Codeswallop-Linux",
+  "version": "26.04.0",
+  "description": "",
+  "main": "src/compile.js",
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "javascript-console-styling": "^1.1.3"
+  }
+}

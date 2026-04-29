@@ -9,6 +9,9 @@ Currently **not** designed or prepared for personal usage by anyone other than m
 - Target Audience: Ubuntu Desktop, Windows 11, macOS users
 - Usage: Run compiled script or install ISO to get an enhanced version of Ubuntu with quality-of-life and aesthetic improvements
 
+## Support me
+If you find this project useful, or used my wallpapers for your desktop, then please consider [buying me a coffee](https://buymeacoffee.com/codeswallop) :)
+
 ## Why?
 'Codeswallop Linux' is not a real name meant to be said alongside 'Ubuntu' or 'Linux Mint' or 'Fedora'. Codeswallop is simply the name of my YouTube channel. And, before the end of this year, I plan to release a series of video essays related to Linux system and user experience design to research and address various pain points (tiny or large) in the Linux desktop - particularly Ubuntu as a starting point - that slowly accumulate to cause a total result of frustration for a user transitioning from another OS. I've personally seen some less eagle-eyed users of other OSs simply feel that there's 'something wrong' with the standard Ubuntu Desktop without being able to pinpoint many individual problems.
 
@@ -35,9 +38,11 @@ The patches are planned to be 'compiled' in two ways:
 
 If it isn't already clear:
 * This repository will build on top of Ubuntu Desktop, as it is, in my opinion, a balanced distribution, as well as the closest distro to what I'm trying to achieve.
-* The script(s) in this repository will assume that it is the first thing you run on your system, even though the patch-like design should be mostly safe for any customisations that you apply before running the script.
+* The script(s) in this repository will assume that it is the first thing you run on your system, many of your customisations may be overridden.
 * The script(s) assume a specific Ubuntu version. Again, even though the patch-like approach should avoid issues with upgrading. More info on versioning will be cleared up once there is actually something in this repository.
 * The script(s) assume a Minimal/Default Ubuntu installation. If you chose the `Extended` option and used this project after installing your system, or chose `Extended` while installing one of my ISO, then know that you are in untested territory.
+* If you are using the .sh version of this project, know that the script will modify both user configurations and system defaults. If you are using the ISO version, everything is already set up and ready to go. In both cases, a README will be added to your desktop for post-installation instructions.
+* The shell scripting in this repository is not designed to be [idempotent](https://en.wikipedia.org/wiki/Idempotence) as of now.
 
 ## Plan
 In an ideal world, this would be its own Linux distribution. But the trouble, responsibility, and resources needed to achieve that obviously make it a task better left for those who can handle it (i.e. distribution maintainers). But, if I were to lay out a long-term plan that assumes unlimited resources, it would go like this:
@@ -57,7 +62,8 @@ Now, what the name of this 'distro' should be, if not 'Codeswallop Linux'... I'v
 But that is, essentially, the ultimate goal...
 
 ## Rights & Licensing
-This project is licensed under the well-known GPL v3, which includes all the code and shell scripts written here. However, media files, when added, will be licensed differently.
+* This project is licensed under the well-known GPL v3, which includes all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md)
+* On the other hand, media files available at [`resources/`](resources/) are license using Creative Commons. License available at [`resources/LICENSE.md`](resources/LICENSE.md)
 
 ## Contributing
 Contributing, for now, will be as simple as submitting an Issue or PR with a good description and valuable information. I currently see no need to restrict how contributions should be made.
