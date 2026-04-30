@@ -105,4 +105,5 @@ seed_extension() {
     rm -rf "$temp_dir" "/tmp/$uuid.zip"
 }
 
-apt-get update && apt-get upgrade
+export DEBIAN_FRONTEND=noninteractive
+apt-get update

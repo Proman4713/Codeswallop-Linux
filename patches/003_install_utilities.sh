@@ -7,7 +7,7 @@ install_packages gdebi gnome-tweaks gnome-shell-extension-manager gnome-calendar
 install_packages htop fastfetch curl wget git unzip
 
 # Canberra for startup sound
-install_packages libcanberra-gtk3-module libcanberra-gtk-module gnome-session-canberra
+install_packages libcanberra-gtk3-module libcanberra-gtk-module gnome-session-canberra || echo "Warning: Some Canberra modules not found, moving on..."
 
 # LibreOffice
 if [ "$ENV_MODE" == "POST" ]; then
