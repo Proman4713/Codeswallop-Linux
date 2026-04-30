@@ -136,7 +136,7 @@ jobs:
           
           # Move it to custom-iso so xorriso can find it via the '-e boot/grub/efi.img' flag
           mkdir -p custom-iso/boot/grub
-          mv efi.img custom-iso/boot/grub/efi.img
+          sudo mv efi.img custom-iso/boot/grub/efi.img
 
           # 3. Generate the ISO
           sudo xorriso -as mkisofs -r \
