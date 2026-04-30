@@ -9,7 +9,7 @@ fi
 # Determine environment
 # 	CUBIC: The terminal environment in CUBIC already runs changes to system-wide configs, we don't 	need to care about user preferences.
 #	Post-Install: If a user runs this script after they install their system, then only changing system defaults doesn't help, we also have to change their current settings.
-if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
+if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ] && getent passwd "$SUDO_USER" >/dev/null 2>&1; then
 	ENV_MODE="POST"
 	TARGET_USER="$SUDO_USER"
 	TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
