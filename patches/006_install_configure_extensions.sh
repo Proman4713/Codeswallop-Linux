@@ -13,3 +13,6 @@ seed_extension "all-in-one-clipboard@NiffirgkcaJ.github.com" "https://extensions
 
 # Install GSConnect for phone link
 install_packages gnome-shell-extension-gsconnect
+
+apt-get autoremove -y --purge
+apt-get clean
