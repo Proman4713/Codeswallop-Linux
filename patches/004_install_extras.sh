@@ -1,6 +1,6 @@
 add-apt-repository -y universe
 add-apt-repository -y multiverse
-apt-get update
+apt_get_update
 
 # Ubuntu does not come with all media codecs by default (for example, codecs for MOV files), install all additional media codecs:
 install_packages ubuntu-restricted-extras

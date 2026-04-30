@@ -105,5 +105,10 @@ seed_extension() {
     rm -rf "$temp_dir" "/tmp/$uuid.zip"
 }
 
+apt_get_update() {
+	apt-get update || echo "Some repos failed, but we should be still fine..."
+}
+
 export DEBIAN_FRONTEND=noninteractive
-apt-get update || echo "Some repos failed, but we should be still fine..."
+
+apt_get_update
