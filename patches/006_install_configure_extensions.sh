@@ -10,3 +10,6 @@ seed_extension "just-perfection-desktop@just-perfection" "https://extensions.gno
 # seed_extension "unlockDialogBackground@sun.wxg@gmail.com" "https://extensions.gnome.org/extension-data/unlockDialogBackgroundsun.wxggmail.com.v40.shell-extension.zip"
 seed_extension "Vitals@CoreCoding.com" "https://extensions.gnome.org/extension-data/VitalsCoreCoding.com.v75.shell-extension.zip"
 seed_extension "all-in-one-clipboard@NiffirgkcaJ.github.com" "https://extensions.gnome.org/extension-data/all-in-one-clipboardNiffirgkcaJ.github.com.v19.shell-extension.zip"
+
+# Install GSConnect for phone link
+install_packages gnome-shell-extension-gsconnect

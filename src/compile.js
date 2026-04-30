@@ -48,7 +48,7 @@ files.forEach(file => {
 // add closing message
 compiledScript += `
 
-echo "${Colours.brightGreen("Codeswallop Linux has finished setting up!")}"`;
+echo "${Colours.brightGreen("Codeswallop Linux has finished setting up! Please reboot your system before using it.")}"`;
 
 fs.writeFileSync(
 	path.join(__dirname, "..", "dist", `codeswallop-linux-${CODESWALLOP_LINUX_VERSION}.sh`),

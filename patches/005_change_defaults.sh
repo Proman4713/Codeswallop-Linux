@@ -1,4 +1,4 @@
-# TODO: Brave default settings, default pinned apps, app grid layout, GSConnect
+# TODO: Brave default settings, default pinned apps, app grid layout
 
 # Remove Rhythmbox - if its there - since we installed GNOME Music
 apt-get remove -y rhythmbox
@@ -45,8 +45,8 @@ WP_DIR="/usr/share/backgrounds/codeswallop"
 PROP_DIR="/usr/share/gnome-background-properties"
 mkdir -p "$WP_DIR" "$PROP_DIR"
 
-wget -qO "$WP_DIR/light.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Light.png?raw=true"
-wget -qO "$WP_DIR/dark.jpg" "https://github.com/Proman4713/Codeswallop-Linux/blob/main/resources/Codeswallop%20Linux%20Wallpaper%20Dark.png?raw=true"
+wget -qO "$WP_DIR/light.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Light.png"
+wget -qO "$WP_DIR/dark.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Dark.png"
 
 #! XML file content got through Google & AI, not truly reliable
 cat << EOF > "$WP_DIR/adaptive.xml"
@@ -69,39 +69,51 @@ apply_gsettings \
     "org.gnome.desktop.background|picture-uri|'file://$WP_DIR/light.jpg'" \
     "org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/dark.jpg'"
 
-# GNOME Configurations
-	# Ubuntu
-		# Wartybrown theme
-		apply_gsettings "org.gnome.desktop.interface|accent-color|'brown'"
-		# Make the dock minimise/maximise apps when clicked there
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|extend-height|false"
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dock-position|'BOTTOM'"
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-mounts|false"
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-trash|false"
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-apps-at-top|true"
-		# Due to the fractional scaling setup, the Ubuntu Dock also needs to have a lower icon size (default 44)
-		apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dash-max-icon-size|35"
+# Ubuntu
+	# Wartybrown theme
+	apply_gsettings "org.gnome.desktop.interface|accent-color|'brown'"
+	# Make the dock minimise/maximise apps when clicked there
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|extend-height|false"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dock-position|'BOTTOM'"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-mounts|false"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-trash|false"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-apps-at-top|true"
+	# Due to the fractional scaling setup, the Ubuntu Dock also needs to have a lower icon size (default 44)
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dash-max-icon-size|35"
 
-	# Muscle Memory: Windows users are used to Alt+Shift and Ctrl+Alt+Shift for switching input sources. Not only is this not the default in GNOME,
-	#	it is actually impossible to achieve through the UI due to a bug that doesn't accept Alt+Shift_L.
-	apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source|['<Alt>Shift_L']"
-	apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source-backward|['<Primary><Alt>Shift_L']"
+# Muscle Memory: Windows users are used to Alt+Shift and Ctrl+Alt+Shift for switching input sources. Not only is this not the default in GNOME,
+#	it is actually impossible to achieve through the UI due to a bug that doesn't accept Alt+Shift_L.
+apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source|['<Alt>Shift_L']"
+apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source-backward|['<Primary><Alt>Shift_L']"
 
-	# Muscle Memory: Windows users use Win+Shift+S to open the Snipping Tool
-	apply_gsettings "org.gnome.shell.keybindings|show-screenshot-ui|['<Shift><Super>s']"
+# Muscle Memory: Windows users use Win+Shift+S to open the Snipping Tool
+apply_gsettings "org.gnome.shell.keybindings|show-screenshot-ui|['<Shift><Super>s']"
 
-	# GNOME sometimes bugs certain extensions, like Hide Top Bar, that perfectly work with extension validation disabled
-	apply_gsettings "org.gnome.shell|disable-extension-version-validation|true"
+# GNOME sometimes bugs certain extensions, like Hide Top Bar, that perfectly work with extension validation disabled
+apply_gsettings "org.gnome.shell|disable-extension-version-validation|true"
 
-	# Make the cursor smaller, default is 24. This is to match the smaller font sizes we applied, so that it doesn't get too big with fractional scaling.
-	apply_gsettings "org.gnome.desktop.interface|cursor-size|22"
+# Make the cursor smaller, default is 24. This is to match the smaller font sizes we applied, so that it doesn't get too big with fractional scaling.
+apply_gsettings "org.gnome.desktop.interface|cursor-size|22"
 
-	# Bind Super+E to open Files (Nautilus)
-	apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
+# Bind Super+E to open Files (Nautilus)
+apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
 
-	# Remove IBus emoji keybind to leave room for the 'All-In-One Clipboard' extension we're going to install
-	apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|[]"
+# Remove IBus emoji keybind to leave room for the 'All-In-One Clipboard' extension we're going to install
+apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|[]"
 
-	# Default pinned apps
-	apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'gnome-control-center.desktop']"
+# Default pinned apps
+apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'gnome-control-center.desktop']"
+
+# Startup sound
+create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/canberra-gtk-play --id="desktop-login"
+Hidden=false
+NoDisplay=false
+Name=Login Sound
+Comment=Plays a sound at login
+X-GNOME-Autostart-enabled=true
+EOF
+)"

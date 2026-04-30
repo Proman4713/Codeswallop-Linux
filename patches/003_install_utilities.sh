@@ -6,9 +6,16 @@ install_packages gdebi gnome-tweaks gnome-shell-extension-manager gnome-calendar
 # Tools
 install_packages htop fastfetch curl wget git unzip
 
-# LibreOffice
+# Canberra for startup sound
+install_packages libcanberra-gtk3-module libcanberra-gtk-module gnome-session-canberra
 
+# LibreOffice
 if [ "$ENV_MODE" == "POST" ]; then
 	install_packages libreoffice
 fi
-# TODO: REMOVE LIBREOFFICE FROM PURGE LIST IN UBUNTU MINIMAL INSTALLATION FOR CUBIC
+
+# Prevent libreoffice from being uninstalled in minimal install
+MINIMAL_LIST="/usr/share/ubiquity/minimal-install"
+if [ -f "$MINIMAL_LIST" ]; then
+    sed -i '/libreoffice/d' "$MINIMAL_LIST"
+fi

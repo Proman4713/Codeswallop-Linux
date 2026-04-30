@@ -1,0 +1,139 @@
+name: Build Codeswallop Linux 26.04 ISO
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-custom-iso:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+    
+      - name: Install pnpm
+        run: |
+          corepack enable pnpm
+          
+      - name: Install OS Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync
+
+      - name: Compile Bash Script (Node.js)
+        run: |
+          # Install any dependencies your node script needs
+          npm install 
+          
+          # Run the compilation script
+          node .
+          
+          # Verify the output exists
+          ls -la dist/codeswallop-linux-26.04.sh
+
+      - name: Download Base Ubuntu 26.04 ISO
+        run: |
+          wget -q -O base-ubuntu-26.04.iso https://releases.ubuntu.com/resolute/ubuntu-26.04-desktop-amd64.iso
+
+      - name: Extract Base ISO
+        run: |
+          mkdir -p source-iso custom-iso squashfs-root
+          
+          # Mount the original ISO and copy its contents
+          sudo mount -o loop base-ubuntu-26.04.iso source-iso
+          rsync -a source-iso/ custom-iso/
+          sudo umount source-iso
+
+      - name: Extract Root Filesystem (SquashFS)
+        run: |
+          # Extract the actual OS filesystem (this takes a moment)
+          sudo unsquashfs -f -d squashfs-root custom-iso/casper/filesystem.squashfs
+
+      - name: Setup Chroot Environment & Run Custom Script
+        run: |
+          # Copy the generated script into the root filesystem
+          sudo cp dist/codeswallop-linux-26.04.sh squashfs-root/opt/codeswallop-linux-26.04.sh
+          sudo chmod +x squashfs-root/opt/codeswallop-linux-26.04.sh
+
+          # Bind mount necessary virtual filesystems so the chroot environment has network and device access
+          sudo mount --bind /dev squashfs-root/dev
+          sudo mount --bind /run squashfs-root/run
+          sudo mount -t proc /proc squashfs-root/proc
+          sudo mount -t sysfs /sys squashfs-root/sys
+          
+          # Give chroot network access
+          sudo cp /etc/resolv.conf squashfs-root/etc/resolv.conf
+
+          # Execute the script inside the chroot (Simulating the CUBIC terminal environment)
+          sudo chroot squashfs-root /bin/bash -c "/opt/codeswallop-linux-26.04.sh"
+
+          # Cleanup
+          sudo rm squashfs-root/opt/codeswallop-linux-26.04.sh
+          sudo rm squashfs-root/etc/resolv.conf
+          sudo umount squashfs-root/sys
+          sudo umount squashfs-root/proc
+          sudo umount squashfs-root/run
+          sudo umount squashfs-root/dev
+
+      - name: Apply Custom Disk Metadata
+        run: |
+          # Matches: Disk Name and Release
+          echo 'Codeswallop 26.04 amd64 "Resolute Raccoon" - Release amd64 (20260430)' | sudo tee custom-iso/.disk/info
+          
+          # Matches: Release URL
+          echo 'https://github.com/Proman4713/Codeswallop-Linux' | sudo tee custom-iso/.disk/release_notes_url
+          
+          # Set the Version marker
+          echo '2026.04.30' | sudo tee custom-iso/.disk/codeswallop_version
+
+      - name: Re-compress Root Filesystem
+        run: |
+          # Remove the old base filesystem
+          sudo rm custom-iso/casper/filesystem.squashfs
+          
+          # Compress the modified filesystem (using zstd for optimal compression like modern Ubuntu)
+          sudo mksquashfs squashfs-root custom-iso/casper/filesystem.squashfs -comp zstd -b 1M -noappend
+          
+          # Update the filesystem size manifest so the installer knows how much space is needed
+          printf $(sudo du -sx --block-size=1 squashfs-root | cut -f1) | sudo tee custom-iso/casper/filesystem.size
+
+      - name: Update MD5 Checksums
+        run: |
+          cd custom-iso
+          sudo rm -f md5sum.txt
+          # Calculate new checksums for integrity verification during boot
+          sudo find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
+          cd ..
+
+      - name: Generate Final ISO
+        run: |
+          # Matches: Volume ID and Filename
+          # Note: Modern Ubuntu (EFI + Legacy) requires specific xorriso arguments to remain bootable.
+          # We extract the Master Boot Record from the original ISO to ensure high compatibility.
+          dd if=base-ubuntu-26.04.iso bs=512 count=1 of=isohdpfx.bin
+
+          sudo xorriso -as mkisofs -r \
+            -V "Codeswallop 26.04 amd64" \
+            -o codeswallop-26.04-desktop-amd64.iso \
+            -J -l -b boot/grub/i386-pc/eltorito.img -c boot.catalog \
+            -no-emul-boot -boot-load-size 4 -boot-info-table \
+            -isohybrid-mbr isohdpfx.bin \
+            -eltorito-alt-boot \
+            -e boot/grub/efi.img \
+            -no-emul-boot -isohybrid-gpt-basdat \
+            custom-iso
+
+      - name: Upload Custom ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeswallop-26.04-desktop-amd64.iso
+          path: codeswallop-26.04-desktop-amd64.iso
+          retention-days: 5
