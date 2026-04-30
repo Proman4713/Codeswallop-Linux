@@ -50,6 +50,8 @@ compiledScript += `
 
 echo "${Colours.brightGreen("Codeswallop Linux has finished setting up! Please reboot your system before using it.")}"`;
 
+fs.mkdirSync(path.join(__dirname, "..", "dist"), { recursive: true });
+
 fs.writeFileSync(
 	path.join(__dirname, "..", "dist", `codeswallop-linux-${CODESWALLOP_LINUX_VERSION}.sh`),
 	compiledScript
