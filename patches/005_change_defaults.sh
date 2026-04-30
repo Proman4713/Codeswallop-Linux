@@ -13,16 +13,16 @@ install_packages brave-browser
 # Configure Brave command-line args
 BRAVE_DESKTOP="/usr/share/applications/brave-browser.desktop"
 if [ -f "$BRAVE_DESKTOP" ]; then
-    echo "Applying custom flags to Brave .desktop file..."
-    
-    # Add Wayland support, middle-click to scroll, and hopefully (untested) better touchpad support
-    sed -i 's|Exec=/usr/bin/brave-browser-stable|Exec=/usr/bin/brave-browser-stable --enable-blink-features=MiddleClickAutoscroll --enable-features=UseOzonePlatform,TouchpadOverscrollHistoryNavigation,VaapiVideoDecoder --ozone-platform=wayland|g' "$BRAVE_DESKTOP"
-    
-    # Set Brave as the default handler for web browser schemes
-    # This is a system-wide association
-    update-desktop-database /usr/share/applications
+	echo "Applying custom flags to Brave .desktop file..."
+
+	# Add Wayland support, middle-click to scroll, and hopefully (untested) better touchpad support
+	sed -i 's|Exec=/usr/bin/brave-browser-stable|Exec=/usr/bin/brave-browser-stable --enable-blink-features=MiddleClickAutoscroll --enable-features=UseOzonePlatform,TouchpadOverscrollHistoryNavigation,VaapiVideoDecoder --ozone-platform=wayland|g' "$BRAVE_DESKTOP"
+
+	# Set Brave as the default handler for web browser schemes
+	# This is a system-wide association
+	update-desktop-database /usr/share/applications
 else
-    echo "Warning: Brave .desktop file not found at $BRAVE_DESKTOP"
+	echo "Warning: Brave .desktop file not found at $BRAVE_DESKTOP"
 fi
 
 # Set font sizes to 9 rather than 11, which is roughly 125% smaller, then increase default fractional scaling to 125%. This is to make Chromium browsers look as big as
@@ -69,8 +69,8 @@ EOF
 chmod 644 "$WP_DIR"/* "$PROP_DIR"/*
 
 apply_gsettings \
-    "org.gnome.desktop.background|picture-uri|'file://$WP_DIR/light.jpg'" \
-    "org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/dark.jpg'"
+	"org.gnome.desktop.background|picture-uri|'file://$WP_DIR/light.jpg'" \
+	"org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/dark.jpg'"
 
 # Ubuntu
 	# Wartybrown theme

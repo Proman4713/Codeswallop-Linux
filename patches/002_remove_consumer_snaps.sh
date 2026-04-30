@@ -7,6 +7,6 @@ rm -rf /var/lib/snapd/seed/snaps/firefox_*
 rm -rf /var/lib/snapd/seed/snaps/thunderbird_*
 
 if [ -f /var/lib/snapd/seed/seed.yaml ]; then
-    sed -i '/firefox/d' /var/lib/snapd/seed/seed.yaml
-    sed -i '/thunderbird/d' /var/lib/snapd/seed/seed.yaml
+	sed -i '/firefox/d' /var/lib/snapd/seed/seed.yaml
+	sed -i '/thunderbird/d' /var/lib/snapd/seed/seed.yaml
 fi

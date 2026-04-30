@@ -17,5 +17,5 @@ fi
 # Prevent libreoffice from being uninstalled in minimal install
 MINIMAL_LIST="/usr/share/ubiquity/minimal-install"
 if [ -f "$MINIMAL_LIST" ]; then
-    sed -i '/libreoffice/d' "$MINIMAL_LIST"
+	sed -i '/libreoffice/d' "$MINIMAL_LIST"
 fi

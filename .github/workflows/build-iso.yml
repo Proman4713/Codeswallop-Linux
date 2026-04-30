@@ -123,11 +123,22 @@ jobs:
 
       - name: Generate Final ISO
         run: |
-          # Matches: Volume ID and Filename
-          # Note: Modern Ubuntu (EFI + Legacy) requires specific xorriso arguments to remain bootable.
-          # We extract the Master Boot Record from the original ISO to ensure high compatibility.
+          # 1. Extract the Master Boot Record (MBR)
           dd if=base-ubuntu-26.04.iso bs=512 count=1 of=isohdpfx.bin
 
+          # 2. Extract the hidden EFI partition from the modern Ubuntu ISO
+          # Use sfdisk to dump partition data as JSON, then use jq to grab the Start and Size of the EFI partition
+          EFI_START=$(sfdisk -J base-ubuntu-26.04.iso | jq -r '.partitiontable.partitions[] | select(.type=="C12A7328-F81F-11D2-BA4B-00A0C93EC93B" or .type=="ef" or .type=="0xef" or .name=="EFI" or .type=="EFI System") | .start' | head -n 1)
+          EFI_SIZE=$(sfdisk -J base-ubuntu-26.04.iso | jq -r '.partitiontable.partitions[] | select(.type=="C12A7328-F81F-11D2-BA4B-00A0C93EC93B" or .type=="ef" or .type=="0xef" or .name=="EFI" or .type=="EFI System") | .size' | head -n 1)
+          
+          # Use dd to carve out the EFI partition
+          dd if=base-ubuntu-26.04.iso bs=512 skip=$EFI_START count=$EFI_SIZE of=efi.img
+          
+          # Move it to custom-iso so xorriso can find it via the '-e boot/grub/efi.img' flag
+          mkdir -p custom-iso/boot/grub
+          mv efi.img custom-iso/boot/grub/efi.img
+
+          # 3. Generate the ISO
           sudo xorriso -as mkisofs -r \
             -V "Codeswallop 26.04 amd64" \
             -o codeswallop-26.04-desktop-amd64.iso \
