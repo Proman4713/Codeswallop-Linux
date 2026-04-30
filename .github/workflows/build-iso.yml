@@ -30,7 +30,7 @@ jobs:
       - name: Compile Bash Script (Node.js)
         run: |
           # Install any dependencies your node script needs
-          npm install 
+          pnpm install 
           
           # Run the compilation script
           node .
@@ -53,8 +53,15 @@ jobs:
 
       - name: Extract Root Filesystem (SquashFS)
         run: |
-          # Extract the actual OS filesystem (this takes a moment)
-          sudo unsquashfs -f -d squashfs-root custom-iso/casper/filesystem.squashfs
+          # Find the largest .squashfs file in the casper directory dynamically
+          SQUASHFS_FILE=$(ls -S custom-iso/casper/*.squashfs | head -n 1)
+          echo "Found root filesystem: $SQUASHFS_FILE"
+          
+          # Save the exact path to GitHub ENV so the re-compress step knows what to overwrite
+          echo "SQUASHFS_PATH=$SQUASHFS_FILE" >> $GITHUB_ENV
+          
+          # Extract it
+          sudo unsquashfs -f -d squashfs-root "$SQUASHFS_FILE"
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
@@ -95,14 +102,17 @@ jobs:
 
       - name: Re-compress Root Filesystem
         run: |
-          # Remove the old base filesystem
-          sudo rm custom-iso/casper/filesystem.squashfs
+          # Remove the old base filesystem using the path we found earlier
+          sudo rm "${{ env.SQUASHFS_PATH }}"
           
-          # Compress the modified filesystem (using zstd for optimal compression like modern Ubuntu)
-          sudo mksquashfs squashfs-root custom-iso/casper/filesystem.squashfs -comp zstd -b 1M -noappend
+          # Compress the modified filesystem back to the exact same file name
+          sudo mksquashfs squashfs-root "${{ env.SQUASHFS_PATH }}" -comp zstd -b 1M -noappend
           
-          # Update the filesystem size manifest so the installer knows how much space is needed
-          printf $(sudo du -sx --block-size=1 squashfs-root | cut -f1) | sudo tee custom-iso/casper/filesystem.size
+          # Update the matching filesystem size manifest (.size file)
+          SIZE_FILE="${{ env.SQUASHFS_PATH }}"
+          SIZE_FILE="${SIZE_FILE%.squashfs}.size"
+          
+          printf $(sudo du -sx --block-size=1 squashfs-root | cut -f1) | sudo tee "$SIZE_FILE"
 
       - name: Update MD5 Checksums
         run: |
