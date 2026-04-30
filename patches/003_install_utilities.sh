@@ -19,8 +19,13 @@ if [ "$ENV_MODE" == "POST" ]; then
 fi
 
 # Prevent some packages from being uninstalled in minimal install
-MINIMAL_LIST="/usr/share/ubiquity/minimal-install"
+MINIMAL_LIST="/usr/share/ubuntu-desktop-provision/manifests/minimal-install"
+
 if [ -f "$MINIMAL_LIST" ]; then
-    # Use -E for extended regex to delete multiple matches in one go
-    sed -i -E '/libreoffice|deja-dup|gnome-calendar|gnome-clocks|gnome-music|showtime/d' "$MINIMAL_LIST"
+    echo "Patching Flutter installer manifest..."
+    # Remove our preferred apps from the 'kill list'
+    # This ensures they survive even if the user selects a Minimal Install
+    sed -i -E '/libreoffice|deja-dup|gnome-calendar|gnome-clocks|gnome-music|showtime|loupe|gnome-snapshot/d' "$MINIMAL_LIST"
+else
+    echo "Warning: Modern minimal-install manifest not found at $MINIMAL_LIST"
 fi

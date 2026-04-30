@@ -63,6 +63,10 @@ jobs:
           # Extract it
           sudo unsquashfs -f -d squashfs-root "$SQUASHFS_FILE"
 
+      - name: Find available squashed filesystems
+        run: |
+          ls -la custom-iso/casper/
+
       - name: Setup Chroot Environment & Run Custom Script
         run: |
           # Copy script
@@ -87,6 +91,20 @@ jobs:
           sudo umount squashfs-root/proc
           sudo umount squashfs-root/run
           sudo umount squashfs-root/dev
+
+      - name: Verify Installer Manifest Patch
+        run: |
+          MANIFEST="squashfs-root/usr/share/ubuntu-desktop-provision/manifests/minimal-install"
+          if [ -f "$MANIFEST" ]; then
+            if grep -E "libreoffice" "$MANIFEST"; then
+              echo "Error: Packages still present in the minimal-install kill-list!"
+              exit 1
+            else
+              echo "Success: Manifest patched correctly."
+            fi
+          else
+            echo "Warning: Manifest file not found. Check the path for Ubuntu 26.04."
+          fi
 
       - name: Apply Custom Disk Metadata
         run: |
