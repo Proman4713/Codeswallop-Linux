@@ -65,25 +65,24 @@ jobs:
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
-          # Copy the generated script into the root filesystem
-          sudo cp dist/codeswallop-linux-26.04.sh squashfs-root/opt/codeswallop-linux-26.04.sh
+          # Copy script
+          sudo cp dist/codeswallop-linux-26.04.sh squashfs-root/opt/
           sudo chmod +x squashfs-root/opt/codeswallop-linux-26.04.sh
 
-          # Bind mount necessary virtual filesystems so the chroot environment has network and device access
+          # Bind mounts
           sudo mount --bind /dev squashfs-root/dev
           sudo mount --bind /run squashfs-root/run
           sudo mount -t proc /proc squashfs-root/proc
           sudo mount -t sysfs /sys squashfs-root/sys
           
-          # Give chroot network access
-          sudo cp /etc/resolv.conf squashfs-root/etc/resolv.conf
+          # Fix for the "same file" error: Remove and copy with dereference
+          sudo rm -f squashfs-root/etc/resolv.conf
+          sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
-          # Execute the script inside the chroot (Simulating the CUBIC terminal environment)
+          # Execute in chroot
           sudo chroot squashfs-root /bin/bash -c "/opt/codeswallop-linux-26.04.sh"
 
-          # Cleanup
-          sudo rm squashfs-root/opt/codeswallop-linux-26.04.sh
-          sudo rm squashfs-root/etc/resolv.conf
+          # Proper Cleanup (Unmount in reverse order)
           sudo umount squashfs-root/sys
           sudo umount squashfs-root/proc
           sudo umount squashfs-root/run
