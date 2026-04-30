@@ -1,4 +1,4 @@
-# TODO: Brave default settings, default pinned apps, app grid layout
+# TODO: Brave default settings, app grid layout
 
 # Remove Rhythmbox - if its there - since we installed GNOME Music
 apt-get remove -y rhythmbox

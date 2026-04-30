@@ -1,3 +1,4 @@
+[![Build Codeswallop Linux 26.04 ISO](https://github.com/Proman4713/Codeswallop-Linux/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Codeswallop-Linux/actions/workflows/build-iso.yml)
 # Codeswallop-Linux
 Container for all configurations, extensions, or experiments done to Ubuntu Desktop while I prepare my Linux video essays at https://youtube.com/@lots_of_codeswallop
 
