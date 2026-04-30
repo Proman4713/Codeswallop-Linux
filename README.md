@@ -19,13 +19,14 @@ The patches can be 'compiled' in two ways:
 1. Through the NodeJS codebase (and later, a CI/CD pipeline), which generates one big .sh file that is essentially a merge of all the individual 'patch' .sh files. This allows the entire project to be usable by someone in one terminal command, but also keeps it modular and easy to modify/contribute to.
 2. Through a custom Ubuntu ISO created through [CUBIC](https://github.com/PJ-Singh-001/Cubic), where the script is run in the CUBIC environment (most likely in addition to other commands that make it more suitable to be an ISO and/or distinguishable from a regular Ubuntu ISO)
 
-If it isn't already clear:
+A few things that need to be clear:
 * This repository builds on top of Ubuntu Desktop, as it is, in my opinion, a balanced distribution, as well as the closest distro to what I'm trying to achieve.
 * The script(s) in this repository assume that it is the first thing you run on your system, many of your customisations may be overridden.
 * The script(s) assume a specific Ubuntu version. Again, even though the patch-like approach should avoid issues with upgrading. The project is not intended to work on any Ubuntu version older than Ubuntu 26.04 LTS.
 * The script(s) assume a Minimal/Default Ubuntu installation. If you chose the `Extended` option and used this project after installing your system, or chose `Extended` while installing one of my ISOs, then know that you are in untested territory.
 * If you are using the .sh version of this project, know that the script will modify both user configurations and system defaults. If you are using the ISO version, everything is already set up and ready to go. In both cases, a README will be added to your desktop for post-installation instructions.
 * The shell scripting in this repository is not designed to be [idempotent](https://en.wikipedia.org/wiki/Idempotence) as of now.
+* This project hasn't been tested with offline Ubuntu installations
 
 ## Plan
 In an ideal world, this would be its own Linux distribution. But the skill, responsibility, and resources needed to achieve that obviously make it a task better left for those who can handle it (i.e. distribution maintainers). But, if I were to lay out a long-term plan that assumes unlimited resources, it would go like this:

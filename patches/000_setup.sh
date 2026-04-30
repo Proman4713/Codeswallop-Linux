@@ -106,4 +106,4 @@ seed_extension() {
 }
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
+apt-get update || echo "Some repos failed, but we should be still fine..."
