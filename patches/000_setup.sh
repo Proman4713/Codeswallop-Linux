@@ -1,4 +1,4 @@
-set -euo pipefail # Strict
+set -exuo pipefail # Strict
 
 # Ensure we are running as root, obviously
 if [ "$EUID" -ne 0 ]; then 

@@ -80,7 +80,7 @@ jobs:
           sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
           # Execute in chroot
-          sudo chroot squashfs-root /bin/bash -c "/opt/codeswallop-linux-26.04.sh"
+          sudo chroot squashfs-root /bin/bash -xlc "/opt/codeswallop-linux-26.04.sh"
 
           # Proper Cleanup (Unmount in reverse order)
           sudo umount squashfs-root/sys
