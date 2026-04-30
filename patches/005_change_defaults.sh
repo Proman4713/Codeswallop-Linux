@@ -5,7 +5,10 @@ apt-get remove -y rhythmbox
 
 # We uninstalled Firefox as part of eliminating non-system snap packages, so we need a new default browser...
 # Brave is going to be it. For no particular reason other than its ease of installation in addition to being my personal default
-curl -fsS https://dl.brave.com/install.sh | sh
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
+apt_get_update
+install_packages brave-browser
 
 # Configure Brave command-line args
 BRAVE_DESKTOP="/usr/share/applications/brave-browser.desktop"
