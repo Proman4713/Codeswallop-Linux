@@ -11,13 +11,13 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: '24'
           cache: 'pnpm'
@@ -28,15 +28,26 @@ jobs:
           sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync
 
       - name: Compile Bash Script (Node.js)
+        env:
+          # If this was triggered by a tag (release), set to release. Otherwise, nightly will automatically be used.
+          BUILD_TYPE: ${{ startsWith(github.ref, 'refs/tags/') && 'release' || '' }}
         run: |
           # Install any dependencies your node script needs
           pnpm install 
           
           # Run the compilation script
-          node .
+          SH_NAME=$(node . | tail -n 1)
+
+          TEMP_NAME=${SH_NAME#codeswallop-linux-}
+          TAG_NAME=${TEMP_NAME%.sh}
+          ISO_NAME="${SH_NAME%.sh}.iso"
+
+          echo "SH_NAME=$SH_NAME" >> $GITHUB_ENV
+          echo "ISO_NAME=$ISO_NAME" >> $GITHUB_ENV
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           
           # Verify the output exists
-          ls -la dist/codeswallop-linux-26.04.sh
+          ls -la "dist/$SH_NAME"
 
       - name: Download Base Ubuntu 26.04 ISO
         run: |
@@ -87,8 +98,8 @@ jobs:
       - name: Setup Chroot Environment & Run Custom Script
         run: |
           # Copy script
-          sudo cp dist/codeswallop-linux-26.04.sh squashfs-root/opt/
-          sudo chmod +x squashfs-root/opt/codeswallop-linux-26.04.sh
+          sudo cp dist/${{ env.SH_NAME }} squashfs-root/opt/
+          sudo chmod +x squashfs-root/opt/${{ env.SH_NAME }}
 
           # Bind mounts
           sudo mount --bind /dev squashfs-root/dev
@@ -101,7 +112,7 @@ jobs:
           sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
           # Execute in chroot
-          sudo chroot squashfs-root /bin/bash -xlc "/opt/codeswallop-linux-26.04.sh"
+          sudo chroot squashfs-root /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
 
           # Proper Cleanup (Unmount in reverse order)
           sudo umount squashfs-root/sys
@@ -115,7 +126,7 @@ jobs:
           echo 'Codeswallop 26.04 amd64 "Resolute Raccoon" - Release amd64 (20260430)' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
-          echo 'https://github.com/Proman4713/Codeswallop-Linux' | sudo tee custom-iso/.disk/release_notes_url
+          echo 'https://github.com/Proman4713/Codeswallop-Linux/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
           
           # Set the Version marker
           echo '2026.04.30' | sudo tee custom-iso/.disk/codeswallop_version
@@ -171,13 +182,17 @@ jobs:
             -isohybrid-mbr isohdpfx.bin \
             -isohybrid-gpt-basdat \
             -append_partition 2 0xef custom-iso/boot/grub/efi.img \
-            -output codeswallop-26.04-desktop-amd64.iso \
+            -output ${{ env.ISO_NAME }} \
             -graft-points \
             "/=$(pwd)/custom-iso"
 
-      - name: Upload Custom ISO Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Custom ISO to GitHub Releases
+        uses: softprops/action-gh-release@v3.0.0
         with:
-          name: codeswallop-26.04-desktop-amd64.iso
-          path: codeswallop-26.04-desktop-amd64.iso
-          retention-days: 5
+          tag_name: ${{ env.TAG_NAME }}
+          name: Codeswallop Linux ${{ env.TAG_NAME }}
+          files: |
+            ${{ env.ISO_NAME }}
+            dist/${{ env.SH_NAME }}
+          # Automatically mark as pre-release if it's a nightly or beta
+          prerelease: ${{ contains(env.TAG_NAME, 'nightly') || contains(env.TAG_NAME, 'beta') }}

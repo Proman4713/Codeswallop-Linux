@@ -6,9 +6,14 @@ Currently **not** designed or prepared for personal usage by anyone other than m
 
 ## Quick Start
 - Status: Early development (Ubuntu-adjacent)
-- Target OS: Ubuntu 26.04 LTS
+- Target OS: Ubuntu 26.04 LTS for Intel and AMD CPUs
 - Target Audience: Ubuntu, Windows 11, macOS users
 - Usage: Run compiled script or install ISO to get an enhanced version of Ubuntu with quality-of-life and aesthetic improvements
+- Minimum Requirements:
+	1. My ISO is actually smaller than the standard Ubuntu ISO due to several unnecessary packages being removed, so the requirement for the bootable USB matches Ubuntu's **8GB** minimum.
+	3. The Disk storage usage may be higher due to LibreOffice being included in the minimal (and only) installation option. The requirement, however, isn't lifted from upstream's **25GB** minimum due to it including the Extended Selection as well.
+	4. No additional services have been added to the ISO, so the RAM requirement also matches upstream's **6GB** recommended.
+	5. VRAM consumption is slightly higher due to the Blur My Shell extension, but this extension is intended to be disable by default in a later version of the script.
 
 ## Support me
 If you find this project useful, or used my wallpapers for your desktop, then please consider [buying me a coffee](https://buymeacoffee.com/codeswallop) :)
