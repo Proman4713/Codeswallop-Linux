@@ -89,6 +89,12 @@ seed_extension() {
 	wget -qO "/tmp/$uuid.zip" "$zip_url"
 	unzip -qo "/tmp/$uuid.zip" -d "$temp_dir"
 
+	# Compile the schemas in the temp folder first
+    if [ -d "$temp_dir/schemas" ]; then
+        echo -e "\nCompiling settings for $uuid...\n"
+        glib-compile-schemas "$temp_dir/schemas"
+    fi
+
 	# Copy to skel and current user if POST
 	mkdir -p "/etc/skel/$(dirname "$target_path")"
 	cp -r "$temp_dir" "/etc/skel/$target_path"

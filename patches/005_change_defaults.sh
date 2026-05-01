@@ -133,6 +133,18 @@ apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'b
 # Mouse acceleration
 apply_gsettings "org.gnome.desktop.peripherals.mouse|accel-profile|'flat'"
 
+# Force DING to use the top-right and auto-arrange
+apply_gsettings "org.gnome.shell.extensions.ding|start-corner|'top-right'"
+apply_gsettings "org.gnome.shell.extensions.ding|auto-arrange-icons|true"
+
+# POST-INSTALL: Reset the icon positions to force them to snap to the new corner
+if [ "$ENV_MODE" == "POST" ]; then
+    # Clear the saved coordinates so the corner setting takes over
+    sudo -u "$TARGET_USER" dconf reset /org/gnome/shell/extensions/ding/icon-state || true
+    # Restart the background process to apply changes immediately
+    pkill -f "ding.js" || true
+fi
+
 # Startup sound
 create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
 [Desktop Entry]
