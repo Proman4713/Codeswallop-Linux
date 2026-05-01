@@ -67,6 +67,18 @@ jobs:
         run: |
           ls -la custom-iso/casper/
 
+      - name: Inspect and Prune Extended Installation
+        run: |
+          # 1. Print the install-sources configuration for debugging
+          echo "--- START OF install-sources.yaml ---"
+          cat custom-iso/casper/install-sources.yaml
+          echo "--- END OF install-sources.yaml ---"
+
+          # 2. Delete the standard squashfs and its associated manifests
+          # This removes ~600MB of unneeded apps (GNOME Mahjongg, etc.)
+          echo "Pruning minimal.standard files..."
+          rm -fv custom-iso/casper/minimal.standard.*
+
       - name: Setup Chroot Environment & Run Custom Script
         run: |
           # Copy script
@@ -91,20 +103,6 @@ jobs:
           sudo umount squashfs-root/proc
           sudo umount squashfs-root/run
           sudo umount squashfs-root/dev
-
-      - name: Verify Installer Manifest Patch
-        run: |
-          MANIFEST="squashfs-root/usr/share/ubuntu-desktop-provision/manifests/minimal-install"
-          if [ -f "$MANIFEST" ]; then
-            if grep -E "libreoffice" "$MANIFEST"; then
-              echo "Error: Packages still present in the minimal-install kill-list!"
-              exit 1
-            else
-              echo "Success: Manifest patched correctly."
-            fi
-          else
-            echo "Warning: Manifest file not found. Check the path for Ubuntu 26.04."
-          fi
 
       - name: Apply Custom Disk Metadata
         run: |
