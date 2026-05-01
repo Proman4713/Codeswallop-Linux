@@ -42,7 +42,7 @@ files.forEach(file => {
 		return;
 	};
 
-	compiledScript += ("\n" + `\n#^ PATCH FILE ${file}\n` + `\necho "APPLYING PATCH: ${file.replace(".sh", "")}"\n\n` + content);
+	compiledScript += ("\n" + `\n#^ PATCH FILE ${file}\n` + `\necho -e "\\nAPPLYING PATCH: ${file.replace(".sh", "")}\\n"\n\n` + content);
 });
 
 // add closing message
@@ -55,7 +55,7 @@ const now = new Date();
 const startOfYear = new Date(now.getFullYear(), 0, 1);
 // Number of days since Jan 1st
 const numOfDays = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-const weekNumber = Math.ceil((now.getDay() + 1 + numOfDays) / 7);
+const weekNumber = Math.floor((numOfDays + startOfYear.getDay()) / 7) + 1;
 const letters = "abcdefg";
 const dayLetter = letters[now.getDay()];
 

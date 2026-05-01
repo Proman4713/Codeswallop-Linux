@@ -79,6 +79,7 @@ apply_gsettings \
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|extend-height|false"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dock-position|'BOTTOM'"
+	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|dock-fixed|false"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-mounts|false"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-trash|false"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|show-apps-at-top|true"
@@ -99,14 +100,38 @@ apply_gsettings "org.gnome.shell|disable-extension-version-validation|true"
 # Make the cursor smaller, default is 24. This is to match the smaller font sizes we applied, so that it doesn't get too big with fractional scaling.
 apply_gsettings "org.gnome.desktop.interface|cursor-size|22"
 
+# Enable Hot Corners
+apply_gsettings "org.gnome.desktop.interface|enable-hot-corners|true"
+
+# Show Battery % in Top Bar
+apply_gsettings "org.gnome.desktop.interface|show-battery-percentage|true"
+
+# Set time to AM/PM. 24-hour users understand the time immediately when they see it in 12-hour, and they can change it. But for 12-hour users, it takes more friction
+#	for them to read the time if its 24-hour, so we set it to AM/PM.
+apply_gsettings "org.gnome.desktop.interface|clock-format|12h"
+
+# Show week day
+apply_gsettings "org.gnome.desktop.interface|clock-show-weekday|true"
+
+#! Enable eyesight reminders, debatable on whether this is a good idea
+apply_gsettings "org.gnome.desktop.break-reminders.eyesight|enabled|true"
+apply_gsettings "org.gnome.desktop.break-reminders.eyesight|notify|true"
+apply_gsettings "org.gnome.desktop.break-reminders.eyesight|interval-seconds|1200" # 20 minutes
+
 # Bind Super+E to open Files (Nautilus)
 apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
 
-# Remove IBus emoji keybind to leave room for the 'All-In-One Clipboard' extension we're going to install
+# Remove IBus emoji keybind (Super + .) to leave room for the 'All-In-One Clipboard' extension we're going to install
 apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|[]"
 
+# Remove the notification/calendar tray keybind (Super + v) to leave room for 'All-In-One Clipboard'
+apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|[]"
+
 # Default pinned apps
-apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'gnome-control-center.desktop']"
+apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'org.gnome.Settings.desktop']"
+
+# Mouse acceleration
+apply_gsettings "org.gnome.desktop.peripherals.mouse|accel-profile|'flat'"
 
 # Startup sound
 create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
