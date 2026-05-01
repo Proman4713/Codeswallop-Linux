@@ -69,15 +69,20 @@ jobs:
 
       - name: Inspect and Prune Extended Installation
         run: |
-          # 1. Print the install-sources configuration for debugging
-          echo "--- START OF install-sources.yaml ---"
+          echo "--- ORIGINAL install-sources.yaml ---"
           cat custom-iso/casper/install-sources.yaml
-          echo "--- END OF install-sources.yaml ---"
+          echo "--- END OF ORIGINAL install-sources.yaml ---"
 
-          # 2. Delete the standard squashfs and its associated manifests
-          # This removes ~600MB of unneeded apps (GNOME Mahjongg, etc.)
-          echo "Pruning minimal.standard files..."
-          rm -fv custom-iso/casper/minimal.standard.*
+          # 1. Delete the standard squashfs and its associated manifests
+          echo "Pruning minimal.standard files to save ~600MB..."
+          sudo rm -fv custom-iso/casper/minimal.standard.*
+
+          # 2. Remove the "Extended Installation" profile from the installer UI
+          # yq is pre-installed on ubuntu-latest runners
+          sudo yq eval 'del(.sources[] | select(.id == "ubuntu-desktop"))' -i custom-iso/casper/install-sources.yaml
+
+          echo "--- UPDATED install-sources.yaml ---"
+          cat custom-iso/casper/install-sources.yaml
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
