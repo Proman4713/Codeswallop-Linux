@@ -53,7 +53,7 @@ jobs:
 
       - name: Download Base Ubuntu 26.04 ISO
         run: |
-          wget -q -O base-ubuntu-26.04.iso https://mirrors.mit.edu/ubuntu-releases/resolute/ubuntu-26.04-desktop-amd64.iso
+          wget -q -O base-ubuntu-26.04.iso https://releases.ubuntu.com/resolute/ubuntu-26.04-desktop-amd64.iso
 
       - name: Extract Base ISO
         run: |
@@ -194,7 +194,6 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           name: Codeswallop Linux ${{ env.TAG_NAME }}
           files: |
-            ${{ env.ISO_NAME }}
             dist/${{ env.SH_NAME }}
           # Automatically mark as pre-release if it's a nightly or beta
           prerelease: ${{ contains(env.TAG_NAME, 'nightly') || contains(env.TAG_NAME, 'beta') }}

@@ -82,17 +82,18 @@ seed_extension() {
 	local temp_dir="/tmp/ext_$uuid"
 	local target_path=".local/share/gnome-shell/extensions/$uuid"
 
-	echo "Seeding extension for updateability: $uuid"
+	echo -e "\nSeeding extension for updateability: $uuid\n"
 		
 	# Download and extract to a temp
 	mkdir -p "$temp_dir"
 	wget -qO "/tmp/$uuid.zip" "$zip_url"
 	unzip -qo "/tmp/$uuid.zip" -d "$temp_dir"
 
-	# Compile the schemas in the temp folder first
+	# Register extension schemas system-wide so apply_gsettings can configure them
     if [ -d "$temp_dir/schemas" ]; then
-        echo -e "\nCompiling settings for $uuid...\n"
-        glib-compile-schemas "$temp_dir/schemas"
+		echo -e "\nRegistering settings system-wide for $uuid...\n"
+		cp "$temp_dir/schemas/"*.xml /usr/share/glib-2.0/schemas/
+        glib-compile-schemas /usr/share/glib-2.0/schemas/
     fi
 
 	# Copy to skel and current user if POST

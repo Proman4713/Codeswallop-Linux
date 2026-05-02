@@ -4,6 +4,18 @@ Container for all configurations, extensions, or experiments done to Ubuntu Desk
 
 Currently **not** designed or prepared for personal usage by anyone other than myself. I claim no liability over anything this project may do to your system as of now.
 
+### Table Of Contents
+- [Quick Start](#quick-start)
+- [Support me](#support-me)
+- [Structure](#structure)
+- [Plan](#plan)
+	- [Ubuntu-adjacent](#ubuntu-adjacent)
+	- [Ubuntu-reliant](#ubuntu-reliant)
+	- [Ubuntu-independent](#ubuntu-independent)
+- [Why?](#why)
+- [Rights & Licensing](#rights--licensing)
+- [Contributing](#contributing)
+
 ## Quick Start
 - Status: Early development (Ubuntu-adjacent)
 - Target OS: Ubuntu 26.04 LTS for Intel and AMD CPUs
@@ -71,6 +83,13 @@ I hope I've explained myself well.
 ## Rights & Licensing
 * This project is licensed under the well-known GPL v3, which includes all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md)
 * On the other hand, media files available at [`resources/`](resources/) are license using Creative Commons. License available at [`resources/LICENSE.md`](resources/LICENSE.md)
+* By using this project, you also agree to the [Microsoft Core Fonts EULA](https://corefonts.sourceforge.net/eula.htm) because it is automatically accepted during the installation of LibreOffice onto your system.
+* Obviously, I do not own the rights to any of the Ubuntu logos or wallpapers used in the product system of my ISO. I do not own any rights to the Yaru theme. You get the point, I'm just not good enough to do anything about these things existing in the ISO built from this project yet ;)
+* This is also a reason why I do not promote the use of this project, it is not independent of Ubuntu yet.
 
 ## Contributing
 Contributing, for now, will be as simple as submitting an Issue or PR with a good description and valuable information. I currently see no need to restrict how contributions should be made.
+
+This code, mostly due to my own initial incapability to understand certain things, contains AI-written code/comments that may not be optimal. I intend to rewrite them before I consider this project ready for release.
+
+Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise that I care about a user's first-time, zero-knowledge experience, something that Windows ironically does not do well.

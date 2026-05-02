@@ -91,8 +91,8 @@ apply_gsettings \
 apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source|['<Alt>Shift_L']"
 apply_gsettings "org.gnome.desktop.wm.keybindings|switch-input-source-backward|['<Primary><Alt>Shift_L']"
 
-# Muscle Memory: Windows users use Win+Shift+S to open the Snipping Tool
-apply_gsettings "org.gnome.shell.keybindings|show-screenshot-ui|['<Shift><Super>s']"
+# Muscle Memory: Windows users use Win+Shift+S to open the Snipping Tool, not just PrtScr
+apply_gsettings "org.gnome.shell.keybindings|show-screenshot-ui|['<Shift><Super>s', 'Print']"
 
 # GNOME sometimes bugs certain extensions, like Hide Top Bar, that perfectly work with extension validation disabled
 apply_gsettings "org.gnome.shell|disable-extension-version-validation|true"
@@ -106,15 +106,15 @@ apply_gsettings "org.gnome.desktop.interface|enable-hot-corners|true"
 # Show Battery % in Top Bar
 apply_gsettings "org.gnome.desktop.interface|show-battery-percentage|true"
 
-# Set time to AM/PM. 24-hour users understand the time immediately when they see it in 12-hour, and they can change it. But for 12-hour users, it takes more friction
-#	for them to read the time if its 24-hour, so we set it to AM/PM.
-apply_gsettings "org.gnome.desktop.interface|clock-format|12h"
+# Set time to AM/PM. 24-hour users would understand the time immediately if it's in 12-hour OOBE, and they can change it. But for 12-hour users, it would take
+#	more friction for them to read the time if its 24-hour OOBE, so we set it to AM/PM.
+apply_gsettings "org.gnome.desktop.interface|clock-format|'12h'"
 
 # Show week day
 apply_gsettings "org.gnome.desktop.interface|clock-show-weekday|true"
 
 #! Enable eyesight reminders, debatable on whether this is a good idea
-apply_gsettings "org.gnome.desktop.break-reminders.eyesight|enabled|true"
+apply_gsettings "org.gnome.desktop.break-reminders|selected-breaks|['eyesight']"
 apply_gsettings "org.gnome.desktop.break-reminders.eyesight|notify|true"
 apply_gsettings "org.gnome.desktop.break-reminders.eyesight|interval-seconds|1200" # 20 minutes
 
@@ -133,17 +133,9 @@ apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'b
 # Mouse acceleration
 apply_gsettings "org.gnome.desktop.peripherals.mouse|accel-profile|'flat'"
 
-# Force DING to use the top-right and auto-arrange
+# Force DING to use the top-right
 apply_gsettings "org.gnome.shell.extensions.ding|start-corner|'top-right'"
-apply_gsettings "org.gnome.shell.extensions.ding|auto-arrange-icons|true"
-
-# POST-INSTALL: Reset the icon positions to force them to snap to the new corner
-if [ "$ENV_MODE" == "POST" ]; then
-    # Clear the saved coordinates so the corner setting takes over
-    sudo -u "$TARGET_USER" dconf reset /org/gnome/shell/extensions/ding/icon-state || true
-    # Restart the background process to apply changes immediately
-    pkill -f "ding.js" || true
-fi
+apply_gsettings "org.gnome.shell.extensions.ding|show-trash|true"
 
 # Startup sound
 create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
