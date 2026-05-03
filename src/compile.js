@@ -37,7 +37,7 @@ files.forEach(file => {
 		{ encoding: "utf-8" },
 	);
 
-	if (!file.endsWith(".sh") || !content) {
+	if (!file.endsWith(".bash") || !content) {
 		console.log(Colours.yellow(`Skipping ${file}...`));
 		return;
 	};
