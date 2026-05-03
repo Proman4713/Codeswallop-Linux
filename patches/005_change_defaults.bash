@@ -44,33 +44,33 @@ EOF
 )"
 
 # Default Wallpapers
-WP_DIR="/usr/share/backgrounds/codeswallop"
+WP_DIR="/usr/share/backgrounds/utile"
 PROP_DIR="/usr/share/gnome-background-properties"
 mkdir -p "$WP_DIR" "$PROP_DIR"
 
-wget -qO "$WP_DIR/light.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Light.png"
-wget -qO "$WP_DIR/dark.jpg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Codeswallop%20Linux%20Wallpaper%20Dark.png"
+wget -qO "$WP_DIR/abstract-bright.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20OS%20Abstract%20Wallpaper%20Bright.png"
+wget -qO "$WP_DIR/abstract-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20OS%20Abstract%20Wallpaper%20Dark.png"
 
 #! XML file content got through Google & AI, not truly reliable
 cat << EOF > "$WP_DIR/adaptive.xml"
 <?xml version="1.0"?><!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-<wallpapers><wallpaper deleted="false"><name>Codeswallop Adaptive</name><filename>$WP_DIR/light.jpg</filename><filename-dark>$WP_DIR/dark.jpg</filename-dark><options>zoom</options><shade_type>solid</shade_type><pcolor>#000</pcolor><scolor>#000</scolor></wallpaper></wallpapers>
+<wallpapers><wallpaper deleted="false"><name>Utile Abstract Adaptive</name><filename>$WP_DIR/abstract-bright.png</filename><filename-dark>$WP_DIR/abstract-dark.png</filename-dark><options>zoom</options><shade_type>solid</shade_type><pcolor>#000</pcolor><scolor>#000</scolor></wallpaper></wallpapers>
 EOF
 
-cat << EOF > "$PROP_DIR/codeswallop-wallpapers.xml"
+cat << EOF > "$PROP_DIR/utile-wallpapers.xml"
 <?xml version="1.0"?><!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>
-  <wallpaper deleted="false"><name>Codeswallop (Auto)</name><filename>$WP_DIR/light.jpg</filename><filename-dark>$WP_DIR/dark.jpg</filename-dark><options>zoom</options></wallpaper>
-  <wallpaper deleted="false"><name>Codeswallop (Light)</name><filename>$WP_DIR/light.jpg</filename><options>zoom</options></wallpaper>
-  <wallpaper deleted="false"><name>Codeswallop (Dark)</name><filename>$WP_DIR/dark.jpg</filename><options>zoom</options></wallpaper>
+  <wallpaper deleted="false"><name>Utile Abstract (Auto)</name><filename>$WP_DIR/abstract-bright.png</filename><filename-dark>$WP_DIR/abstract-dark.png</filename-dark><options>zoom</options></wallpaper>
+  <wallpaper deleted="false"><name>Utile Abstract (Bright)</name><filename>$WP_DIR/abstract-bright.png</filename><options>zoom</options></wallpaper>
+  <wallpaper deleted="false"><name>Utile Abstract (Dark)</name><filename>$WP_DIR/abstract-dark.png</filename><options>zoom</options></wallpaper>
 </wallpapers>
 EOF
 
 chmod 644 "$WP_DIR"/* "$PROP_DIR"/*
 
 apply_gsettings \
-	"org.gnome.desktop.background|picture-uri|'file://$WP_DIR/light.jpg'" \
-	"org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/dark.jpg'"
+	"org.gnome.desktop.background|picture-uri|'file://$WP_DIR/abstract-bright.png'" \
+	"org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/abstract-dark.png'"
 
 # Ubuntu
 	# Wartybrown theme

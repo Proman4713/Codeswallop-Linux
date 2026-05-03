@@ -20,13 +20,13 @@ if (!isZsh && !isBash) {
 	process.exit(1);
 }
 
-const CODESWALLOP_LINUX_VERSION = version.endsWith(".0") ? version.slice(0, -2) : version;
+const UTILE_OS_VERSION = version.endsWith(".0") ? version.slice(0, -2) : version;
 
-console.log(Colours.yellow(`Compiling bash patches for Codeswallop Linux ${CODESWALLOP_LINUX_VERSION} into production script...\n`));
+console.log(Colours.yellow(`Compiling bash patches for Utile OS ${UTILE_OS_VERSION} into production script...\n`));
 
 // initiate 'compiled' script with shebang and greeting
 let compiledScript = `#!/bin/bash
-echo "${Colours.brightGreen("Setting up Codeswallop Linux...")}"`;
+echo "${Colours.brightGreen("Setting up Utile OS...")}"`;
 
 // read all .sh files in /patches directory
 const files = fs.readdirSync(path.join(__dirname, "..", "patches"));
@@ -48,7 +48,7 @@ files.forEach(file => {
 // add closing message
 compiledScript += `
 
-echo "${Colours.brightGreen("Codeswallop Linux has finished setting up! Please reboot your system before using it.")}"`;
+echo "${Colours.brightGreen("Utile OS has finished setting up! Please reboot your system before using it.")}"`;
 
 const now = new Date();
 // Jan 1st
@@ -62,29 +62,29 @@ const dayLetter = letters[now.getDay()];
 console.log(`WEEK DAY: ${now.getDay()} == ${now.toLocaleDateString("en-US", { weekday: "long" })}`);
 
 /*
-	Example Nightly:	codeswallop-linux-26.04-nightly-26w18a
-	Example Beta:		codeswallop-linux-26.04-v1.0.0-beta1
-	Example Release:	codeswallop-linux-26.04-v1.0.0
+	Example Nightly:	utile-os-26.04-nightly-26w18a
+	Example Beta:		utile-os-26.04-v1.0.0-beta1
+	Example Release:	utile-os-26.04-v1.0.0
 */
 const SCRIPT_VERSION = process.env.BUILD_TYPE === "release" && process.env.GITHUB_REF_NAME
-						? `${CODESWALLOP_LINUX_VERSION}-${process.env.GITHUB_REF_NAME}`
-						: `${CODESWALLOP_LINUX_VERSION}-nightly-${now.getFullYear().toString().slice(-2)}w${weekNumber.toString().padStart(2, "0")}${dayLetter}`;
+						? `${UTILE_OS_VERSION}-${process.env.GITHUB_REF_NAME}`
+						: `${UTILE_OS_VERSION}-nightly-${now.getFullYear().toString().slice(-2)}w${weekNumber.toString().padStart(2, "0")}${dayLetter}`;
 
 fs.mkdirSync(path.join(__dirname, "..", "dist"), { recursive: true });
 
 fs.writeFileSync(
-	path.join(__dirname, "..", "dist", `codeswallop-linux-${SCRIPT_VERSION}.sh`),
+	path.join(__dirname, "..", "dist", `utile-os-${SCRIPT_VERSION}.sh`),
 	compiledScript
 )
 
-console.log(Colours.green(`\nSuccessfully compiled script into ${path.join(__dirname, "..", "dist", `codeswallop-linux-${SCRIPT_VERSION}.sh`)}!`));
+console.log(Colours.green(`\nSuccessfully compiled script into ${path.join(__dirname, "..", "dist", `utile-os-${SCRIPT_VERSION}.sh`)}!`));
 
 // spawn child sudo process to run chmod
-const child = spawn("sudo", ["chmod", "+x", path.join(__dirname, "..", "dist", `codeswallop-linux-${SCRIPT_VERSION}.sh`)], {
+const child = spawn("sudo", ["chmod", "+x", path.join(__dirname, "..", "dist", `utile-os-${SCRIPT_VERSION}.sh`)], {
 	stdio: "inherit"
 });
 child.on('close', (code) => {
 	console.log((code === 0 ? Colours.green : Colours.yellow)(`chmod exited with code ${code}`));
-	console.log(`codeswallop-linux-${SCRIPT_VERSION}.sh`);
+	console.log(`utile-os-${SCRIPT_VERSION}.sh`);
 	process.exit(0);
 });

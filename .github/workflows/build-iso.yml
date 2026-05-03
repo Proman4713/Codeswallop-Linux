@@ -1,4 +1,4 @@
-name: Build Codeswallop Linux 26.04 ISO
+name: Build Utile OS 26.04 ISO
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
           # Run the compilation script
           SH_NAME=$(node . | tail -n 1)
 
-          TEMP_NAME=${SH_NAME#codeswallop-linux-}
+          TEMP_NAME=${SH_NAME#utile-os-}
           TAG_NAME=${TEMP_NAME%.sh}
           ISO_NAME="${SH_NAME%.sh}.iso"
 
@@ -125,13 +125,13 @@ jobs:
       - name: Apply Custom Disk Metadata
         run: |
           # Matches: Disk Name and Release
-          echo 'Codeswallop 26.04 amd64 "Resolute Raccoon" - Release amd64 (20260430)' | sudo tee custom-iso/.disk/info
+          echo 'Utile 26.04 amd64 "Abstract Assembly" - Release amd64 (20260430)' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
           echo 'https://github.com/Proman4713/Codeswallop-Linux/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
           
           # Set the Version marker
-          echo '2026.04.30' | sudo tee custom-iso/.disk/codeswallop_version
+          echo '2026.04.30' | sudo tee custom-iso/.disk/utile_version
 
       - name: Re-compress Root Filesystem
         run: |
@@ -174,7 +174,7 @@ jobs:
           sudo xorriso -as mkisofs \
             -iso-level 3 \
             -full-iso9660-filenames \
-            -volid "Codeswallop 26.04 amd64" \
+            -volid "Utile 26.04 amd64" \
             -eltorito-boot boot/grub/i386-pc/eltorito.img \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
             --eltorito-catalog boot.catalog \
@@ -192,7 +192,7 @@ jobs:
         uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: ${{ env.TAG_NAME }}
-          name: Codeswallop Linux ${{ env.TAG_NAME }}
+          name: Utile OS ${{ env.TAG_NAME }}
           files: |
             dist/${{ env.SH_NAME }}
           # Automatically mark as pre-release if it's a nightly or beta
