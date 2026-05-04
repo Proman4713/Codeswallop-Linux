@@ -53,7 +53,7 @@ jobs:
 
       - name: Download Base Ubuntu 26.04 ISO
         run: |
-          wget -q -O base-ubuntu-26.04.iso https://mirrors.mit.edu/ubuntu-releases/resolute/ubuntu-26.04-desktop-amd64.iso
+          wget -q -O base-ubuntu-26.04.iso https://releases.ubuntu.com/resolute/ubuntu-26.04-desktop-amd64.iso
 
       - name: Extract Base ISO
         run: |
@@ -80,6 +80,7 @@ jobs:
         run: |
           ls -la custom-iso/casper/
 
+      # TODO: Update INITRD to not try to mount the deleted squashfs
       - name: Inspect and Prune Extended Installation
         run: |
           echo "--- ORIGINAL install-sources.yaml ---"
