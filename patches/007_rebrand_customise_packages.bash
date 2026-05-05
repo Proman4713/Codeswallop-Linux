@@ -31,8 +31,8 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	fi
 
 	# Release Info
-	sudo rm -rf /etc/os-release
-	sudo rm -rf /usr/lib/os-release
+	sudo rm -f /etc/os-release
+	sudo rm -f /usr/lib/os-release
 
 	# TODO: make utile-os-release debian package OR base-files and lsb/lsb-release forks from upstream
 	cat <<EOF | sudo tee /usr/lib/os-release
@@ -52,7 +52,7 @@ LOGO=utile-logo
 EOF
 	sudo ln -srf /usr/lib/os-release /etc/os-release
 
-	sudo rm -rf /etc/lsb-release
+	sudo rm -f /etc/lsb-release
 	cat <<EOF | sudo tee /etc/lsb-release
 DISTRIB_ID=UtileOS
 DISTRIB_RELEASE=26.04
