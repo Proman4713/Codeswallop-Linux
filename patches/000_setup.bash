@@ -47,18 +47,33 @@ create_or_update_file_in_home() {
 	fi
 }
 
+mkdir -p /etc/dconf/profile
+touch /etc/dconf/profile/user
+echo "user-db:user" > /etc/dconf/profile/user
+echo "system-db:local" >> /etc/dconf/profile/user
+
 # `gsettings` command alternative to set both system-wide and current user defaults
 # Usage: apply_gsettings <schema> <key> <value>
 apply_gsettings() {
 	local settings=("$@")
 	[[ ${#settings[@]} -eq 0 ]] && return
 		
-	local override_file="/usr/share/glib-2.0/schemas/90_custom_defaults.gschema.override"
+	local override_file="/usr/share/glib-2.0/schemas/zz99_utile_os_defaults.gschema.override"
+	local dconf_override="/etc/dconf/db/local.d/zz99_utile_os_defaults"
+
+	mkdir -p "$(dirname "$dconf_override")"
+	if ! [ -f "$dconf_override" ]; then
+		touch "$dconf_override"
+	fi
 	echo "Applying GSettings..."
 
 	for entry in "${settings[@]}"; do
 		# Split string by pipe character: schema|key|value
 		IFS='|' read -r schema key value <<< "$entry"
+
+		local schemaReplaceDotWithSlash="${schema//./\/}"
+		echo -e "\n[$schemaReplaceDotWithSlash]" >> "$dconf_override"
+		echo "$key=$value" >> "$dconf_override"
 		
 		# System-wide Override
 		echo -e "\n[$schema]" >> "$override_file"
@@ -70,9 +85,6 @@ apply_gsettings() {
 			gsettings set "$schema" "$key" "$value" || true
 		fi
 	done
-
-	echo "Compiling GLib schemas..."
-	glib-compile-schemas /usr/share/glib-2.0/schemas/
 }
 
 # Usage: seed_extension "UUID" "ZIP_URL"

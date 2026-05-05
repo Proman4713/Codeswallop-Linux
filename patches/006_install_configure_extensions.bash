@@ -138,3 +138,10 @@ apply_gsettings "org.gnome.shell|enabled-extensions|['hidetopbar@mathieu.bidon.c
 
 apt-get autoremove -y --purge
 apt-get clean
+rm -rf /var/lib/apt/lists/*
+
+echo "Compiling GLib schemas..."
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+echo "Updating Dconf"
+dconf update

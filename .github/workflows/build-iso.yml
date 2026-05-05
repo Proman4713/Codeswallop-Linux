@@ -222,7 +222,8 @@ jobs:
           curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}" -F "folderId=d96e59a5-9121-4b18-9bb4-4a6228e66bcd" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"
           
           # calculate sha256 checksum
-          echo $(sha256sum ${{ env.ISO_NAME }} | awk '{print $1}') | sudo tee ${{ env.ISO_NAME.iso }}.sha256sum
+          sha256sum ${{ env.ISO_NAME }} > ${{ env.ISO_NAME }}.sha256sum
+          echo "sha256sum: $(cat ${{ env.ISO_NAME }}.sha256sum)"
           
           # Upload checksum to Gofile
           curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}.sha256sum" -F "folderId=d96e59a5-9121-4b18-9bb4-4a6228e66bcd" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"
