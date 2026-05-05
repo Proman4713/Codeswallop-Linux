@@ -48,8 +48,8 @@ WP_DIR="/usr/share/backgrounds/utile"
 PROP_DIR="/usr/share/gnome-background-properties"
 mkdir -p "$WP_DIR" "$PROP_DIR"
 
-wget -qO "$WP_DIR/abstract-bright.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20OS%20Abstract%20Wallpaper%20Bright.png"
-wget -qO "$WP_DIR/abstract-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20OS%20Abstract%20Wallpaper%20Dark.png"
+wget -qO "$WP_DIR/abstract-bright.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/media/Utile%20OS%20Abstract%20Wallpaper%20Bright.png"
+wget -qO "$WP_DIR/abstract-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/media/Utile%20OS%20Abstract%20Wallpaper%20Dark.png"
 
 #! XML file content got through Google & AI, not truly reliable
 cat << EOF > "$WP_DIR/adaptive.xml"
