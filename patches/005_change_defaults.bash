@@ -122,10 +122,10 @@ apply_gsettings "org.gnome.desktop.break-reminders.eyesight|interval-seconds|120
 apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
 
 # Remove IBus emoji keybind (Super + .) to leave room for the 'All-In-One Clipboard' extension we're going to install
-apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|[]"
+apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|@as []"
 
 # Remove the notification/calendar tray keybind (Super + v) to leave room for 'All-In-One Clipboard'
-apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|[]"
+apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|@as []"
 
 # Default pinned apps
 apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'org.gnome.Settings.desktop']"
