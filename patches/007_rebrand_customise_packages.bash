@@ -53,10 +53,18 @@ EOF
 
 	# Add utile-logo
 	# TODO: Make that a debian package
-	wget -qO "/usr/share/pixmaps/utile-logo.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Square%20Logo.svg"
+	download_logo() {
+		local dest="$1" url="$2"
+		if ! wget -qO "$dest" "$url"; then
+			echo "Error: Failed to download $url" >&2
+			exit 1
+		fi
+	}
+
+	download_logo "/usr/share/pixmaps/utile-logo.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Square%20Logo.svg"
 	# For GNOME Control Centre (https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/system/about/cc-about-page.c?ref_type=heads):
-	wget -qO "/usr/share/pixmaps/utile-logo-text.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	wget -qO "/usr/share/pixmaps/utile-logo-text.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
-	wget -qO "/usr/share/pixmaps/utile-logo-text-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	wget -qO "/usr/share/pixmaps/utile-logo-text-dark.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
+	download_logo "/usr/share/pixmaps/utile-logo-text.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
+	download_logo "/usr/share/pixmaps/utile-logo-text.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
+	download_logo "/usr/share/pixmaps/utile-logo-text-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
+	download_logo "/usr/share/pixmaps/utile-logo-text-dark.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
 fi
