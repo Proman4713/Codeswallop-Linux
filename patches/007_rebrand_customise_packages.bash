@@ -34,6 +34,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	sudo rm -rf /etc/os-release
 	sudo rm -rf /usr/lib/os-release
 
+	# TODO: make utile-os-release debian package OR base-files and lsb/lsb-release forks from upstream
 	cat <<EOF | sudo tee /usr/lib/os-release
 PRETTY_NAME="Utile OS 26.04"
 NAME="utile"
@@ -51,8 +52,16 @@ LOGO=utile-logo
 EOF
 	sudo ln -srf /usr/lib/os-release /etc/os-release
 
+	sudo rm -rf /etc/lsb-release
+	cat <<EOF | sudo tee /etc/lsb-release
+DISTRIB_ID=UtileOS
+DISTRIB_RELEASE=26.04
+DISTRIB_CODENAME=abstract
+DISTRIB_DESCRIPTION="Utile OS 26.04"
+EOF
+
 	# Add utile-logo
-	# TODO: Make that a debian package
+	# TODO: make utile-os-logos debian package OR replace base-files as well
 	download_logo() {
 		local dest="$1" url="$2"
 		if ! wget -qO "$dest" "$url"; then
