@@ -43,10 +43,10 @@ VERSION="26.04 (Abstract Assembly)"
 VERSION_CODENAME=abstract
 ID=utile
 ID_LIKE="ubuntu debian"
-HOME_URL="https://github.com/Proman4713/Codeswallop-Linux"
-SUPPORT_URL="https://github.com/Proman4713/Codeswallop-Linux/issues"
-BUG_REPORT_URL="https://github.com/Proman4713/Codeswallop-Linux/issues"
-PRIVACY_POLICY_URL="https://github.com/Proman4713/Codeswallop-Linux/blob/main/LICENSE.md"
+HOME_URL="https://github.com/Proman4713/Utile-OS"
+SUPPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
+BUG_REPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
+PRIVACY_POLICY_URL="https://github.com/Proman4713/Utile-OS/blob/main/LICENSE.md"
 UBUNTU_CODENAME=resolute
 LOGO=utile-logo
 EOF
@@ -70,10 +70,10 @@ EOF
 		fi
 	}
 
-	download_logo "/usr/share/pixmaps/utile-logo.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Square%20Logo.svg"
+	download_logo "/usr/share/pixmaps/utile-logo.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Square%20Logo.svg"
 	# For GNOME Control Centre (https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/system/about/cc-about-page.c?ref_type=heads):
-	download_logo "/usr/share/pixmaps/utile-logo-text.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	download_logo "/usr/share/pixmaps/utile-logo-text.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
-	download_logo "/usr/share/pixmaps/utile-logo-text-dark.png" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	download_logo "/usr/share/pixmaps/utile-logo-text-dark.svg" "https://raw.githubusercontent.com/Proman4713/Codeswallop-Linux/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
+	download_logo "/usr/share/pixmaps/utile-logo-text.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
+	download_logo "/usr/share/pixmaps/utile-logo-text.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
+	download_logo "/usr/share/pixmaps/utile-logo-text-dark.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
+	download_logo "/usr/share/pixmaps/utile-logo-text-dark.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
 fi

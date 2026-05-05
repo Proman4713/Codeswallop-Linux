@@ -1,0 +1,95 @@
+[![Build Codeswallop Linux 26.04 ISO](https://github.com/Proman4713/Codeswallop-Linux/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Codeswallop-Linux/actions/workflows/build-iso.yml)
+# Codeswallop-Linux
+Container for all configurations, extensions, or experiments done to Ubuntu Desktop while I prepare my Linux video essays at https://youtube.com/@lots_of_codeswallop
+
+Currently **not** designed or prepared for personal usage by anyone other than myself. I claim no liability over anything this project may do to your system as of now.
+
+### Table Of Contents
+- [Quick Start](#quick-start)
+- [Support me](#support-me)
+- [Structure](#structure)
+- [Plan](#plan)
+	- [Ubuntu-adjacent](#ubuntu-adjacent)
+	- [Ubuntu-reliant](#ubuntu-reliant)
+	- [Ubuntu-independent](#ubuntu-independent)
+- [Why?](#why)
+- [Rights & Licensing](#rights--licensing)
+- [Contributing](#contributing)
+
+## Quick Start
+- Status: Early development (Ubuntu-adjacent)
+- Target OS: Ubuntu 26.04 LTS for Intel and AMD CPUs
+- Target Audience: Ubuntu, Windows 11, macOS users
+- Usage: Run compiled script or install ISO to get an enhanced version of Ubuntu with quality-of-life and aesthetic improvements
+- Minimum Requirements:
+	1. My ISO is actually smaller than the standard Ubuntu ISO due to several unnecessary packages being removed, so the requirement for the bootable USB matches Ubuntu's **8GB** minimum.
+	3. The Disk storage usage may be higher due to LibreOffice being included in the minimal (and only) installation option. The requirement, however, isn't lifted from upstream's **25GB** minimum due to it including the Extended Selection as well.
+	4. No additional services have been added to the ISO, so the RAM requirement also matches upstream's **6GB** recommended.
+	5. VRAM consumption is slightly higher due to the Blur My Shell extension, but this extension is disabled by default.
+
+## Support me
+If you find this project useful, or used my wallpapers for your desktop, then please consider [buying me a coffee](https://buymeacoffee.com/codeswallop) :)
+
+## Structure
+This repository is designed to follow a 'patch-like' system, similar to how Canonical applies git .patch files to modify GNOME shell and Mutter. In practice, this means that each task is split into its own 'patch' .sh script. Additionally, the .sh scripts work in a 'scaffolding' design rather than an 'importing' design. Essentially meaning that each script is designed to install packages, edit individual settings, and make configurations step-by-step to better handle changes that are made in Ubuntu, GNOME, GNOME extensions, or anything else (including the possibility that a user may have customised their setup before running my script), by not brute forcing configs or dconf dumps onto the system.
+
+The patches can be 'compiled' in two ways:
+1. Through the NodeJS codebase (used in a GitHub workflow), which generates one big .sh file that is essentially a merge of all the individual 'patch' .sh files. This allows the entire project to be usable by someone in one terminal command, but also keeps it modular and easy to modify/contribute to. The 'compiled' .sh script is automatically uploaded to GitHub releases.
+2. Through a custom Linux ISO, also built during the GitHub workflow, created by downloading the official Ubuntu ISO and applying the patches there. Additionally, other processes are run to make it more distinguishable from a regular Ubuntu ISO, although it still is **not** completely out of the scope of Canonical's trademarks, which is something that needs to change before this project is ready for distribution. The ISO is currently not uploaded to GitHub releases due to its file size, but it will hopefully be accessible sometime in the future.
+
+A few things that need to be clear:
+* This repository builds on top of Ubuntu Desktop, as it is, in my opinion, a balanced distribution, as well as the closest distribution to what I'm trying to achieve. This is **not** an independent distribution, **nor** is it standard Ubuntu desktop. This is somewhere in-between, and should be treated as such.
+* The script(s) in this repository assume that it is the first thing you run on your system, many of your customisations may be overridden.
+* The script(s) assume a specific Ubuntu version. Again, even though the patch-like approach should avoid issues with upgrading. The project is not intended to work on any Ubuntu version older than Ubuntu 26.04 LTS.
+* The script(s) assume a Minimal/Default Ubuntu installation. If you chose the `Extended` option and used this project after installing your system, or chose `Extended` while installing one of my ISOs, then know that you are in untested territory.
+* If you are using the .sh version of this project, know that the script will modify both user configurations and system defaults. If you are using the ISO version, everything is already set up and ready to go. In both cases, a README will be added to your desktop for post-installation instructions.
+* The shell scripting in this repository is not designed to be [idempotent](https://en.wikipedia.org/wiki/Idempotence) as of now.
+* This project hasn't been tested with offline Ubuntu installations
+
+## Plan
+In an ideal world, this would be its own Linux distribution. But the skill, responsibility, and resources needed to achieve that obviously make it a task better left for those who can handle it (i.e. distribution maintainers). But, if I were to lay out a long-term plan that assumes unlimited resources, it would go like this:
+
+### Ubuntu-adjacent
+This is essentially what this repository, or 'Codeswallop Linux', is right now. A set of configurations, extensions, and high-level additions to the base Ubuntu Desktop that should keep things like smooth Ubuntu version upgrades without relying on me making my project up-to-date with the latest Ubuntu version. Basically, it's a project that runs *adjacent* to Ubuntu's development with no disruption to its users.
+
+### Ubuntu-reliant
+This is where, possibly, I - or anyone else working on this - will have made my own GTK/Libadwaita Apps to act as one-stop destinations to configure the things I add/make, my own forks of certain GNOME extensions, changes to system apps, etcetera.
+
+This is where it starts to look more like a distribution. However, I outlined this stage because it is technically possible that the skill required to achieve these tasks is available without the resources required to make it a complete distribution. This is when I would probably shift to ISO-only (no .sh script), make Ubuntu upgrades disabled by default, and make some CLI or app that allows users to upgrade once I actually sync the project with changes 'upstream' (i.e., stock Ubuntu).
+
+### Ubuntu-independent
+This is the very unlikely stage where custom infrastructure should start to be added/made to turn this into an independent Ubuntu-*based* distribution. Customisations to the GNOME desktop, shell, Mutter, system apps, and other things that would essentially require separate package repositories from the Ubuntu ones. This is where the hurdles of an Ubuntu-reliant setup, like managing upgrades, would simply become part of the new distribution's release cycle.
+
+Now, what the name of this 'distribution' should be, if not 'Codeswallop Linux'... I've got absolutely no idea.<br />
+But that is, essentially, the ultimate goal...
+
+## Why?
+'Codeswallop Linux' is not a real name meant to one day be said alongside 'Ubuntu', 'Linux Mint' or 'Fedora'. Codeswallop is simply the name of my YouTube channel, and it's also a joke. But, before the end of this year, I plan to release a series of video essays related to Linux system and user experience design to research and address various pain points (tiny or large) in the Linux desktop - particularly Ubuntu as a starting point - that slowly accumulate to cause a total result of frustration for a user transitioning from another OS. This is why I'm naming this project after my YouTube channel. I've personally seen some less eagle-eyed users of other OSs simply feel that there's 'something wrong' with the standard Ubuntu Desktop without being able to pinpoint many individual problems.
+
+The YouTube videos are meant to talk from a technically-free perspective, meaning that I'm going to provide my points on what could be done to solve a problem without always looking into why it is - or isn't - realistic from a technical/backend perspective, this gives me more opportunity to address the significant majority of pain points as much as I can from a UX perspective, so that my points could theoretically help a technical organisation know what's _recommended_ to do, but then let *them* think about technical possibilities or implementations to determine what is worth pursuing first.
+
+In the meantime, I'm going to act as that theoretical organisation, and will use this repository to create 'patches' that I find are easy enough for me to implement before, during, or after the production of my YouTube video essays.
+
+Personally, I think Ubuntu is one of the most end-user compatible distributions out there. And I'd like to keep this a technical rather than a philosophical point of view.
+If you're used to another distribution, desktop environment, or packaging solution, then this project is most likely not going to suit you. If, however, you don't like Ubuntu for philosophical or political reasons, then your opinion may not affect this project at all, since the only philosophy behind it is: 'my dad should be able to use it without frustration.' And my dad definitely doesn't use middle-click paste.
+
+Back to the point at hand: While Ubuntu is a very suitable starting point for end users, it - and many other distributions - often lack things that would seem trivial to a Windows or macOS user, regardless of the actual technical complications behind them.
+I'm saying this as someone who transitioned to Ubuntu twice: Once from Windows 10 and again from 11. My aim with this project is to try to provide a much better starting point *without* compressing myself into Windows 10, 11 or macOS territory, which is something that some distributions or desktop environments often do to immediately appeal to users of such operating systems. It's okay for Ubuntu or GNOME to have a unique design language and 'feel' to their user experience. But what I also don't want, though, is for Linux desktop - or this one specifically - to be buried under years of accumulated Power-User defaults and assumptions, or usage patterns and muscle memory configurations that completely break the expectations of Windows or macOS users. With Windows specifically being a main target, since macOS users usually have to re-learn certain things anyway when they transition to PC due to the slightly different keyboard layout on Apple devices.
+
+This will most likely inevitably cause an increase in system resource consumption or a decrease in power efficiency over other Linux desktops. But my argument there is that whatever 'Codeswallop Linux' does, its resource usage will be far less than that of Windows (I do not use Apple devices often enough to provide a comparison there), for instance. But it should still be capable of looking and feeling just as good or maybe even better than other OSs. Resource consumption increase is inevitable given enough time, what with browsers and Electron apps eating up more RAM, and design and graphics standards becoming so that a modern UI, by Windows and especially macOS expectations, needs more resources than some of the current Linux desktops.
+
+I hope I've explained myself well.
+
+## Rights & Licensing
+* This project is licensed under the well-known GPL v3, which includes all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md)
+* On the other hand, media files available at [`resources/`](resources/) are license using Creative Commons. License available at [`resources/LICENSE.md`](resources/LICENSE.md)
+* By using this project, you also agree to the [Microsoft Core Fonts EULA](https://corefonts.sourceforge.net/eula.htm) because it is automatically accepted during the installation of LibreOffice onto your system.
+* Obviously, I do not own the rights to any of the Ubuntu logos or wallpapers available in the my produced ISO. I also do not own any rights to the Yaru theme. You get the point, I'm just not good enough to do anything about these things existing in this project yet ;)
+* This is also a reason why I do not promote the use of this project, as it is not independent of Ubuntu and may cause confusion to anyone who happens to use it due to the abundance of Ubuntu references. This, of course, needs to be changed before the project is 'released' (i.e. the ISO is easy to access, presented as a complete product, etcetera).
+
+## Contributing
+Contributing, for now, will be as simple as submitting an Issue or PR with a good description and valuable information. I currently see no need to restrict how contributions should be made.
+
+This code, mostly due to my own initial incapability to understand certain things, contains AI-written code/comments that may not be optimal. I intend to rewrite them before I consider this project ready for release.
+
+Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise that I care about a user's first-time, zero-knowledge experience, something that Windows ironically does not do well.

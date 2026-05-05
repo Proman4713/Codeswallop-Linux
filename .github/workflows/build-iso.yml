@@ -175,7 +175,7 @@ jobs:
           echo 'Utile OS 26.04 "Abstract Assembly" - Release amd64 (${{ env.TAG_NAME }})' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
-          echo 'https://github.com/Proman4713/Codeswallop-Linux/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
+          echo 'https://github.com/Proman4713/Utile-OS/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
 
       - name: Re-compress Root Filesystem
         run: |
