@@ -15,7 +15,7 @@ desktop-color: "#000"
 	width=40%
 	height=60%
 	left=30% # (100 - 40) / 2
-	top=25% # (100 - 60) / 2
+	top=25%
 	item_color="#aaa"
 	item_font="Ubuntu Sans Bold 20"
 	selected_item_font="Ubuntu Sans ExtraBold Regular 20"
@@ -33,5 +33,5 @@ desktop-color: "#000"
 	text="Booting in %d"
 	font="Ubuntu Sans Bold 18"
 	color="#fff"
-	align=center
+	align="center"
 }

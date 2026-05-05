@@ -125,17 +125,17 @@ jobs:
           sudo cp grub/theme.txt squashfs-root/usr/share/grub/themes/utile/
 
           sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
-          sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons
+          sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
 
           sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/fonts
-          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/fonts
+          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/fonts 2>/dev/null || true
 
           # Live USB
           sudo mkdir -p custom-iso/boot/grub/themes/utile
           sudo cp -r grub/theme.txt custom-iso/boot/grub/themes/utile/
 
           sudo mkdir -p custom-iso/boot/grub/themes/utile/icons
-          sudo cp -r grub/icons/* custom-iso/boot/grub/themes/utile/icons
+          sudo cp -r grub/icons/* custom-iso/boot/grub/themes/utile/icons 2>/dev/null || true
 
           sudo mkdir -p custom-iso/boot/grub/fonts
           sudo cp -r grub/*.pf2 custom-iso/boot/grub/fonts/ 2>/dev/null || true
