@@ -27,7 +27,7 @@ jobs:
       - name: Install OS Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync
+          sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync rclone
 
       - name: Compile Bash Script (Node.js)
         env:
@@ -80,23 +80,42 @@ jobs:
         run: |
           ls -la custom-iso/casper/
 
-      # TODO: Update INITRD to not try to mount the deleted squashfs
+      # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
       - name: Inspect and Prune Extended Installation
         run: |
-          echo "--- ORIGINAL install-sources.yaml ---"
-          cat custom-iso/casper/install-sources.yaml
-          echo "--- END OF ORIGINAL install-sources.yaml ---"
+          echo "Replacing the standard squashfs with a symlink to save space without breaking the installer..."
 
-          # 1. Delete the standard squashfs and its associated manifests
-          echo "Pruning minimal.standard files to save ~600MB..."
-          sudo rm -fv custom-iso/casper/minimal.standard.*
+          PRIMARY_BASENAME=$(basename "${{ env.SQUASHFS_PATH }}")
 
-          # 2. Remove the "Extended Installation" profile from the installer UI
-          # yq is pre-installed on ubuntu-latest runners
-          sudo yq eval 'del(.sources[] | select(.id == "ubuntu-desktop"))' -i custom-iso/casper/install-sources.yaml
+          STANDARD_FILE=$(ls custom-iso/casper/*standard.squashfs 2>/dev/null | head -n 1)
 
-          echo "--- UPDATED install-sources.yaml ---"
-          cat custom-iso/casper/install-sources.yaml
+          if [ -n "$STANDARD_FILE" ]; then
+            STANDARD_BASENAME=$(basename "$STANDARD_FILE")
+            echo "Found standard squashfs: $STANDARD_BASENAME"
+            
+            # 1. Delete the heavy extended payload
+            sudo rm -f "custom-iso/casper/$STANDARD_BASENAME"
+            
+            # 2. Delete the old size and manifest files associated with it
+            sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.size"
+            sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.manifest"
+            
+            # 3. Create the symlinks directly inside the casper directory
+            cd custom-iso/casper/
+            
+            # Symlink the squashfs
+            sudo ln -s "$PRIMARY_BASENAME" "$STANDARD_BASENAME"
+            
+            # Symlink the size file so the installer's disk space check doesn't fail or show wrong numbers
+            sudo ln -s "${PRIMARY_BASENAME%.squashfs}.size" "${STANDARD_BASENAME%.squashfs}.size"
+            
+            cd ../../
+            
+            echo "Successfully symlinked $STANDARD_BASENAME to $PRIMARY_BASENAME"
+            ls -la custom-iso/casper/*standard*
+          else
+            echo "No standard squashfs found, skipping symlink trick."
+          fi
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
@@ -126,13 +145,10 @@ jobs:
       - name: Apply Custom Disk Metadata
         run: |
           # Matches: Disk Name and Release
-          echo 'Utile 26.04 amd64 "Abstract Assembly" - Release amd64 (20260430)' | sudo tee custom-iso/.disk/info
+          echo 'Utile 26.04 amd64 "Abstract Assembly"' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
           echo 'https://github.com/Proman4713/Codeswallop-Linux/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
-          
-          # Set the Version marker
-          echo '2026.04.30' | sudo tee custom-iso/.disk/utile_version
 
       - name: Re-compress Root Filesystem
         run: |
@@ -189,7 +205,7 @@ jobs:
             -graft-points \
             "/=$(pwd)/custom-iso"
 
-      - name: Upload Custom ISO to GitHub Releases
+      - name: Upload script to GitHub Releases
         uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: ${{ env.TAG_NAME }}
@@ -198,3 +214,10 @@ jobs:
             dist/${{ env.SH_NAME }}
           # Automatically mark as pre-release if it's a nightly or beta
           prerelease: ${{ contains(env.TAG_NAME, 'nightly') || contains(env.TAG_NAME, 'beta') }}
+
+      - name: Upload ISO to Gofile.io
+        env:
+          GOFILE_KEY: ${{ secrets.GOFILE_KEY }}
+        run: |
+          curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}" -F "folderId=d96e59a5-9121-4b18-9bb4-4a6228e66bcd" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"
+          
