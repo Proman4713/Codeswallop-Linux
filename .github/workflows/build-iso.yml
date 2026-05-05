@@ -64,6 +64,7 @@ jobs:
           rsync -a source-iso/ custom-iso/
           sudo umount source-iso
 
+      # TODO: Use CUBIC's trick to merge the squashfs
       - name: Extract Root Filesystem (SquashFS)
         run: |
           # Find the largest .squashfs file in the casper directory dynamically
@@ -116,6 +117,32 @@ jobs:
           else
             echo "No standard squashfs found, skipping symlink trick."
           fi
+
+      - name: Inject GRUB theme into ISO and installed system
+        run: |
+          # Installed System
+          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile
+          sudo cp grub/theme.txt squashfs-root/usr/share/grub/themes/utile/
+
+          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
+          sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons
+
+          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/fonts
+          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/fonts
+
+          # Live USB
+          sudo mkdir -p custom-iso/boot/grub/themes/utile
+          sudo cp -r grub/theme.txt custom-iso/boot/grub/themes/utile/
+
+          sudo mkdir -p custom-iso/boot/grub/themes/utile/icons
+          sudo cp -r grub/icons/* custom-iso/boot/grub/themes/utile/icons
+
+          sudo mkdir -p custom-iso/boot/grub/fonts
+          sudo cp -r grub/*.pf2 custom-iso/boot/grub/fonts/ 2>/dev/null || true
+
+          # Replace Live USB grub config
+          sudo rm -f custom-iso/boot/grub/grub.cfg 2>/dev/null || true
+          sudo cp grub/grub.installer.cfg custom-iso/boot/grub/grub.cfg
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |

@@ -1,0 +1,37 @@
+title-text: ""
+title-color: "#000"
+desktop-color: "#000"
+
++ label {
+	width=100%
+	top=20%
+	text="Boot Options"
+	color="#fff"
+	font="Ubuntu Sans Bold 24"
+	align="center"
+}
+
++ boot_menu {
+	width=40%
+	height=60%
+	left=30% # (100 - 40) / 2
+	top=25% # (100 - 60) / 2
+	item_color="#aaa"
+	item_font="Ubuntu Sans Bold 20"
+	selected_item_font="Ubuntu Sans ExtraBold Regular 20"
+	selected_item_color="#fff"
+	item_padding=10
+	item_spacing=10
+	icon_width=48
+	icon_height=48
+}
+
++ label {
+	top=80%
+	width=100%
+	id="__timeout__"
+	text="Booting in %d"
+	font="Ubuntu Sans Bold 18"
+	color="#fff"
+	align=center
+}
