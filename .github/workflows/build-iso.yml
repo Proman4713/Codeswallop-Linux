@@ -169,10 +169,10 @@ jobs:
           sudo umount squashfs-root/run
           sudo umount squashfs-root/dev
 
-      - name: Apply Custom Disk Metadata
+      - name: Apply Custom System Metadata
         run: |
           # Matches: Disk Name and Release
-          echo 'Utile 26.04 amd64 "Abstract Assembly"' | sudo tee custom-iso/.disk/info
+          echo 'Utile OS 26.04 "Abstract Assembly" - Release amd64 (${{ env.TAG_NAME }})' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
           echo 'https://github.com/Proman4713/Codeswallop-Linux/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
@@ -218,7 +218,7 @@ jobs:
           sudo xorriso -as mkisofs \
             -iso-level 3 \
             -full-iso9660-filenames \
-            -volid "Utile 26.04 amd64" \
+            -volid "Utile OS 26.04 amd64" \
             -eltorito-boot boot/grub/i386-pc/eltorito.img \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
             --eltorito-catalog boot.catalog \

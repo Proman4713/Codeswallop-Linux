@@ -58,8 +58,8 @@ apply_gsettings() {
 	local settings=("$@")
 	[[ ${#settings[@]} -eq 0 ]] && return
 		
-	local override_file="/usr/share/glib-2.0/schemas/zz99_utile_os_defaults.gschema.override"
-	local dconf_override="/etc/dconf/db/local.d/zz99_utile_os_defaults"
+	local override_file="/usr/share/glib-2.0/schemas/zz99_utile_defaults.gschema.override"
+	local dconf_override="/etc/dconf/db/local.d/zz99_utile_defaults"
 
 	mkdir -p "$(dirname "$dconf_override")"
 	if ! [ -f "$dconf_override" ]; then
