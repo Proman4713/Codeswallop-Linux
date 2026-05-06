@@ -43,5 +43,8 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	install_packages utile-wallpapers && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
 
 	# Release Info and logos
-	apt-get install --only-upgrade -y base-files
+	if ! apt-get install --only-upgrade -y base-files; then
+		echo "Error: Failed to upgrade base-files package" >&2
+		exit 1
+	fi
 fi
