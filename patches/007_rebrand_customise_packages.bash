@@ -5,6 +5,7 @@
 #	TODO: to do things like this which make this a distribution, not a project.
 
 if [ "$ENV_MODE" == "ISO" ]; then
+	# TODO: do this with debian packages
 	# New GRUB bootloader screen
 	echo -e "\nConfiguring GRUB...\n"
 
@@ -36,7 +37,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		exit 1
 	fi
 	echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main" | sudo tee /etc/apt/sources.list.d/utile.list
-	apt-get update
+	apt_get_update
 
 	# Wallpapers
 	install_packages utile-wallpapers && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*

@@ -57,6 +57,15 @@ Local development & build instructions are not yet available. Although if you re
 ## Plans
 Before starting this project, I detailed a specific plan in [an older readme](./README.old.md#plan), however, I have since realised that those plans were not realistically laid out due to various intricacies around how Ubuntu and apt/debian packages work. So this section is being repurposed for future plans.
 
+<details>
+	<summary>Plans</summary>
+	<ol>
+		<li><strike>Make my own APT repository and debian packages.</strike></li>
+		<li>Fully transition to use Debian packages (i.e. make more packages) to modify upstream rather than manually executing commands.</li>
+		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
+	</ol>
+</details>
+
 ## Why?
 Utile OS started as an idea for my YouTube channel, [Codeswallop](https://youtube.com/@lots_of_codeswallop), where I intend to publish a series of video essays based around Linux desktop system design and UX. For these videos, I'll need to research and address various pain points (tiny or large) in the Linux desktop - with Ubuntu particularly serving as a starting point - that slowly accumulate to cause a total result of inexplicable frustration for a user transitioning from another OS.
 
