@@ -1,4 +1,4 @@
-# TODO: Brave default settings, app grid layout
+# TODO: Brave default settings, app grid layout, use debian packages for GNOME settings (to allow for in-place upgrades)
 
 # Remove Rhythmbox - if its there - since we installed GNOME Music
 apt-get remove -y rhythmbox
@@ -43,44 +43,9 @@ alias neofetch="fastfetch"
 EOF
 )"
 
-# Default Wallpapers
-WP_DIR="/usr/share/backgrounds/utile"
-PROP_DIR="/usr/share/gnome-background-properties"
-mkdir -p "$WP_DIR" "$PROP_DIR"
-
-if ! wget -qO "$WP_DIR/abstract-bright.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/media/Utile%20OS%20Abstract%20Wallpaper%20Bright.png"; then
-	echo "Error: Failed to download abstract-bright.png"
-	exit 1
-fi
-if ! wget -qO "$WP_DIR/abstract-dark.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/media/Utile%20OS%20Abstract%20Wallpaper%20Dark.png"; then
-	echo "Error: Failed to download abstract-dark.png"
-	exit 1
-fi
-
-#! XML file content got through Google & AI, not truly reliable
-cat << EOF > "$WP_DIR/adaptive.xml"
-<?xml version="1.0"?><!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-<wallpapers><wallpaper deleted="false"><name>Utile Abstract Adaptive</name><filename>$WP_DIR/abstract-bright.png</filename><filename-dark>$WP_DIR/abstract-dark.png</filename-dark><options>zoom</options><shade_type>solid</shade_type><pcolor>#000</pcolor><scolor>#000</scolor></wallpaper></wallpapers>
-EOF
-
-cat << EOF > "$PROP_DIR/utile-wallpapers.xml"
-<?xml version="1.0"?><!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-<wallpapers>
-  <wallpaper deleted="false"><name>Utile Abstract (Auto)</name><filename>$WP_DIR/abstract-bright.png</filename><filename-dark>$WP_DIR/abstract-dark.png</filename-dark><options>zoom</options></wallpaper>
-  <wallpaper deleted="false"><name>Utile Abstract (Bright)</name><filename>$WP_DIR/abstract-bright.png</filename><options>zoom</options></wallpaper>
-  <wallpaper deleted="false"><name>Utile Abstract (Dark)</name><filename>$WP_DIR/abstract-dark.png</filename><options>zoom</options></wallpaper>
-</wallpapers>
-EOF
-
-chmod 644 "$WP_DIR"/* "$PROP_DIR"/*
-
-apply_gsettings \
-	"org.gnome.desktop.background|picture-uri|'file://$WP_DIR/abstract-bright.png'" \
-	"org.gnome.desktop.background|picture-uri-dark|'file://$WP_DIR/abstract-dark.png'"
-
 # Ubuntu
 	# Wartybrown theme
-	apply_gsettings "org.gnome.desktop.interface|accent-color|'brown'"
+	apply_gsettings "org.gnome.desktop.interface|accent-color|'purple'"
 	# Make the dock minimise/maximise apps when clicked there
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|extend-height|false"
@@ -124,14 +89,18 @@ apply_gsettings "org.gnome.desktop.break-reminders|selected-breaks|['eyesight']"
 apply_gsettings "org.gnome.desktop.break-reminders.eyesight|notify|true"
 apply_gsettings "org.gnome.desktop.break-reminders.eyesight|interval-seconds|1200" # 20 minutes
 
+# Set Nightlight start period to 00:00 and end to 23:00 so that it always gets enabled if the user clicks on 'Night Light' unless they set their own schedule
+apply_gsettings "org.gnome.settings-daemon.plugins.color|night-light-schedule-from|0.0"
+apply_gsettings "org.gnome.settings-daemon.plugins.color|night-light-schedule-to|23.0"
+
 # Bind Super+E to open Files (Nautilus)
 apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
 
 # Remove IBus emoji keybind (Super + .) to leave room for the 'All-In-One Clipboard' extension we're going to install
 apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|@as []"
 
-# Remove the notification/calendar tray keybind (Super + v) to leave room for 'All-In-One Clipboard'
-apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|@as []"
+# Remove the notification/calendar tray keybind (Super + v) to leave room for 'All-In-One Clipboard' | Default is ['<Super>v', '<Super>m']
+apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|['<Super>m']"
 
 # Default pinned apps
 apply_gsettings "org.gnome.shell|favorite-apps|['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Music.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'libreoffice-writer.desktop', 'snap-store_snap-store.desktop', 'org.gnome.Settings.desktop']"

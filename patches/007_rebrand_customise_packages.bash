@@ -30,6 +30,14 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		echo 'GRUB_GFXMODE=1920x1080,auto' >> /etc/default/grub
 	fi
 
+	# APT Repository
+	curl -s https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg
+	echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main" | sudo tee /etc/apt/sources.list.d/utile.list
+	apt_get update
+
+	# Wallpapers
+	install_packages utile-wallpapers && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
+
 	# Release Info
 	sudo rm -f /etc/os-release
 	sudo rm -f /usr/lib/os-release
@@ -46,7 +54,7 @@ ID_LIKE="ubuntu debian"
 HOME_URL="https://github.com/Proman4713/Utile-OS"
 SUPPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
 BUG_REPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
-PRIVACY_POLICY_URL="https://github.com/Proman4713/Utile-OS/blob/main/LICENSE.md"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
 UBUNTU_CODENAME=resolute
 LOGO=utile-logo
 EOF
