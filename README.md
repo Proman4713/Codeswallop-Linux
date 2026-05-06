@@ -61,7 +61,11 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 	<summary>Plans</summary>
 	<ol>
 		<li><strike>Make my own APT repository and debian packages.</strike></li>
-		<li>Fully transition to use Debian packages (i.e. make more packages) to modify upstream rather than manually executing commands.</li>
+		<li>Override upstream's `base-files` package to provide logos and release metadata</li>
+		<li>Implement my own plymouth theme.</li>
+		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
+		<li>Similarly, make a `utile-gnome-shell-extensions` package to be able to install preferred extensions as system extensions and update them without needing the hacky `seed_extension` function in patch 000.</li>
+		<li>`utile-gnome-defaults` for the gsettings/dconf changes</li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
 	</ol>
 </details>

@@ -36,56 +36,12 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		echo "Error: Failed to download or install Utile GPG key" >&2
 		exit 1
 	fi
-	echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main" | sudo tee /etc/apt/sources.list.d/utile.list
+	echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main upstream universe" | sudo tee /etc/apt/sources.list.d/utile.list
 	apt_get_update
 
 	# Wallpapers
 	install_packages utile-wallpapers && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
 
-	# Release Info
-	sudo rm -f /etc/os-release
-	sudo rm -f /usr/lib/os-release
-
-	# TODO: make utile-os-release debian package OR base-files and lsb/lsb-release forks from upstream
-	cat <<EOF | sudo tee /usr/lib/os-release
-PRETTY_NAME="Utile OS 26.04"
-NAME="utile"
-VERSION_ID="26.04"
-VERSION="26.04 (Abstract Assembly)"
-VERSION_CODENAME=abstract
-ID=utile
-ID_LIKE="ubuntu debian"
-HOME_URL="https://github.com/Proman4713/Utile-OS"
-SUPPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
-BUG_REPORT_URL="https://github.com/Proman4713/Utile-OS/issues"
-PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-UBUNTU_CODENAME=resolute
-LOGO=utile-logo
-EOF
-	sudo ln -srf /usr/lib/os-release /etc/os-release
-
-	sudo rm -f /etc/lsb-release
-	cat <<EOF | sudo tee /etc/lsb-release
-DISTRIB_ID=UtileOS
-DISTRIB_RELEASE=26.04
-DISTRIB_CODENAME=abstract
-DISTRIB_DESCRIPTION="Utile OS 26.04"
-EOF
-
-	# Add utile-logo
-	# TODO: make utile-os-logos debian package OR replace base-files as well
-	download_logo() {
-		local dest="$1" url="$2"
-		if ! wget -qO "$dest" "$url"; then
-			echo "Error: Failed to download $url" >&2
-			exit 1
-		fi
-	}
-
-	download_logo "/usr/share/pixmaps/utile-logo.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Square%20Logo.svg"
-	# For GNOME Control Centre (https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/system/about/cc-about-page.c?ref_type=heads):
-	download_logo "/usr/share/pixmaps/utile-logo-text.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	download_logo "/usr/share/pixmaps/utile-logo-text.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
-	download_logo "/usr/share/pixmaps/utile-logo-text-dark.png" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.png"
-	download_logo "/usr/share/pixmaps/utile-logo-text-dark.svg" "https://raw.githubusercontent.com/Proman4713/Utile-OS/refs/heads/main/resources/Utile%20Transparent%20Lockup.svg"
+	# Release Info and logos
+	apt-get install --only-upgrade -y base-files
 fi
