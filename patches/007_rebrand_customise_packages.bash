@@ -31,9 +31,12 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	fi
 
 	# APT Repository
-	curl -s https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg
+	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg; then
+		echo "Error: Failed to download or install Utile GPG key" >&2
+		exit 1
+	fi
 	echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main" | sudo tee /etc/apt/sources.list.d/utile.list
-	apt_get update
+	apt-get update
 
 	# Wallpapers
 	install_packages utile-wallpapers && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*

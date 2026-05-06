@@ -44,7 +44,7 @@ EOF
 )"
 
 # Ubuntu
-	# Wartybrown theme
+	# Purple theme
 	apply_gsettings "org.gnome.desktop.interface|accent-color|'purple'"
 	# Make the dock minimise/maximise apps when clicked there
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
@@ -91,7 +91,7 @@ apply_gsettings "org.gnome.desktop.break-reminders.eyesight|interval-seconds|120
 
 # Set Nightlight start period to 00:00 and end to 23:00 so that it always gets enabled if the user clicks on 'Night Light' unless they set their own schedule
 apply_gsettings "org.gnome.settings-daemon.plugins.color|night-light-schedule-from|0.0"
-apply_gsettings "org.gnome.settings-daemon.plugins.color|night-light-schedule-to|23.0"
+apply_gsettings "org.gnome.settings-daemon.plugins.color|night-light-schedule-to|23.99"
 
 # Bind Super+E to open Files (Nautilus)
 apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
