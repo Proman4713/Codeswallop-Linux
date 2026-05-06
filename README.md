@@ -1,11 +1,8 @@
-<center>
-<image src="./resources/Utile Transparent Lockup.svg" alt="Utile Logo" height="128px" />
-</center>
-
-[![Build Utile OS 26.04 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml)
-
+![Utile Logo](./resources/Utile%20Transparent%20Lockup.svg)
 # A Minimum-Friction Linux Desktop
 Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
+
+[![Build Utile OS 26.04 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml)
 
 ### Table Of Contents
 - [Quick Start](#quick-start)
