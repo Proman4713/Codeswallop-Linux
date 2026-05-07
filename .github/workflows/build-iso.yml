@@ -82,13 +82,13 @@ jobs:
           ls -la custom-iso/casper/
 
           echo "Checking manifests"
-          cat custom-iso/casper/minimal.manifest 2>/dev/null || echo "(minimal.manifest not present)"
+          #cat custom-iso/casper/minimal.manifest 2>/dev/null || echo "(minimal.manifest not present)"
 
-          cat custom-iso/casper/minimal.manifest.full 2>/dev/null || echo "(minimal.manifest.full not present)"
+          #cat custom-iso/casper/minimal.manifest.full 2>/dev/null || echo "(minimal.manifest.full not present)"
 
-          cat custom-iso/casper/minimal.standard.manifest 2>/dev/null || echo "(minimal.standard.manifest not present)"
+          #cat custom-iso/casper/minimal.standard.manifest 2>/dev/null || echo "(minimal.standard.manifest not present)"
 
-          cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
+          #cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
       # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
       - name: Inspect and Prune Extended Installation
@@ -153,11 +153,10 @@ jobs:
           sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
 
           # Live USB
-          sudo mkdir -p custom-iso/boot/grub/themes/utile
-          sudo cp -r grub/theme.txt custom-iso/boot/grub/themes/utile/
+          sudo cp -r grub/theme.txt custom-iso/boot/grub/
 
-          sudo mkdir -p custom-iso/boot/grub/themes/utile/icons
-          sudo cp -r grub/icons/* custom-iso/boot/grub/themes/utile/icons 2>/dev/null || true
+          sudo mkdir -p custom-iso/boot/grub/icons
+          sudo cp -r grub/icons/* custom-iso/boot/grub/icons 2>/dev/null || true
 
           sudo cp -r grub/*.pf2 custom-iso/boot/grub/ 2>/dev/null || true
 
@@ -193,10 +192,11 @@ jobs:
       - name: Re-generate Manifests
         run: |
           # Commented out until sure of the manifest file we need to change, also, change rm -rf to overwriting
-          # newManifest=$(cat squashfs-root/tmp/utile-release-minimal-manifest)
-          # sudo rm -rf custom-iso/casper/minimal.manifest
-          # sudo rm -rf custom-iso/casper/minimal.manifest.full
-          sudo rm -rf squashfs-root/tmp/utile-release-minimal-manifest
+
+          if ! sudo chroot squashfs-root /bin/bash -xlc "dpkg-query -W --showformat='${Package}\t${Version}\n'" > custom-iso/casper/minimal.manifest.full; then
+              echo "Error: failed to generate minimal manifest" >&2
+              exit 1
+          fi
 
       - name: Apply Custom System Metadata
         run: |
