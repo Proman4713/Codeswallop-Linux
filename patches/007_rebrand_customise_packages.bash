@@ -12,7 +12,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	fonts_src_dir="/usr/share/grub/themes/utile/fonts"
 	if [ -d "$fonts_src_dir" ] && [ -n "$(find "$fonts_src_dir" -maxdepth 1 -name '*.pf2' | head -n 1)" ]; then
 		if ! cp "$fonts_src_dir"/*.pf2 /boot/grub/; then
-			echo "Error: failed to copy GRUB fonts from $fonts_src_dir to /boot/grub/fonts/" >&2
+			echo "Error: failed to copy GRUB fonts from $fonts_src_dir to /boot/grub/" >&2
 			exit 1
 		fi
 	else
@@ -47,6 +47,8 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		exit 1
 	fi
 
-	newManifestContent=$(dpkg-query -W --showformat='${Package}	${Version}\n')
-	echo $newManifestContent > /tmp/utile-release-minimal-manifest
+	if ! dpkg-query -W --showformat='${Package}\t${Version}\n' > /tmp/utile-release-minimal-manifest; then
+		echo "Error: failed to generate minimal manifest" >&2
+		exit 1
+	fi
 fi

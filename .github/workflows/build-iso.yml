@@ -82,13 +82,13 @@ jobs:
           ls -la custom-iso/casper/
 
           echo "Checking manifests"
-          cat custom-iso/casper/minimal.manifest
+          cat custom-iso/casper/minimal.manifest 2>/dev/null || echo "(minimal.manifest not present)"
 
-          cat custom-iso/casper/minimal.manifest.full
+          cat custom-iso/casper/minimal.manifest.full 2>/dev/null || echo "(minimal.manifest.full not present)"
 
-          cat custom-iso/casper/minimal.standard.manifest
+          cat custom-iso/casper/minimal.standard.manifest 2>/dev/null || echo "(minimal.standard.manifest not present)"
 
-          cat custom-iso/casper/minimal.standard.manifest.full
+          cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
       # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
       - name: Inspect and Prune Extended Installation
@@ -131,8 +131,12 @@ jobs:
           STANDARD_MANIFEST_FULL=custom-iso/casper/minimal.standard.manifest.full
 
           if [ -f "$STANDARD_MANIFEST" ] && [ -f "$STANDARD_MANIFEST_FULL" ]; then
+            sudo rm -f "$STANDARD_MANIFEST" "$STANDARD_MANIFEST_FULL"
+            cd custom-iso/casper/
             sudo ln -s "minimal.manifest" "minimal.standard.manifest"
             sudo ln -s "minimal.manifest.full" "minimal.standard.manifest.full"
+            cd ../../
+            echo "Symlinked standard manifests to primary manifests."
           else
             echo "No standard manifest found, skipping symlink trick."
           fi
@@ -146,8 +150,7 @@ jobs:
           sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
           sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
 
-          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/fonts
-          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/fonts 2>/dev/null || true
+          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
 
           # Live USB
           sudo mkdir -p custom-iso/boot/grub/themes/utile
@@ -156,8 +159,7 @@ jobs:
           sudo mkdir -p custom-iso/boot/grub/themes/utile/icons
           sudo cp -r grub/icons/* custom-iso/boot/grub/themes/utile/icons 2>/dev/null || true
 
-          sudo mkdir -p custom-iso/boot/grub/fonts
-          sudo cp -r grub/*.pf2 custom-iso/boot/grub/fonts/ 2>/dev/null || true
+          sudo cp -r grub/*.pf2 custom-iso/boot/grub/ 2>/dev/null || true
 
           # Replace Live USB grub config
           sudo rm -f custom-iso/boot/grub/grub.cfg 2>/dev/null || true
@@ -190,7 +192,7 @@ jobs:
     
       - name: Re-generate Manifests
         run: |
-          # Commented out until sure of the manifest file we need to change
+          # Commented out until sure of the manifest file we need to change, also, change rm -rf to overwriting
           # newManifest=$(cat squashfs-root/tmp/utile-release-minimal-manifest)
           # sudo rm -rf custom-iso/casper/minimal.manifest
           # sudo rm -rf custom-iso/casper/minimal.manifest.full
