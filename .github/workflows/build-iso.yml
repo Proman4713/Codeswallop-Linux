@@ -193,7 +193,7 @@ jobs:
         run: |
           # Commented out until sure of the manifest file we need to change, also, change rm -rf to overwriting
 
-          if ! sudo chroot squashfs-root /bin/bash -xlc "dpkg-query -W --showformat='\${Package}\t\${Version}\n'" > custom-iso/casper/minimal.manifest.full; then
+          if ! sudo chroot squashfs-root /bin/bash -xlc "dpkg-query -W --showformat='\${Package}\t\${Version}\n'" > sudo custom-iso/casper/minimal.manifest.full; then
               echo "Error: failed to generate minimal manifest" >&2
               exit 1
           fi
