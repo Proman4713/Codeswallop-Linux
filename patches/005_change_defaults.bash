@@ -98,6 +98,7 @@ apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|home|['<Super>e']"
 
 # Remove IBus emoji keybind (Super + .) to leave room for the 'All-In-One Clipboard' extension we're going to install
 apply_gsettings "org.freedesktop.ibus.panel.emoji|unicode-hotkey|@as []"
+apply_gsettings "org.freedesktop.ibus.panel.emoji|hotkey|@as []"
 
 # Remove the notification/calendar tray keybind (Super + v) to leave room for 'All-In-One Clipboard' | Default is ['<Super>v', '<Super>m']
 apply_gsettings "org.gnome.shell.keybindings|toggle-message-tray|['<Super>m']"
