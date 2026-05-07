@@ -46,6 +46,10 @@ EOF
 # Ubuntu
 	# Purple theme
 	apply_gsettings "org.gnome.desktop.interface|accent-color|'purple'"
+	#! Experimental, make the desktop icons immediately show purple in the Live USB, rather than waiting for a restart after the installation
+	sudo -u "$TARGET_USER" gtk-update-icon-cache /etc/skel/.local/share/icons
+	gtk-update-icon-cache /usr/share/icons/*
+
 	# Make the dock minimise/maximise apps when clicked there
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|click-action|'minimize-or-previews'"
 	apply_gsettings "org.gnome.shell.extensions.dash-to-dock|extend-height|false"
@@ -112,6 +116,13 @@ apply_gsettings "org.gnome.desktop.peripherals.mouse|accel-profile|'flat'"
 # Force DING to use the top-right
 apply_gsettings "org.gnome.shell.extensions.ding|start-corner|'top-right'"
 apply_gsettings "org.gnome.shell.extensions.ding|show-trash|true"
+
+# Muscle Memory: Windows Win+I for settings
+apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|name|'Launch Settings'"
+apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|command|'gnome-control-center'"
+apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|binding|'<Super>i'"
+
+apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|custom-keybindings|['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
 
 # Startup sound
 create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
