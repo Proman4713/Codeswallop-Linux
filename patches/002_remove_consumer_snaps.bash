@@ -3,7 +3,7 @@ if [ "$ENV_MODE" == "POST" ]; then
 	snap remove --purge thunderbird || true
 fi
 
-apt-get purge -y firefox thunderbird
+apt-get purge -y firefox thunderbird || true
 apt-mark hold firefox thunderbird
 
 rm -rf /var/lib/snapd/seed/snaps/firefox_*

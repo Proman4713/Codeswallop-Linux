@@ -47,7 +47,7 @@ EOF
 	# Purple theme
 	apply_gsettings "org.gnome.desktop.interface|accent-color|'purple'"
 	#! Experimental, make the desktop icons immediately show purple in the Live USB, rather than waiting for a restart after the installation
-	sudo -u "$TARGET_USER" gtk-update-icon-cache /etc/skel/.local/share/icons
+	#gtk-update-icon-cache /etc/skel/.local/share/icons
 	gtk-update-icon-cache /usr/share/icons/*
 
 	# Make the dock minimise/maximise apps when clicked there
