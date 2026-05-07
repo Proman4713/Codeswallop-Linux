@@ -83,7 +83,12 @@ jobs:
 
           echo "Checking manifests"
           cat custom-iso/casper/minimal.manifest
+
           cat custom-iso/casper/minimal.manifest.full
+
+          cat custom-iso/casper/minimal.standard.manifest
+
+          cat custom-iso/casper/minimal.standard.manifest.full
 
       # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
       - name: Inspect and Prune Extended Installation
@@ -120,6 +125,16 @@ jobs:
             ls -la custom-iso/casper/*standard*
           else
             echo "No standard squashfs found, skipping symlink trick."
+          fi
+
+          STANDARD_MANIFEST=custom-iso/casper/minimal.standard.manifest
+          STANDARD_MANIFEST_FULL=custom-iso/casper/minimal.standard.manifest.full
+
+          if [ -f "$STANDARD_MANIFEST" ] && [ -f "$STANDARD_MANIFEST_FULL" ]; then
+            sudo ln -s "minimal.manifest" "minimal.standard.manifest"
+            sudo ln -s "minimal.manifest.full" "minimal.standard.manifest.full"
+          else
+            echo "No standard manifest found, skipping symlink trick."
           fi
 
       - name: Inject GRUB theme into ISO and installed system
@@ -172,6 +187,14 @@ jobs:
           sudo umount squashfs-root/proc
           sudo umount squashfs-root/run
           sudo umount squashfs-root/dev
+    
+      - name: Re-generate Manifests
+        run: |
+          # Commented out until sure of the manifest file we need to change
+          # newManifest=$(cat squashfs-root/tmp/utile-release-minimal-manifest)
+          # sudo rm -rf custom-iso/casper/minimal.manifest
+          # sudo rm -rf custom-iso/casper/minimal.manifest.full
+          sudo rm -rf squashfs-root/tmp/utile-release-minimal-manifest
 
       - name: Apply Custom System Metadata
         run: |

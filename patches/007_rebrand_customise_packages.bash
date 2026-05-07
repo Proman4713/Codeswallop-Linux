@@ -11,8 +11,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 
 	fonts_src_dir="/usr/share/grub/themes/utile/fonts"
 	if [ -d "$fonts_src_dir" ] && [ -n "$(find "$fonts_src_dir" -maxdepth 1 -name '*.pf2' | head -n 1)" ]; then
-		mkdir -p /boot/grub/fonts
-		if ! cp "$fonts_src_dir"/*.pf2 /boot/grub/fonts/; then
+		if ! cp "$fonts_src_dir"/*.pf2 /boot/grub/; then
 			echo "Error: failed to copy GRUB fonts from $fonts_src_dir to /boot/grub/fonts/" >&2
 			exit 1
 		fi
@@ -47,4 +46,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		echo "Error: Failed to upgrade base-files package" >&2
 		exit 1
 	fi
+
+	newManifestContent=$(dpkg-query -W --showformat='${Package}	${Version}\n')
+	echo $newManifestContent > /tmp/utile-release-minimal-manifest
 fi
