@@ -77,9 +77,13 @@ jobs:
           # Extract it
           sudo unsquashfs -f -d squashfs-root "$SQUASHFS_FILE"
 
-      - name: Find available squashed filesystems
+      - name: Log contents for debugging
         run: |
           ls -la custom-iso/casper/
+
+          echo "Checking manifests"
+          cat custom-iso/casper/minimal.manifest
+          cat custom-iso/casper/minimal.manifest.full
 
       # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
       - name: Inspect and Prune Extended Installation

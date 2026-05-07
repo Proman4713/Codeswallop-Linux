@@ -61,12 +61,27 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 	<summary>Plans</summary>
 	<ol>
 		<li><strike>Make my own APT repository and debian packages.</strike></li>
-		<li>Override upstream's `base-files` package to provide logos and release metadata</li>
+		<li><strike>Override upstream's `base-files` package to provide logos and release metadata</strike></li>
+		<li>Change bashrc to use a lighter colour for the <code>user@computer</code> text</li>
+		<li>Either contribute my distribution's ASCII symbol to `fastfetch` or include it in a debian package and set the `--logo` argument in a bashrc alias of `fastfetch`/`neofetch`</li>
 		<li>Implement my own plymouth theme.</li>
+		<li>Figure out a way to use/implement an equivalent of the <code>Customised Wallpapers</code> without cluttering the UI</li>
 		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
 		<li>Similarly, make a `utile-gnome-shell-extensions` package to be able to install preferred extensions as system extensions and update them without needing the hacky `seed_extension` function in patch 000.</li>
 		<li>Create a `utile-gnome-defaults` package for the gsettings/dconf changes</li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
+	</ol>
+</details>
+<details>
+	<summary>Debatable</summary>
+	<ol>
+		<li>Should I add ClamAV? Potentially with a custom extension to go with it to provide a GUI in the top bar/quick settings?</li>
+		<li>Should I allow a custom wallpaper for the lock screen through extensions (potentially custom, to unify GDM login and lock screen)?</li>
+		<li>Should I create an extension to reduce the size of the headerbar in GNOME, especially with fractional scaling?</li>
+		<li>Should I include a pre-configure 'Dash2Dock Animated' extension? Is that too much like macOS in a way that it shouldn't be?</li>
+		<li>Similarly, what about the `Compiz alike magic lamp effect` extension? This could be too much, but maybe another extension that provides a springier minimise animation than default?</li>
+		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well></li>
+		<li>The average user does not have NAS devices and doesn't use <a href="https://ubuntu.com/server/docs/how-to/networking/install-nfs/">NFS</a>, should I disable the NetworkManager-wait-online.service to speed up boot time? What are the tradeoffs?</li>
 	</ol>
 </details>
 
