@@ -117,12 +117,13 @@ apply_gsettings "org.gnome.desktop.peripherals.mouse|accel-profile|'flat'"
 apply_gsettings "org.gnome.shell.extensions.ding|start-corner|'top-right'"
 apply_gsettings "org.gnome.shell.extensions.ding|show-trash|true"
 
-# Muscle Memory: Windows Win+I for settings
-apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|name|'Launch Settings'"
-apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|command|'gnome-control-center'"
-apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|binding|'<Super>i'"
+# TODO: Muscle Memory: Windows Win+I for settings, current error:
+#! trailing slash for dconf (... custom0/)
+#apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|name|'Launch Settings'"
+#apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|command|'gnome-control-center'"
+#apply_gsettings "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/|binding|'<Super>i'"
 
-apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|custom-keybindings|['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+#apply_gsettings "org.gnome.settings-daemon.plugins.media-keys|custom-keybindings|['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
 
 # Startup sound
 create_or_update_file_in_home ".config/autostart/login-sound.desktop" "$(cat << 'EOF'
