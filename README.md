@@ -1,8 +1,9 @@
 ![Utile Logo](./resources/Utile%20Transparent%20Lockup.svg)
 # A Minimum-Friction Linux Desktop
 Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
-
 [![Build Utile OS 26.04 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml)
+
+###### [Debian packages](https://github.com/Proman4713/Utile-OS-debian), [APT repository](https://github.com/Proman4713/Utile-OS-apt)
 
 ### Table Of Contents
 - [Quick Start](#quick-start)
