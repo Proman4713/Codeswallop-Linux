@@ -47,3 +47,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		exit 1
 	fi
 fi
+
+apt-get autoremove -y --purge
+apt-get clean
+rm -rf /var/lib/apt/lists/*

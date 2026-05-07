@@ -4,6 +4,7 @@ if [ "$ENV_MODE" == "POST" ]; then
 fi
 
 apt-get purge -y firefox thunderbird
+apt-get hold -y firefox thunderbird
 
 rm -rf /var/lib/snapd/seed/snaps/firefox_*
 rm -rf /var/lib/snapd/seed/snaps/thunderbird_*

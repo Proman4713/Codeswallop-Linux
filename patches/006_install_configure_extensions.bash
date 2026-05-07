@@ -136,10 +136,6 @@ apply_gsettings "org.gnome.shell.extensions.all-in-one-clipboard|shortcut-open-c
 # Enable Extensions (except Blur My Shell):
 apply_gsettings "org.gnome.shell|enabled-extensions|['hidetopbar@mathieu.bidon.ca', 'ding@rastersoft.com', 'ubuntu-dock@ubuntu.com', 'tiling-assistant@ubuntu.com', 'snapd-search-provider@canonical.com', 'web-search-provider@ubuntu.com', 'gsconnect@andyholmes.github.io', 'add-to-desktop@tommimon.github.com', 'just-perfection-desktop@just-perfection', 'Vitals@CoreCoding.com', 'all-in-one-clipboard@NiffirgkcaJ.github.com']"
 
-apt-get autoremove -y --purge
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-
 echo "Compiling GLib schemas..."
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
