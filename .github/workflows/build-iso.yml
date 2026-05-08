@@ -249,7 +249,7 @@ jobs:
 
           echo "Calculating combined squashfs size"
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
-          printf '%s\n' "$combined_squash_bytes" > sudo "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
+          printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
 
           echo "Symlinking standard squashfs size to primary squashfs size"
           sudo ln -sf "${{ env.MINIMAL_SIZE }}" "custom-iso/casper/${{ env.STANDARD_SIZE }}"
