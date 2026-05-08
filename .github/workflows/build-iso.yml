@@ -64,11 +64,9 @@ jobs:
           rsync -a source-iso/ custom-iso/
           sudo umount source-iso
 
-      # CUBIC's trick to merge the squashfs
+      # CUBIC's trick to merge the squashfs (https://github.com/PJ-Singh-001/Cubic)
       - name: Extract and Merge Root Filesystems
         run: |
-          # Find the largest .squashfs file in the casper directory dynamically
-          
           if [ ! -f "custom-iso/casper/minimal.squashfs" ]; then
             echo "No squashfs found."
             exit 1
@@ -125,57 +123,6 @@ jobs:
           echo "Checking minimal.standard.manifest.full"
           cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
-      # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
-      #- name: Inspect and Prune Extended Installation
-        #run: |
-          #echo "Replacing the standard squashfs with a symlink to save space without breaking the installer..."
-
-          #PRIMARY_BASENAME=$(basename "${{ env.SQUASHFS_PATH }}")
-
-          #STANDARD_FILE=$(ls custom-iso/casper/*standard.squashfs 2>/dev/null | head -n 1)
-
-          #if [ -n "$STANDARD_FILE" ]; then
-            #STANDARD_BASENAME=$(basename "$STANDARD_FILE")
-            #echo "Found standard squashfs: $STANDARD_BASENAME"
-            
-            # 1. Delete the heavy extended payload
-            #sudo rm -f "custom-iso/casper/$STANDARD_BASENAME"
-            
-            # 2. Delete the old size and manifest files associated with it
-            #sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.size"
-            #sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.manifest"
-            
-            # 3. Create the symlinks directly inside the casper directory
-            #cd custom-iso/casper/
-            
-            # Symlink the squashfs
-            #sudo ln -s "$PRIMARY_BASENAME" "$STANDARD_BASENAME"
-            
-            # Symlink the size file so the installer's disk space check doesn't fail or show wrong numbers
-            #sudo ln -s "${PRIMARY_BASENAME%.squashfs}.size" "${STANDARD_BASENAME%.squashfs}.size"
-            
-            #cd ../../
-            
-            #echo "Successfully symlinked $STANDARD_BASENAME to $PRIMARY_BASENAME"
-            #ls -la custom-iso/casper/*standard*
-          #else
-            #echo "No standard squashfs found, skipping symlink trick."
-          #fi
-
-          #STANDARD_MANIFEST=custom-iso/casper/minimal.standard.manifest
-          #STANDARD_MANIFEST_FULL=custom-iso/casper/minimal.standard.manifest.full
-
-          #if [ -f "$STANDARD_MANIFEST" ] && [ -f "$STANDARD_MANIFEST_FULL" ]; then
-            #sudo rm -f "$STANDARD_MANIFEST" "$STANDARD_MANIFEST_FULL"
-            #cd custom-iso/casper/
-            #sudo ln -s "minimal.manifest" "minimal.standard.manifest"
-            #sudo ln -s "minimal.manifest.full" "minimal.standard.manifest.full"
-            #cd ../../
-            #echo "Symlinked standard manifests to primary manifests."
-          #else
-            #echo "No standard manifest found, skipping symlink trick."
-          #fi
-
       - name: Inject GRUB theme into ISO and installed system
         run: |
           # Installed System
@@ -186,18 +133,6 @@ jobs:
           sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
 
           sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
-
-          # Live USB
-          sudo cp -r grub/theme.txt custom-iso/boot/grub/
-
-          sudo mkdir -p custom-iso/boot/grub/icons
-          sudo cp -r grub/icons/* custom-iso/boot/grub/icons 2>/dev/null || true
-
-          sudo cp -r grub/*.pf2 custom-iso/boot/grub/ 2>/dev/null || true
-
-          # Replace Live USB grub config
-          sudo rm -f custom-iso/boot/grub/grub.cfg 2>/dev/null || true
-          sudo cp grub/grub.installer.cfg custom-iso/boot/grub/grub.cfg
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
@@ -235,6 +170,7 @@ jobs:
         run: |
           packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
           [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
+          snaps="$(grep "^snap:" "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}")"
 
           echo "$packages"
 
@@ -242,6 +178,9 @@ jobs:
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
           printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
+          printf '%s' "$snaps" | sudo tee -a "$manifest" > /dev/null
+          sudo sed -i '/snap:firefox/d' "$manifest"
+          sudo sed -i '/snap:thunderbird/d' "$manifest"
           echo "Generated $manifest"
 
           echo "Symlinking standard manifests to primary manifests"
@@ -264,10 +203,9 @@ jobs:
 
       - name: Re-compress Root Filesystem
         run: |
-          # Remove the old base filesystem using the path we found earlier
           sudo rm "custom-iso/casper/${{ env.MINIMAL_SQUASH }}"
           
-          # Compress the modified filesystem back to the exact same file name
+          # Compress the modified filesystem in place of the original
           echo "Compressing minimal squashfs"
           sudo mksquashfs squashfs-root "custom-iso/casper/${{ env.MINIMAL_SQUASH }}" -comp xz -noappend
           
@@ -346,5 +284,3 @@ jobs:
           
           # Upload checksum to Gofile
           curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}.sha256sum" -F "folderId=d96e59a5-9121-4b18-9bb4-4a6228e66bcd" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"
-          
-          

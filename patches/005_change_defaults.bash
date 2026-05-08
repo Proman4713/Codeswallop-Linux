@@ -39,7 +39,7 @@ apply_gsettings "org.gnome.desktop.interface|font-hinting|'full'"
 # Default neofetch
 create_or_update_file_in_home ".bashrc" "$(cat << 'EOF'
 
-alias neofetch="fastfetch"
+alias neofetch="fastfetch --config neofetch.jsonc"
 EOF
 )"
 

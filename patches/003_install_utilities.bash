@@ -1,7 +1,7 @@
 # Apps
 # Pretty unneeded for the average user, shotwell doesn't look good, and the games are unnecessary bloat for most.
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
-apt-get purge -y transmission-gtk transmission-common shotwell shotwell-common gnome-mines gnome-sudoku gnome-mahjongg aisleriot remmina* simple-scan
+apt-get purge -y transmission-gtk transmission-common shotwell shotwell-common gnome-mines gnome-sudoku gnome-mahjongg aisleriot remmina* simple-scan usb-creator* wbrazilian wbritish wfrench witalian wngerman wogerman wportuguese wspanish wswiss xorriso ubuntu-desktop
 
 # TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
 # TODO: Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu, also only available as Flatpak
