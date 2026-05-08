@@ -171,13 +171,14 @@ jobs:
           packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
           [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
           snaps="$(grep "^snap:" "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" | grep -v "snap:firefox" | grep -v "snap:thunderbird" || true)"
+          echo "Found snaps: $snaps"
 
           echo "Total $(wc -l <<< "$packages") packages found."
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
-          printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
+          printf '%s' "$packages" | sudo tee "$manifest"
           if [[ -n "$snaps" ]]; then
-            printf '%s\n' "$snaps" | sudo tee -a "$manifest" > /dev/null
+            printf '%s\n' "$snaps" | sudo tee -a "$manifest"
           fi
           cat "$manifest"
           echo "Generated $manifest"
