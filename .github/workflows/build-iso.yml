@@ -170,7 +170,7 @@ jobs:
         run: |
           packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
           [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
-          snaps="$(grep "^snap:" "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}")"
+          snaps="$(grep "^snap:" "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" | grep -v "snap:firefox" | grep -v "snap:thunderbird" || true)"
 
           echo "$packages"
 
@@ -178,9 +178,9 @@ jobs:
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
           printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
-          printf '%s' "$snaps" | sudo tee -a "$manifest" > /dev/null
-          sudo sed -i '/snap:firefox/d' "$manifest"
-          sudo sed -i '/snap:thunderbird/d' "$manifest"
+          if [[ -n "$snaps" ]]; then
+            printf '%s\n' "$snaps" | sudo tee -a "$manifest" > /dev/null
+          fi
           echo "Generated $manifest"
 
           echo "Symlinking standard manifests to primary manifests"
