@@ -20,7 +20,7 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 - Status: Pre-Release Snapshots
 - Target OS: Ubuntu 26.04 LTS for Intel and AMD CPUs
 - Target Audience: Ubuntu, Windows 11, macOS users
-- Minimum Requirements (untested):
+- Minimum Requirements:
 	1. A USB drive of at least **8GBs**.
 	3. Internal Storage: **25GB** minimum.
 	4. RAM: **6GB** recommended.
@@ -57,7 +57,7 @@ The reason the patches are given the .bash extension, even though the product sc
 Local development & build instructions are not yet available. Although if you really wanted to, you could check out the [ISO Build workflow](https://github.com/Proman4713/Utile-OS/blob/main/.github/workflows/build-iso.yml), which uses the NodeJS script, to replicate a similar process locally. If this works out, feel free to contribute your solution to the repository.
 
 ## Plans
-Before starting this project, I detailed a specific plan in [an older readme](./README.old.md#plan), however, I have since realised that those plans were not realistically laid out due to various intricacies around how Ubuntu and apt/debian packages work. So this section is being repurposed for future plans.
+Before starting this project, I detailed a specific plan in [an older readme](./README.old.md#plan), however, I have since realised that those plans were not realistically laid out due to various intricacies around how Ubuntu and apt/debian packages work. So this section is being repurposed for future plans. I write these plans when I think of them, and they are subject to change.
 
 <details>
 	<summary>Plans</summary>
@@ -72,6 +72,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Similarly, make a `utile-gnome-shell-extensions` package to be able to install preferred extensions as system extensions and update them without needing the hacky `seed_extension` function in patch 000.</li>
 		<li>Create a `utile-gnome-defaults` package for the gsettings/dconf changes</li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
+		<li>Implement my own app store (packaged in Debian, not a Snap) which makes the issue of Snap vs. Debian less of a technical dilemma and more of a user-friendly choice. This app store must also improve on the UI/UX of usual Linux app stores, which, in my opinion, are developed by people that are too tech-centric to dedicate enough thought to the appeal of their UI. Additionally, I would like to allow developers to publish Debian-packaged apps to this store even if they don't come from the device's apt sources, this could potentially be done by verifying a developer's identity and their app's safety, then only adding their app's source repository if the user chooses to install the app.</li>
 	</ol>
 </details>
 <details>

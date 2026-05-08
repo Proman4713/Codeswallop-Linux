@@ -64,82 +64,117 @@ jobs:
           rsync -a source-iso/ custom-iso/
           sudo umount source-iso
 
-      # TODO: Use CUBIC's trick to merge the squashfs
-      - name: Extract Root Filesystem (SquashFS)
+      # CUBIC's trick to merge the squashfs
+      - name: Extract and Merge Root Filesystems
         run: |
           # Find the largest .squashfs file in the casper directory dynamically
-          SQUASHFS_FILE=$(ls -S custom-iso/casper/*.squashfs | head -n 1)
-          echo "Found root filesystem: $SQUASHFS_FILE"
           
-          # Save the exact path to GitHub ENV so the re-compress step knows what to overwrite
-          echo "SQUASHFS_PATH=$SQUASHFS_FILE" >> $GITHUB_ENV
+          if [ ! -f "custom-iso/casper/minimal.squashfs" ]; then
+            echo "No squashfs found."
+            exit 1
+          fi
+
+          MINIMAL_SQUASH="minimal.squashfs"
+          STANDARD_SQUASH="minimal.standard.squashfs"
+          MINIMAL_MANIFEST="minimal.manifest"
+          STANDARD_MANIFEST="minimal.standard.manifest"
+          MINIMAL_SIZE="minimal.size"
+          STANDARD_SIZE="minimal.standard.size"
+
+          echo "MINIMAL_SQUASH=$MINIMAL_SQUASH" >> $GITHUB_ENV
+          echo "STANDARD_SQUASH=$STANDARD_SQUASH" >> $GITHUB_ENV
+          echo "MINIMAL_MANIFEST=$MINIMAL_MANIFEST" >> $GITHUB_ENV
+          echo "STANDARD_MANIFEST=$STANDARD_MANIFEST" >> $GITHUB_ENV
+          echo "MINIMAL_SIZE=$MINIMAL_SIZE" >> $GITHUB_ENV
+          echo "STANDARD_SIZE=$STANDARD_SIZE" >> $GITHUB_ENV
+
+          echo "Found root filesystem: $MINIMAL_SQUASH"
           
-          # Extract it
-          sudo unsquashfs -f -d squashfs-root "$SQUASHFS_FILE"
+          STAGING="$(sudo mktemp -d)"
+
+          echo "Extracting minimal filesystem"
+          sudo unsquashfs -f -d "$STAGING/squashfs-root" "$custom-iso/casper/$MINIMAL_SQUASH"
+          sudo rsync -aHAX "$STAGING/squashfs-root/" squashfs-root/
+          sudo rm -rf "$STAGING"
+
+          echo "Merging standard filesystem"
+          TMP="$(sudo mktemp -d)"
+          STANDARD_STAGING="$(sudo mktemp -d)"
+          sudo unsquashfs -f -d "$STANDARD_STAGING/squashfs-root" "$custom-iso/casper/$STANDARD_SQUASH"
+          sudo rsync -aHAX "$STANDARD_STAGING/squashfs-root/" "$TMP/"
+          sudo rm -rf "$STANDARD_STAGING"
+          sudo rsync -aHAXc "$TMP/" squashfs-root/
+          sudo rm -rf "$TMP"
+
+          echo "Merge complete"
 
       - name: Log contents for debugging
         run: |
           ls -la custom-iso/casper/
 
           echo "Checking manifests"
-          #cat custom-iso/casper/minimal.manifest 2>/dev/null || echo "(minimal.manifest not present)"
-
-          #cat custom-iso/casper/minimal.manifest.full 2>/dev/null || echo "(minimal.manifest.full not present)"
-
-          #cat custom-iso/casper/minimal.standard.manifest 2>/dev/null || echo "(minimal.standard.manifest not present)"
-
-          #cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
+          echo "Checking minimal.manifest"
+          cat custom-iso/casper/minimal.manifest 2>/dev/null || echo "(minimal.manifest not present)"
+          
+          echo "Checking minimal.manifest.full"
+          cat custom-iso/casper/minimal.manifest.full 2>/dev/null || echo "(minimal.manifest.full not present)"
+          
+          echo "Checking minimal.standard.manifest"
+          cat custom-iso/casper/minimal.standard.manifest 2>/dev/null || echo "(minimal.standard.manifest not present)"
+          
+          echo "Checking minimal.standard.manifest.full"
+          cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
       # Symlink trick borrowed from CUBIC (https://github.com/PJ-Singh-001/Cubic)
-      - name: Inspect and Prune Extended Installation
-        run: |
-          echo "Replacing the standard squashfs with a symlink to save space without breaking the installer..."
+      #- name: Inspect and Prune Extended Installation
+        #run: |
+          #echo "Replacing the standard squashfs with a symlink to save space without breaking the installer..."
 
-          PRIMARY_BASENAME=$(basename "${{ env.SQUASHFS_PATH }}")
+          #PRIMARY_BASENAME=$(basename "${{ env.SQUASHFS_PATH }}")
 
-          STANDARD_FILE=$(ls custom-iso/casper/*standard.squashfs 2>/dev/null | head -n 1)
+          #STANDARD_FILE=$(ls custom-iso/casper/*standard.squashfs 2>/dev/null | head -n 1)
 
-          if [ -n "$STANDARD_FILE" ]; then
-            STANDARD_BASENAME=$(basename "$STANDARD_FILE")
-            echo "Found standard squashfs: $STANDARD_BASENAME"
+          #if [ -n "$STANDARD_FILE" ]; then
+            #STANDARD_BASENAME=$(basename "$STANDARD_FILE")
+            #echo "Found standard squashfs: $STANDARD_BASENAME"
             
             # 1. Delete the heavy extended payload
-            sudo rm -f "custom-iso/casper/$STANDARD_BASENAME"
+            #sudo rm -f "custom-iso/casper/$STANDARD_BASENAME"
             
             # 2. Delete the old size and manifest files associated with it
-            sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.size"
-            sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.manifest"
+            #sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.size"
+            #sudo rm -f "custom-iso/casper/${STANDARD_BASENAME%.squashfs}.manifest"
             
             # 3. Create the symlinks directly inside the casper directory
-            cd custom-iso/casper/
+            #cd custom-iso/casper/
             
             # Symlink the squashfs
-            sudo ln -s "$PRIMARY_BASENAME" "$STANDARD_BASENAME"
+            #sudo ln -s "$PRIMARY_BASENAME" "$STANDARD_BASENAME"
             
             # Symlink the size file so the installer's disk space check doesn't fail or show wrong numbers
-            sudo ln -s "${PRIMARY_BASENAME%.squashfs}.size" "${STANDARD_BASENAME%.squashfs}.size"
+            #sudo ln -s "${PRIMARY_BASENAME%.squashfs}.size" "${STANDARD_BASENAME%.squashfs}.size"
             
-            cd ../../
+            #cd ../../
             
-            echo "Successfully symlinked $STANDARD_BASENAME to $PRIMARY_BASENAME"
-            ls -la custom-iso/casper/*standard*
-          else
-            echo "No standard squashfs found, skipping symlink trick."
-          fi
+            #echo "Successfully symlinked $STANDARD_BASENAME to $PRIMARY_BASENAME"
+            #ls -la custom-iso/casper/*standard*
+          #else
+            #echo "No standard squashfs found, skipping symlink trick."
+          #fi
 
-          STANDARD_MANIFEST=custom-iso/casper/minimal.standard.manifest
-          STANDARD_MANIFEST_FULL=custom-iso/casper/minimal.standard.manifest.full
+          #STANDARD_MANIFEST=custom-iso/casper/minimal.standard.manifest
+          #STANDARD_MANIFEST_FULL=custom-iso/casper/minimal.standard.manifest.full
 
-          if [ -f "$STANDARD_MANIFEST" ] && [ -f "$STANDARD_MANIFEST_FULL" ]; then
-            sudo rm -f "$STANDARD_MANIFEST" "$STANDARD_MANIFEST_FULL"
-            cd custom-iso/casper/
-            sudo ln -s "minimal.manifest" "minimal.standard.manifest"
-            sudo ln -s "minimal.manifest.full" "minimal.standard.manifest.full"
-            cd ../../
-            echo "Symlinked standard manifests to primary manifests."
-          else
-            echo "No standard manifest found, skipping symlink trick."
-          fi
+          #if [ -f "$STANDARD_MANIFEST" ] && [ -f "$STANDARD_MANIFEST_FULL" ]; then
+            #sudo rm -f "$STANDARD_MANIFEST" "$STANDARD_MANIFEST_FULL"
+            #cd custom-iso/casper/
+            #sudo ln -s "minimal.manifest" "minimal.standard.manifest"
+            #sudo ln -s "minimal.manifest.full" "minimal.standard.manifest.full"
+            #cd ../../
+            #echo "Symlinked standard manifests to primary manifests."
+          #else
+            #echo "No standard manifest found, skipping symlink trick."
+          #fi
 
       - name: Inject GRUB theme into ISO and installed system
         run: |
@@ -172,31 +207,52 @@ jobs:
 
           # Bind mounts
           sudo mount --bind /dev squashfs-root/dev
-          sudo mount --bind /run squashfs-root/run
+          sudo mount --bind /dev/pts squashfs-root/dev/pts
           sudo mount -t proc /proc squashfs-root/proc
           sudo mount -t sysfs /sys squashfs-root/sys
+          sudo mount --bind /run squashfs-root/run
           
           # Fix for the "same file" error: Remove and copy with dereference
+          ORIGINAL_RESOLVE_CONF=$(cat /etc/resolv.conf)
           sudo rm -f squashfs-root/etc/resolv.conf
           sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
           # Execute in chroot
           sudo chroot squashfs-root /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
 
+          # Restore original resolv.conf
+          sudo rm -f squashfs-root/etc/resolv.conf
+          echo "$ORIGINAL_RESOLVE_CONF" | sudo tee squashfs-root/etc/resolv.conf
+
           # Proper Cleanup (Unmount in reverse order)
-          sudo umount squashfs-root/sys
-          sudo umount squashfs-root/proc
-          sudo umount squashfs-root/run
-          sudo umount squashfs-root/dev
+          sudo umount --lazy squashfs-root/run
+          sudo umount --lazy squashfs-root/sys
+          sudo umount --lazy squashfs-root/proc
+          sudo umount --lazy squashfs-root/dev/pts
+          sudo umount --lazy squashfs-root/dev
     
       - name: Re-generate Manifests
         run: |
-          # Commented out until sure of the manifest file we need to change, also, change rm -rf to overwriting
+          packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || echo "dpkg-query failed" && exit 1
+          [[ -n "$packages" ]] || echo "No packages found" && exit 1
 
-          if ! sudo chroot squashfs-root /bin/bash -xlc "dpkg-query -W --showformat='\${Package}\t\${Version}\n'" > sudo custom-iso/casper/minimal.manifest.full; then
-              echo "Error: failed to generate minimal manifest" >&2
-              exit 1
-          fi
+          echo "$packages"
+
+          echo "Total $(wc -l <<< "$packages") packages found."
+          manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
+          echo "Generating $manifest"
+          printf '$s' "$packages" > sudo "$manifest"
+          echo "Generated $manifest"
+
+          echo "Symlinking standard manifests to primary manifests"
+          sudo ln -sf "${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
+
+          echo "Calculating combined squashfs size"
+          combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
+          printf '%s\n' "$bytes" > "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
+
+          echo "Symlinking standard squashfs size to primary squashfs size"
+          sudo ln -sf "${{ env.MINIMAL_SIZE }}" "custom-iso/casper/${{ env.STANDARD_SIZE }}"
 
       - name: Apply Custom System Metadata
         run: |
@@ -209,23 +265,30 @@ jobs:
       - name: Re-compress Root Filesystem
         run: |
           # Remove the old base filesystem using the path we found earlier
-          sudo rm "${{ env.SQUASHFS_PATH }}"
+          sudo rm "custom-iso/casper/${{ env.MINIMAL_SQUASH }}"
           
           # Compress the modified filesystem back to the exact same file name
-          sudo mksquashfs squashfs-root "${{ env.SQUASHFS_PATH }}" -comp zstd -b 1M -noappend
+          echo "Compressing minimal squashfs"
+          sudo mksquashfs squashfs-root "custom-iso/casper/${{ env.MINIMAL_SQUASH }}" -comp xz -noappend
           
-          # Update the matching filesystem size manifest (.size file)
-          SIZE_FILE="${{ env.SQUASHFS_PATH }}"
-          SIZE_FILE="${SIZE_FILE%.squashfs}.size"
-          
-          printf $(sudo du -sx --block-size=1 squashfs-root | cut -f1) | sudo tee "$SIZE_FILE"
+          echo "Compressed minimal squashfs"
+
+          echo "Creating empty standard squashfs"
+          empty_directory="$(mktemp -d)"
+          sudo mksquashfs "$empty_directory" "custom-iso/casper/${{ env.STANDARD_SQUASH }}" -comp xz -noappend
+          rmdir "$empty_directory"
+
+          echo "Created empty standard squashfs"
 
       - name: Update MD5 Checksums
         run: |
           cd custom-iso
           sudo rm -f md5sum.txt
+          
           # Calculate new checksums for integrity verification during boot
+          echo "Calculating MD5 checksums"
           sudo find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
+          echo "Calculated MD5 checksums"
           cd ..
 
       - name: Generate Final ISO
