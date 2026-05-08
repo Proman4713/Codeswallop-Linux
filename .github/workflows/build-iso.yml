@@ -93,14 +93,14 @@ jobs:
           STAGING="$(sudo mktemp -d)"
 
           echo "Extracting minimal filesystem"
-          sudo unsquashfs -f -d "$STAGING/squashfs-root" "$custom-iso/casper/$MINIMAL_SQUASH"
+          sudo unsquashfs -f -d "$STAGING/squashfs-root" "custom-iso/casper/$MINIMAL_SQUASH"
           sudo rsync -aHAX "$STAGING/squashfs-root/" squashfs-root/
           sudo rm -rf "$STAGING"
 
           echo "Merging standard filesystem"
           TMP="$(sudo mktemp -d)"
           STANDARD_STAGING="$(sudo mktemp -d)"
-          sudo unsquashfs -f -d "$STANDARD_STAGING/squashfs-root" "$custom-iso/casper/$STANDARD_SQUASH"
+          sudo unsquashfs -f -d "$STANDARD_STAGING/squashfs-root" "custom-iso/casper/$STANDARD_SQUASH"
           sudo rsync -aHAX "$STANDARD_STAGING/squashfs-root/" "$TMP/"
           sudo rm -rf "$STANDARD_STAGING"
           sudo rsync -aHAXc "$TMP/" squashfs-root/
@@ -213,7 +213,7 @@ jobs:
           sudo mount --bind /run squashfs-root/run
           
           # Fix for the "same file" error: Remove and copy with dereference
-          ORIGINAL_RESOLVE_CONF=$(cat /etc/resolv.conf)
+          ORIGINAL_RESOLVE_CONF=$(cat squashfs-root/etc/resolv.conf)
           sudo rm -f squashfs-root/etc/resolv.conf
           sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
@@ -233,15 +233,15 @@ jobs:
     
       - name: Re-generate Manifests
         run: |
-          packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || echo "dpkg-query failed" && exit 1
-          [[ -n "$packages" ]] || echo "No packages found" && exit 1
+          packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
+          [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
 
           echo "$packages"
 
           echo "Total $(wc -l <<< "$packages") packages found."
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
-          printf '$s' "$packages" > sudo "$manifest"
+          printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
           echo "Generated $manifest"
 
           echo "Symlinking standard manifests to primary manifests"
@@ -249,7 +249,7 @@ jobs:
 
           echo "Calculating combined squashfs size"
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
-          printf '%s\n' "$bytes" > "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
+          printf '%s\n' "$combined_squash_bytes" > "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
 
           echo "Symlinking standard squashfs size to primary squashfs size"
           sudo ln -sf "${{ env.MINIMAL_SIZE }}" "custom-iso/casper/${{ env.STANDARD_SIZE }}"
