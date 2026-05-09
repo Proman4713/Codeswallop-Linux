@@ -8,7 +8,7 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 
 ### Table Of Contents
 - [Quick Start](#quick-start)
-- **[Disclaimers & Agreements](#disclaimers--agreements)**
+- **[Disclaimers & Agreements (Read Before Using)](#disclaimers--agreements)**
 - [Support me](#support-me)
 - [Structure](#structure)
 - [Plans](#plans)
@@ -48,7 +48,7 @@ While this project is primarily focused on modifying the base Ubuntu ISO to gene
 If you somehow found this project useful, or used my wallpapers for your desktop, then please consider [buying me a coffee](https://buymeacoffee.com/codeswallop) :)
 
 ## Structure
-This project applies a set of 'patches' in the form of .bash files to modify certain aspects of the Ubuntu desktop. The patches are designed to build up a new system from the ground up rather than blindly importing configs or dconf dumps onto the system. This reduces need to edit parts of the script based on updates in Ubuntu, GNOME, GNOME shell extensions, or anything else.
+This project applies a set of 'patches' in the form of .bash files to modify certain aspects of the Ubuntu desktop. The patches are designed to build up a new system from the ground up rather than blindly importing configs or dconf dumps onto the system. This reduces the need to edit parts of the script based on updates in Ubuntu, GNOME, GNOME shell extensions, or anything else.
 
 The patches are 'compiled' through the NodeJS [`compile.js`](./src/compile.js) script, which generates one big .sh file that can apply to both ISOs and Ubuntu installations. The .sh files are then uploaded to GitHub releases and made available for download. This allows me to modularise the patches for ease of development, but also provide one shell script for ease of use and deployment.
 
@@ -63,14 +63,14 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 	<summary>Plans</summary>
 	<ol>
 		<li><strike>Make my own APT repository and debian packages.</strike></li>
-		<li><strike>Override upstream's `base-files` package to provide logos and release metadata</strike></li>
+		<li><strike>Override upstream's <code>base-files</code> package to provide logos and release metadata</strike></li>
 		<li>Change bashrc to use a lighter colour for the <code>user@computer</code> text</li>
-		<li>Either contribute my distribution's ASCII symbol to `fastfetch` or include it in a debian package and set the `--logo` argument in a bashrc alias of `fastfetch`/`neofetch`</li>
+		<li>Either contribute my distribution's ASCII symbol to <code>fastfetch</code> or include it in a debian package and set the <code>--logo</code> argument in a bashrc alias of <code>fastfetch</code>/<code>neofetch</code></li>
 		<li>Implement my own plymouth theme.</li>
-		<li>Figure out a way to use/implement an equivalent of the <code>Customised Wallpapers</code> without cluttering the UI</li>
+		<li>Figure out a way to use/implement an equivalent of the <code>Customised Wallpapers</code> extension without cluttering the UI</li>
 		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
-		<li>Similarly, make a `utile-gnome-shell-extensions` package to be able to install preferred extensions as system extensions and update them without needing the hacky `seed_extension` function in patch 000.</li>
-		<li>Create a `utile-gnome-defaults` package for the gsettings/dconf changes</li>
+		<li>Similarly, make a <code>utile-gnome-shell-extensions</code> package to be able to install preferred extensions as system extensions and update them without needing the hacky <code>seed_extension</code> function in patch 000.</li>
+		<li>Create a <code>utile-gnome-defaults</code> package for the gsettings/dconf changes</li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
 		<li>Implement my own app store (packaged in Debian, not a Snap) which makes the issue of Snap vs. Debian less of a technical dilemma and more of a user-friendly choice. This app store must also improve on the UI/UX of usual Linux app stores, which, in my opinion, are developed by people that are too tech-centric to dedicate enough thought to the appeal of their UI. Additionally, I would like to allow developers to publish Debian-packaged apps to this store even if they don't come from the device's apt sources, this could potentially be done by verifying a developer's identity and their app's safety, then only adding their app's source repository if the user chooses to install the app.</li>
 	</ol>
@@ -82,7 +82,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Should I allow a custom wallpaper for the lock screen through extensions (potentially custom, to unify GDM login and lock screen)?</li>
 		<li>Should I create an extension to reduce the size of the headerbar in GNOME, especially with fractional scaling?</li>
 		<li>Should I include a pre-configure 'Dash2Dock Animated' extension? Is that too much like macOS in a way that it shouldn't be?</li>
-		<li>Similarly, what about the `Compiz alike magic lamp effect` extension? This could be too much, but maybe another extension that provides a springier minimise animation than default?</li>
+		<li>Similarly, what about the 'Compiz alike magic lamp effect' extension? This could be too much, but maybe another extension that provides a springier minimise animation than default?</li>
 		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well></li>
 		<li>The average user does not have NAS devices and doesn't use <a href="https://ubuntu.com/server/docs/how-to/networking/install-nfs/">NFS</a>, should I disable the NetworkManager-wait-online.service to speed up boot time? What are the tradeoffs?</li>
 	</ol>
@@ -97,7 +97,7 @@ If you want to read more from me about this, then I'm pleased to say that there 
 
 This project serves as container for everything that I dare to try to address these pain points.
 
-'**Utile**' is an old English word that meant 'Useful' before Shakespeare decided to first write the now famous word. It was derived from Middle French and still exists in the French language to this day. I particularly picked this word to highlight the helpfulness that I want to provide with this project.
+'**Utile**' (pronounced 'you-tile') is an old English word that meant 'Useful' before Shakespeare decided to first write the now famous word. It was derived from Middle French and still exists in the French language to this day. I particularly picked this word to highlight the helpfulness that I want to provide with this project.
 
 ## Rights & Licensing
 - This project is licensed under the well-known GPL v3, which covers all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md).
@@ -106,6 +106,6 @@ This project serves as container for everything that I dare to try to address th
 ## Contributing
 Contributing, for now, shall be as simple as submitting an Issue or Pull Request with a good description and valuable information. I currently see no need to restrict how contributions can be made.
 
-This code - mostly due to my own initial incapability of understanding certain things - contains AI-written code/comments that may not be optimal. I intend to rewrite them before I consider this project ready for release. However, my main focus now is to ship more functionality.
+This code - mostly due to my own initial incapability of understanding certain things - contains AI-written code/comments that may not be optimal. I intend to rewrite them soon. However, my main focus now is to ship more functionality.
 
 Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise this project's legitimate focus around the user's first-time, zero-knowledge experience.

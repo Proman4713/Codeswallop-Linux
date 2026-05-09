@@ -154,6 +154,7 @@ jobs:
 
           # Execute in chroot
           sudo chroot squashfs-root /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
+          sudo rm -f squashfs-root/opt/${{ env.SH_NAME }}
 
           # Restore original resolv.conf
           sudo rm -f squashfs-root/etc/resolv.conf
@@ -168,9 +169,11 @@ jobs:
     
       - name: Re-generate Manifests
         run: |
+          set -exuo pipefail # Strict
+
           packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
           [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
-          snaps="$(grep "^snap:" "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" | grep -v "snap:firefox" | grep -v "snap:thunderbird" || true)"
+          snaps="$(cat "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" | grep "^snap:" | grep -v "snap:firefox" | grep -v "snap:thunderbird" || true)"
           echo "Found snaps: $snaps"
 
           echo "Total $(wc -l <<< "$packages") packages found."
@@ -181,7 +184,7 @@ jobs:
             printf '%s\n' "$snaps" | sudo tee -a "$manifest"
           fi
           cat "$manifest"
-          echo "Generated $manifest"
+          echo -e "\nGenerated $manifest"
 
           echo "Symlinking standard manifests to primary manifests"
           sudo ln -sf "${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
