@@ -189,15 +189,15 @@ jobs:
 
           echo "Total $(wc -l <<< "$packages") packages found."
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
-          echo "Generating $manifest"
-          printf '%s' "$packages" | sudo tee "$manifest"
+          echo "Generating Manifests"
+          printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
           if [[ -n "${{ env.MANIFEST_SNAPS }}" ]]; then
-            echo "${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest"
+            echo "${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest" > /dev/null
           fi
           cat "$manifest"
 
           # Override minimal.manifest.full with the same content
-          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.MINIMAL_MANIFEST_FULL }}"
+          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.MINIMAL_MANIFEST_FULL }}" > /dev/null
           echo -e "\nGenerated Manifests"
 
           echo "Symlinking standard manifests to primary manifests"
