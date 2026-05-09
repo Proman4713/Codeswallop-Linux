@@ -128,8 +128,12 @@ jobs:
           cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
           echo "Extracting snap section"
-          MANIFEST_SNAPS=$(cat custom-iso/casper/minimal.standard.manifest.full | grep snap | grep -v "snap:firefox" | grep -v "snap:thunderbird")
-          echo "MANIFEST_SNAPS=$MANIFEST_SNAPS" >> $GITHUB_ENV
+          MANIFEST_SNAPS=$(grep snap custom-iso/casper/minimal.standard.manifest.full | grep -v "snap:firefox" | grep -v "snap:thunderbird")
+          {
+            echo "MANIFEST_SNAPS<<EOF"
+            echo "$MANIFEST_SNAPS"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - name: Inject GRUB theme into ISO and installed system
         run: |
@@ -187,7 +191,7 @@ jobs:
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
           printf '%s' "$packages" | sudo tee "$manifest"
-          if [[ -n "$snaps" ]]; then
+          if [[ -n "${{ env.MANIFEST_SNAPS }}" ]]; then
             echo "${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest"
           fi
           cat "$manifest"
