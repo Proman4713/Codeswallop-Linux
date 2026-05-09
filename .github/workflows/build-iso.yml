@@ -128,7 +128,7 @@ jobs:
           cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
 
           echo "Extracting snap section"
-          MANIFEST_SNAPS=$(grep snap custom-iso/casper/minimal.standard.manifest.full | grep -v "snap:firefox" | grep -v "snap:thunderbird")
+          MANIFEST_SNAPS=$(grep "snap:" custom-iso/casper/minimal.standard.manifest.full | grep -v "snap:firefox" | grep -v "snap:thunderbird")
           {
             echo "MANIFEST_SNAPS<<EOF"
             echo "$MANIFEST_SNAPS"
