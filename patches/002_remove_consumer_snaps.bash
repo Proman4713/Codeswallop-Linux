@@ -17,7 +17,16 @@ rm -rf /var/lib/snapd/snaps/*thunderbird*
 rm -rf /var/snap/*firefox*
 rm -rf /var/snap/*thunderbird*
 
+rm -rf /usr/share/applications/*firefox*
+rm -rf /usr/share/applications/*thunderbird*
+
+rm -rf /var/lib/snapd/desktop/applications/*firefox*
+rm -rf /var/lib/snapd/desktop/applications/*thunderbird*
+
 if [ -f /var/lib/snapd/seed/seed.yaml ]; then
 	sed -i '/firefox/d' /var/lib/snapd/seed/seed.yaml
 	sed -i '/thunderbird/d' /var/lib/snapd/seed/seed.yaml
 fi
+
+echo "Remaining Firefox entries:"
+find /usr /var -name "*firefox*"
