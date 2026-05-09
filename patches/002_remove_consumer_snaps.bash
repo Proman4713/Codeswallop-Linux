@@ -5,8 +5,8 @@ fi
 
 # We need to be as harsh as possible here, one issue of snaps is that they're hard to control since they require the snapd daemon to be running before we
 #	can remove them easily.
-apt-mark hold firefox thunderbird
 apt-get purge -y firefox thunderbird || true
+apt-mark hold firefox thunderbird
 
 rm -rf /var/lib/snapd/seed/snaps/*firefox*
 rm -rf /var/lib/snapd/seed/snaps/*thunderbird*
