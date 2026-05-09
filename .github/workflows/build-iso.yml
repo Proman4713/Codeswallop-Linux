@@ -75,14 +75,18 @@ jobs:
           MINIMAL_SQUASH="minimal.squashfs"
           STANDARD_SQUASH="minimal.standard.squashfs"
           MINIMAL_MANIFEST="minimal.manifest"
+          MINIMAL_MANIFEST_FULL="minimal.manifest.full"
           STANDARD_MANIFEST="minimal.standard.manifest"
+          STANDARD_MANIFEST_FULL="minimal.standard.manifest.full"
           MINIMAL_SIZE="minimal.size"
           STANDARD_SIZE="minimal.standard.size"
 
           echo "MINIMAL_SQUASH=$MINIMAL_SQUASH" >> $GITHUB_ENV
           echo "STANDARD_SQUASH=$STANDARD_SQUASH" >> $GITHUB_ENV
           echo "MINIMAL_MANIFEST=$MINIMAL_MANIFEST" >> $GITHUB_ENV
+          echo "MINIMAL_MANIFEST_FULL=$MINIMAL_MANIFEST_FULL" >> $GITHUB_ENV
           echo "STANDARD_MANIFEST=$STANDARD_MANIFEST" >> $GITHUB_ENV
+          echo "STANDARD_MANIFEST_FULL=$STANDARD_MANIFEST_FULL" >> $GITHUB_ENV
           echo "MINIMAL_SIZE=$MINIMAL_SIZE" >> $GITHUB_ENV
           echo "STANDARD_SIZE=$STANDARD_SIZE" >> $GITHUB_ENV
 
@@ -122,6 +126,10 @@ jobs:
           
           echo "Checking minimal.standard.manifest.full"
           cat custom-iso/casper/minimal.standard.manifest.full 2>/dev/null || echo "(minimal.standard.manifest.full not present)"
+
+          echo "Extracting snap section"
+          MANIFEST_SNAPS=$(cat custom-iso/casper/minimal.standard.manifest.full | grep snap | grep -v "snap:firefox" | grep -v "snap:thunderbird")
+          echo "MANIFEST_SNAPS=$MANIFEST_SNAPS" >> $GITHUB_ENV
 
       - name: Inject GRUB theme into ISO and installed system
         run: |
@@ -173,21 +181,25 @@ jobs:
 
           packages="$(dpkg-query --admindir="squashfs-root/var/lib/dpkg" --show 2>/dev/null)" || { echo "dpkg-query failed"; exit 1; }
           [[ -n "$packages" ]] || { echo "No packages found"; exit 1; }
-          snaps="$(cat "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" | grep "^snap:" | grep -v "snap:firefox" | grep -v "snap:thunderbird" || true)"
-          echo "Found snaps: $snaps"
+          echo "Found snaps: ${{ env.MANIFEST_SNAPS }}"
 
           echo "Total $(wc -l <<< "$packages") packages found."
           manifest="custom-iso/casper/${{ env.MINIMAL_MANIFEST }}"
           echo "Generating $manifest"
           printf '%s' "$packages" | sudo tee "$manifest"
           if [[ -n "$snaps" ]]; then
-            printf '%s\n' "$snaps" | sudo tee -a "$manifest"
+            echo "${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest"
           fi
           cat "$manifest"
-          echo -e "\nGenerated $manifest"
+
+          # Override minimal.manifest.full with the same content
+          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.MINIMAL_MANIFEST_FULL }}"
+          echo -e "\nGenerated Manifests"
 
           echo "Symlinking standard manifests to primary manifests"
-          sudo ln -sf "${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
+          sudo ln -sf "${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST_FULL }}"
+          # minimal.standard.manifest only contains packages added over minimal.manifest, so it should be empty
+          echo -e "" | sudo tee "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
 
           echo "Calculating combined squashfs size"
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
