@@ -191,7 +191,7 @@ jobs:
           echo "Generating Manifests"
           printf '%s' "$packages" | sudo tee "$manifest" > /dev/null
           if [[ -n "${{ env.MANIFEST_SNAPS }}" ]]; then
-            echo "${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest" > /dev/null
+            echo -e "\n${{ env.MANIFEST_SNAPS }}" | sudo tee -a "$manifest" > /dev/null
           fi
           cat "$manifest"
 
