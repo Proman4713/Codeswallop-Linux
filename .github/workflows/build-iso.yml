@@ -160,7 +160,6 @@ jobs:
           sudo mount --bind /run squashfs-root/run
           
           # Fix for the "same file" error: Remove and copy with dereference
-          ORIGINAL_RESOLVE_CONF=$(cat squashfs-root/etc/resolv.conf)
           sudo rm -f squashfs-root/etc/resolv.conf
           sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
 
@@ -170,7 +169,7 @@ jobs:
 
           # Restore original resolv.conf
           sudo rm -f squashfs-root/etc/resolv.conf
-          echo "$ORIGINAL_RESOLVE_CONF" | sudo tee squashfs-root/etc/resolv.conf
+          sudo chroot squashfs-root /bin/bash -xlc "sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
           # Proper Cleanup (Unmount in reverse order)
           sudo umount --lazy squashfs-root/run
