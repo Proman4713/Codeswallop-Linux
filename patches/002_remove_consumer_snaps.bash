@@ -28,5 +28,18 @@ if [ -f /var/lib/snapd/seed/seed.yaml ]; then
 	sed -i '/thunderbird/d' /var/lib/snapd/seed/seed.yaml
 fi
 
+# Any leftovers
+find /var/lib/snapd -name "*firefox*" -delete
+find /var/lib/snapd -name "*thunderbird*" -delete
+
+find /usr/share/icons -name "*firefox*" -delete
+find /usr/share/icons -name "*thunderbird*" -delete
+
+find /usr/share/bash-completion -name "*firefox*" -delete
+find /usr/share/bash-completion -name "*thunderbird*" -delete
+
+find /var/cache/apparmor -name "*firefox*" -delete
+find /var/cache/apparmor -name "*thunderbird*" -delete
+
 echo "Remaining Firefox entries:"
 find /usr /var -name "*firefox*"
