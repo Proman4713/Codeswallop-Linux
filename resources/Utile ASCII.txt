@@ -1,32 +1,25 @@
-                         'cx0XWMMMWX0xl'                         
-                   .:dONMMMMMMMMMMMMMMMMMNOd:.                   
-               .cOWMMMMMMMMMMM'   .MMMMMMMMMMMWOc.               
-             lKMMMMMMX                     XMMMMMMKl.            
-          'OMMMMMW        .';:clllc:;'.        WMMMMMO,          
-        ,KMMMMM      .ckKMMMMMMMMMMMMMMMXkc.      MMMMMK,        
-       OMMMMN     ,kWMMMM.             .MMMMWk;     XMMMMO       
-     :WMMMM     oWMMM.     .,:clllc:,.     .MMMWd     MMMMWc     
-    xMMMMo    dMMMo    ;dKMMMx     xMMMKd;    lMMMx    oMMMMx    
-   OMMMM,   ;WMMx   ,OMM;    ...'..     ;MMO,   dMMW:   'MMMMO   
-  xMMMM'   dMMM.  ,KM0   ,d0W,       .d,   0MK,   MMMx   'MMMMk  
- 'MMMMc   xMMM   kMM   dW,  ,;lodol;.  'Wx   MMk   WMMk   cMMMM' 
- NMMMN   :MMM   KMO  oM'     'loool' ;x' 'Mo  kMK   MMM:   NMMMW 
-'MMMM,   WMM:  OMX  OM  k; :'       'c.;k  M0       ;MMM   ,MMMM'
-kMMMM   ;MMM  .MM. lM. X'.d           d..X .Md  :o.  MMM:   MMMMk
-WMMMM   xMMX  lMM  MW cK               N Kc NM  MMo  KMMO   MMMMW
-MMMMM   OMMK  dMM  MN ok               M kx KM  MMx  0MMK   MMMMM
-KMMMM   lMMW  ;MM  XM .W c.           .o W. MN  MM;  WMMd   MMMMK
-cMMMM.  .MMM.  MMo .Mk ;0..c         c'.0: xM. lMM  .MMM.  .MMMMl
- MMMMx   0MMK  'MM. .Mx  Xc. ,c,,,c, .cX  dM. .MM'  0MMX   xMMMM 
- xMMMM.   MMMd  'MW:  OX;  .kllooollk.  ;X0  ;WM'  oMMM   .MMMMk 
-  MMMMX    MMMo   MMk.  cNx;,.      ,;dNl  .kMM   cMMM.   XMMMM  
-  .MMMM0    MMM0   .MMk,    .WXK0KXW.    ,kMM.           0MMMM.  
-   .MMMMK    lMMWo    dMWOl,.       .,lOWMx    oNx'     KMMMM.   
-     MMMMW:    kMMWx'     lMMMWNXNWMMMl     .dWMMO    ;WMMMM     
-      xMMMM0.    ,MMMNx;.               .;xNMMM:    .0MMMMx      
-        MMMMMO'     'MMMMW0xoc:;;;:cox0WMMMM,     'OMMMMM        
-          MMMMMXl.       cMMMMMMMMMMMMMc       .lXMMMMM          
-            0MMMMMXd,                       ,dXMMMMMK            
-               WMMMMMMNOo:'..       ..':oOXMMMMMMW               
-                  'MMMMMMMMMMMM   MMMMMMMMMMMM'                  
-                        dMMMMMM   MMMMMMd                        
+                       KMMK                       
+             ..       lMMMMl       ..             
+           oNMMX.     lMMMMl     .XMMNo           
+           'MMMMW,    lMMMMl    'WMMMM'           
+             MMMMMl   lMMMMl   lMMMMM             
+    .'.       WMMMM.  lMMMMl  .MMMMW       .'.    
+   xMMMXd,             MMMM             ,dXMMMx   
+   oMMMMMMWOc                        cOWMMMMMMo   
+       MMMMMK                        KMMMMM       
+                       .''.                       
+                    .kWMMMMWk.                    
+:0KKKKKKKO.        .MMMMMMMMMM.        .OKKKKKKK0c
+WMMMMMMMMMx        cMMMMMMMMMMl        dMMMMMMMMMM
+                    KMMMMMMMMK                    
+                      :MMMM:                      
+       .:kX0.                        .0XOc.       
+    ,dXMMMMMM                        MMMMMMXd,    
+   WMMMMMMl                            lMMMMMMW   
+    WMW       ;KXOc            :OXK;       NMW    
+             oMMMMM    dkkd.   MMMMMo             
+            kMMMMN    lMMMMl    XMMMMO            
+           KMMMMk     lMMMMl     xMMMMK           
+             MM'      lMMMMl      .MM.            
+                      ,MMMM,                      
+                        KX                        
