@@ -135,16 +135,16 @@ jobs:
             echo "EOF"
           } >> $GITHUB_ENV
 
-      - name: Inject GRUB theme into ISO and installed system
-        run: |
-          # Installed System
-          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile
-          sudo cp grub/theme.txt squashfs-root/usr/share/grub/themes/utile/
+      #- name: Inject GRUB theme into ISO and installed system
+        #run: |
+          ## Installed System
+          #sudo mkdir -p squashfs-root/usr/share/grub/themes/utile
+          #sudo cp grub/theme.txt squashfs-root/usr/share/grub/themes/utile/
 
-          sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
-          sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
+          #sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
+          #sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
 
-          sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
+          #sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
 
       - name: Setup Chroot Environment & Run Custom Script
         run: |
