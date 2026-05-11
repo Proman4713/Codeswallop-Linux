@@ -19,8 +19,11 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	echo "Release $(lsb_release -a)\nCodename: $(lsb_release -cs)"
 
 	# Desktop metapackage (GRUB Theme, Wallpapers, etc.)
-	export GRUB_DISABLE_OS_PROBER=true
+	chmod -x /etc/grub.d/30_os-prober
+	# shellcheck disable=SC2034
+	GRUB_DISABLE_OS_PROBER=true
 	install_packages utile-desktop && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
+	chmod +x /etc/grub.d/30_os-prober
 fi
 
 apt-get autoremove -y --purge
