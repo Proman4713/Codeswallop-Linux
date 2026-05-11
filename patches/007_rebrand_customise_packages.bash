@@ -16,8 +16,10 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		echo "Error: Failed to upgrade base-files package" >&2
 		exit 1
 	fi
+	echo "Release $(lsb_release -a)\nCodename: $(lsb_release -cs)"
 
 	# Desktop metapackage (GRUB Theme, Wallpapers, etc.)
+	export GRUB_DISABLE_OS_PROBER=true
 	install_packages utile-desktop && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
 fi
 

@@ -24,7 +24,8 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 	1. A USB drive of at least **8GBs**.
 	3. Internal Storage: **25GB** minimum.
 	4. RAM: **6GB** recommended.
-	5. VRAM: **Untested**.
+	5. VRAM: **256MB** minimum, **1GB or more** recommended. **3D Acceleration** strongly recommended.
+	6. Secure Boot: Optional, although **Disabled** gives you a better-looking boot screen.
 
 While this project is primarily focused on modifying the base Ubuntu ISO to generate what is essentially a new distribution, it can be used as a bash script to modify an existing Ubuntu installation. The script will modify both user configurations and system defaults. See the [Structure](#structure) section for more details.
 
