@@ -177,6 +177,10 @@ jobs:
           sudo umount --lazy squashfs-root/proc
           sudo umount --lazy squashfs-root/dev/pts
           sudo umount --lazy squashfs-root/dev
+
+      - name: Copy INITRD to match Plymouth
+        run: |
+          sudo cp squashfs-root/boot/initrd.img-* custom-iso/casper/initrd
     
       - name: Re-generate Manifests
         run: |
@@ -195,12 +199,13 @@ jobs:
           fi
           cat "$manifest"
 
-          # Override minimal.manifest.full with the same content
+          # Override minimal.manifest.full and minimal.manifest with the same content
           cat "$manifest" | sudo tee "custom-iso/casper/${{ env.MINIMAL_MANIFEST_FULL }}" > /dev/null
+          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" > /dev/null
           echo -e "\nGenerated Manifests"
 
-          echo "Symlinking standard manifests to primary manifests"
-          sudo ln -sf "${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST_FULL }}"
+          echo "Copying primary manifest to standard manifests"
+          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.STANDARD_MANIFEST_FULL }}"
           # minimal.standard.manifest only contains packages added over minimal.manifest, so it should be empty
           echo -e "" | sudo tee "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
 
@@ -235,6 +240,24 @@ jobs:
           rmdir "$empty_directory"
 
           echo "Created empty standard squashfs"
+
+      - name: Inject GRUB theme into Live USB
+        run: |
+          mkdir -p temp-grub/
+          wget -qO utile-grub-theme.deb "https://github.com/Proman4713/Utile-OS-debian/raw/refs/heads/main/builds/utile-grub-theme-abstract_all.deb"
+          sudo dpkg -x utile-grub-theme.deb temp-grub/
+
+          sudo mkdir -p custom-iso/boot/grub/themes/utile
+          THEME_PATH="temp-grub/boot/grub/themes/utile"
+          sudo cp -r $THEME_PATH/* custom-iso/boot/grub/themes/utile/
+
+          original_grub_config=$(cat custom-iso/boot/grub/grub.cfg)
+          echo "set theme=$(root)/boot/grub/themes/utile/theme.txt" | sudo tee custom-iso/boot/grub/grub.cfg
+          echo "$original_grub_config" | sudo tee -a custom-iso/boot/grub/grub.cfg
+
+          sudo sed 's/--class ubuntu/--class utile/g' -i custom-iso/boot/grub/grub.cfg
+          sudo sed 's/menuentry "Try or Install Ubuntu" {/menuentry "Try or Install Utile OS" --class utile {/g' -i custom-iso/boot/grub/grub.cfg
+          sudo sed 's/Ubuntu (safe graphics)/Utile OS (safe graphics)/g' -i custom-iso/boot/grub/grub.cfg
 
       - name: Update MD5 Checksums
         run: |
