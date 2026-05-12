@@ -27,7 +27,7 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 	5. VRAM: **256MB** minimum, **1GB or more** recommended. **3D Acceleration** strongly recommended.
 	6. Secure Boot: Optional, although **Disabled** gives you a better-looking boot screen.
 
-While this project is primarily focused on modifying the base Ubuntu ISO to generate what is essentially a new distribution, it can be used as a bash script to modify an existing Ubuntu installation. The script will modify both user configurations and system defaults. See the [Structure](#structure) section for more details.
+While this project is primarily focused on modifying the base Ubuntu ISO to generate what is essentially a new distribution, it can be used as a bash script to modify an existing Ubuntu installation (note: this is no longer completely true, the script is now less considerate of existing installations). The script will modify both user configurations and system defaults. See the [Structure](#structure) section for more details.
 
 ## Disclaimers & Agreements
 - This project is **not** designed for personal use by anyone other than myself. I claim no liability over anything this project may do to your system as of now. If you use this project, you do so at your own risk.
@@ -68,7 +68,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Change bashrc to use a lighter colour for the <code>user@computer</code> text</li>
 		<li>Either contribute my distribution's ASCII symbol to <code>fastfetch</code> or include it in a debian package and set the <code>--logo</code> argument in a bashrc alias of <code>fastfetch</code>/<code>neofetch</code></li>
 		<li>Implement my own plymouth theme.</li>
-		<li>Figure out a way to use/implement an equivalent of the <code>Customised Wallpapers</code> extension without cluttering the UI</li>
+		<li>Figure out a way to use/implement an equivalent of the <code>Customised Workspaces</code>, <code>Customize Clock on Lock Screen</code>, and <code>Lock screen background</code> extensions without cluttering the UI</li>
 		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
 		<li>Similarly, make a <code>utile-gnome-shell-extensions</code> package to be able to install preferred extensions as system extensions and update them without needing the hacky <code>seed_extension</code> function in patch 000.</li>
 		<li>Create a <code>utile-gnome-defaults</code> package for the gsettings/dconf changes</li>
@@ -106,7 +106,5 @@ This project serves as container for everything that I dare to try to address th
 
 ## Contributing
 Contributing, for now, shall be as simple as submitting an Issue or Pull Request with a good description and valuable information. I currently see no need to restrict how contributions can be made.
-
-This code - mostly due to my own initial incapability of understanding certain things - contains AI-written code/comments that may not be optimal. I intend to rewrite them soon. However, my main focus now is to ship more functionality.
 
 Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise this project's legitimate focus around the user's first-time, zero-knowledge experience.
