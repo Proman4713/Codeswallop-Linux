@@ -1,6 +1,6 @@
 {
-  "name": "Utile-OS",
-  "version": "26.04.0",
+  "name": "utile-os",
+  "version": "26.0",
   "description": "",
   "main": "src/compile.js",
   "keywords": [],

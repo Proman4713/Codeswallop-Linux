@@ -1,4 +1,4 @@
-name: Build Utile OS 26.04 ISO
+name: Build Utile OS 26 ISO
 
 on:
   push:
@@ -214,7 +214,7 @@ jobs:
       - name: Apply Custom System Metadata
         run: |
           # Matches: Disk Name and Release
-          echo 'Utile OS 26.04 "Abstract Assembly" - Release amd64 (${{ env.TAG_NAME }})' | sudo tee custom-iso/.disk/info
+          echo 'Utile OS 26 "Abstract Assembly" - Release amd64 (${{ env.TAG_NAME }})' | sudo tee custom-iso/.disk/info
           
           # Matches: Release URL
           echo 'https://github.com/Proman4713/Utile-OS/releases/tag/${{ env.TAG_NAME }}' | sudo tee custom-iso/.disk/release_notes_url
@@ -266,7 +266,7 @@ jobs:
           sudo xorriso -as mkisofs \
             -iso-level 3 \
             -full-iso9660-filenames \
-            -volid "Utile OS 26.04 amd64" \
+            -volid "Utile OS 26 amd64" \
             -eltorito-boot boot/grub/i386-pc/eltorito.img \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
             --eltorito-catalog boot.catalog \
@@ -297,9 +297,6 @@ jobs:
           RESPONSE=$(curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}" -F "folderId=d96e59a5-9121-4b18-9bb4-4a6228e66bcd" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" "https://upload.gofile.io/contents/uploadfile")
           CONTENT_ID=$(echo "$RESPONSE" | jq -r '.data.id')
           echo "Uploaded ISO to Gofile with ID: $CONTENT_ID"
-
-          DIRECT_LINK=$(curl --retry 3 -X POST -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" -H "Accept: application/json" "https://api.gofile.io/contents/"$CONTENT_ID"/directlinks")
-          echo "Direct link: $(echo "$DIRECT_LINK")"
           
           # calculate sha256 checksum
           sha256sum ${{ env.ISO_NAME }} > ${{ env.ISO_NAME }}.sha256sum

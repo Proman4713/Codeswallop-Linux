@@ -20,7 +20,8 @@ if (!isZsh && !isBash) {
 	process.exit(1);
 }
 
-const UTILE_OS_VERSION = version.endsWith(".0") ? version.slice(0, -2) : version;
+// Get project version with trailing zeros removed
+const UTILE_OS_VERSION = version.replace(/(\.0+)+$/, '');
 
 console.log(Colours.yellow(`Compiling bash patches for Utile OS ${UTILE_OS_VERSION} into production script...\n`));
 
@@ -62,9 +63,9 @@ const dayLetter = letters[now.getDay()];
 console.log(`WEEK DAY: ${now.getDay()} == ${now.toLocaleDateString("en-US", { weekday: "long" })}`);
 
 /*
-	Example Nightly:	utile-os-26.04-nightly-26w18a
-	Example Beta:		utile-os-26.04-v1.0.0-beta1
-	Example Release:	utile-os-26.04-v1.0.0
+	Example Nightly:	utile-os-26-nightly-26w18a
+	Example Beta:		utile-os-26-v1.0.0-beta1
+	Example Release:	utile-os-26-v1.0.0
 */
 const SCRIPT_VERSION = process.env.BUILD_TYPE === "release" && process.env.GITHUB_REF_NAME
 						? `${UTILE_OS_VERSION}-${process.env.GITHUB_REF_NAME}`
