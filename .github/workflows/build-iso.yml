@@ -293,7 +293,7 @@ jobs:
       - name: Patch install-sources.yaml
         run: |
           echo "Removing unwanted casper/ files"
-          yq -i '
+          sudo yq -i '
             .sources |= map(select(.id == "ubuntu-desktop-minimal")) |
             .sources[0].preinstalled_langs = ["en", ""] |
             .sources[0].size = ${{ env.COMBINED_SIZE }} |
