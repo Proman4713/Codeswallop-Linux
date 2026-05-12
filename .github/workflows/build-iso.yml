@@ -283,7 +283,7 @@ jobs:
           removed=0
           for pattern in "${patterns[@]}"; do
             while IFS= read -r -d '' f; do
-                rm -f "$f"
+                sudo rm -f "$f"
                 echo "  Removed: $(basename "$f")"
                 (( removed++ )) || true
             done < <(find "custom-iso/casper" -maxdepth 1 -name "$pattern" -print0 2>/dev/null)
