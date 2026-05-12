@@ -101,8 +101,3 @@ This project serves as container for everything that I dare to try to address th
 ## Rights & Licensing
 - This project is licensed under the well-known GPL v3, which covers all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md).
 - On the other hand, media files available at [`resources/`](resources/) are licensed using Creative Commons, which covers images, designs, audio, video, and everything else that may exist in that folder as long as it contains the same Creative Commons license. The license available at [`resources/LICENSE.md`](resources/LICENSE.md).
-
-## Contributing
-Contributing, for now, shall be as simple as submitting an Issue or Pull Request with a good description and valuable information. I currently see no need to restrict how contributions can be made.
-
-Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise this project's legitimate focus around the user's first-time, zero-knowledge experience.

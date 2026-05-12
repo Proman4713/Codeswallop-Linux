@@ -7,6 +7,7 @@
 - [Naming Scheme](#naming-scheme)
 - [Codenames](#codenames)
 - [Release Cycle](#release-cycle)
+- [Contributing](#contributing)
 
 ## Naming Scheme
 The first thing to understand about this project is when to say 'Utile', 'Utile OS', 'Utile 26' and 'Utile OS 26':
@@ -68,3 +69,8 @@ I am unsure of whether I will be able to work on .2 and .4 LTS releases as well,
 - **Ubuntu 26.04.4** will become **Utile OS 27.1**
 
 This puts the Utile OS .1 releases at an also very consistent **February** release period, and the major Utile OS upgrades at the already discussed **August** release period. However, for now, only August releases are expected.
+
+## Contributing
+Contributing is as simple as submitting an Issue or Pull Request with a good description and valuable information. I currently see no need to restrict how contributions can be made.
+
+Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-Box Experience', an abbreviation borrowed from Windows's less-than-ideal experience to emphasise this project's legitimate focus around the user's first-time, zero-knowledge experience.
