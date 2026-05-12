@@ -227,13 +227,13 @@ jobs:
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.STANDARD_SIZE }}"
 
           echo "Removing unwanted casper/ files"
-          yq -i "
-            .sources |= map(select(.id == 'ubuntu-desktop-minimal')) |
-            .sources[0].preinstalled_langs = ['en', ''] |
-            .sources[0].size = $combined_squash_bytes |
-            .sources[0].variations.minimal.size = $combined_squash_bytes |
+          yq -i '
+            .sources |= map(select(.id == "ubuntu-desktop-minimal")) |
+            .sources[0].preinstalled_langs = ["en", ""] |
+            .sources[0].size = ($size | idiv(1)) |
+            .sources[0].variations.minimal.size = ($size | idiv(1)) |
             del(.sources[0].variations.minimal-enhanced-secureboot)
-          " custom-iso/casper/install-sources.yaml
+          ' --arg size="$combined_squash_bytes" custom-iso/casper/install-sources.yaml
 
       - name: Strip Language Layer
         run: |
