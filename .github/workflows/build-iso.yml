@@ -168,9 +168,17 @@ jobs:
           sudo mount --bind /run squashfs-root/run
           sudo mount --bind /etc/resolv.conf squashfs-root/etc/resolv.conf
 
+          # Fix for the "same file" error: Remove and copy with dereference
+          sudo rm -f squashfs-root/etc/resolv.conf
+          sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
+
           # Execute in chroot
           sudo chroot squashfs-root /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
           sudo rm -f squashfs-root/opt/${{ env.SH_NAME }}
+
+          # Restore original resolv.conf
+          sudo rm -f squashfs-root/etc/resolv.conf
+          sudo chroot squashfs-root /bin/bash -xlc "sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
           # Proper Cleanup (Unmount in reverse order)
           sudo umount --lazy squashfs-root/etc/resolv.conf
@@ -217,6 +225,15 @@ jobs:
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.STANDARD_SIZE }}"
+
+          echo "Removing unwanted casper/ files"
+          yq -i "
+            .sources |= map(select(.id == 'ubuntu-desktop-minimal')) |
+            .sources[0].preinstalled_langs = ['en', ''] |
+            .sources[0].size = $combined_squash_bytes |
+            .sources[0].variations.minimal.size = $combined_squash_bytes |
+            del(.sources[0].variations.minimal-enhanced-secureboot)
+          " custom-iso/casper/install-sources.yaml
 
       - name: Strip Language Layer
         run: |
@@ -305,15 +322,6 @@ jobs:
           rmdir "$empty_directory"
 
           echo "Created empty standard squashfs"
-
-          echo "Removing unwanted casper/ files"
-          yq -i "
-            .sources |= map(select(.id == 'ubuntu-desktop-minimal')) |
-            .sources[0].preinstalled_langs = ['en', ''] |
-            .sources[0].size = $combined_squash_bytes |
-            .sources[0].variations.minimal.size = $combined_squash_bytes |
-            del(.sources[0].variations.minimal-enhanced-secureboot)
-          " custom-iso/casper/install-sources.yaml
 
       - name: Inject GRUB theme into Live USB
         run: |
