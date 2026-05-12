@@ -29,10 +29,10 @@ The first thing to understand about this project is when to say 'Utile', 'Utile 
 	- In user-facing version-specific text (e.g. `Utile OS 26 has experienced an internal error.` and other error messages, `Utile OS 26` in Settings > System > About)
 	- In OS-differentiating locations (e.g. `PRETTY_NAME="Utile OS 26"` in `/etc/os-release`, which is used by neofetch/fastfetch, `Utile OS 26` in the post-install walkthrough dialogue). In other words, places where screenshots are taken.
 
-Apps or services where the name is automatically picked from `/etc/os-release` - or similar files - are out of scope.
+Apps or services where the OS name is automatically picked from `/etc/os-release` or similar files are out of scope.
 
 ## Codenames
-Utile follows a clear but fun naming scheme. It is composed of an adjective and a technical word starting with the same letter, starting with the letter A for Utile OS's first release (26) and going forward from there. The codename follows the exact same naming scheme as Ubuntu's (adjective only in files and code, full name in `/etc/os-release` and other user-facing text).
+Utile follows a clear but fun naming scheme. It is composed of an adjective and a technical word starting with the same letter, starting with the letter A for Utile OS's first release (26) and going forward from there. Utile OS codenames follow the same naming scheme as Ubuntu's (adjective-only in files and code; full name in `/etc/os-release` and other user-facing text).
 |	Adjective	|	Tech Word	|	Version	|	Upstream	|
 |	:------:	|	:-------:	|	:-----:	|	:-----:		|
 |	Abstract	|	Assembly	|	26		|	26.04.1		|
@@ -50,11 +50,11 @@ Utile follows a clear but fun naming scheme. It is composed of an adjective and 
 This, of course, naturally brings the flow of discussion over to the release cycle.
 
 ## Release Cycle
-Utile OS is based on Ubuntu, which is a stable and reliable distribution, providing one LTS upgrade every two years which is supported for 5 years after that without Ubuntu Pro. Ubuntu interim releases aren't as stable as LTS releases, despite their offering of new features, and thus aren't supported by Utile OS. But I still want to offer more frequent upgrades than the standard Ubuntu LTS cycle, which are only given updates every 2 years. Therefore, Utile OS releases are going to be scheduled for August each year. This should already make sense given the previous table of codenames.
+Utile OS is based on Ubuntu, which is a stable and reliable distribution, providing one LTS upgrade every two years, which is supported for 5 years after that without Ubuntu Pro. Ubuntu interim releases aren't as stable as LTS releases, despite their offering of new features, and thus aren't supported by Utile OS. But I still want to offer more frequent upgrades than the standard Ubuntu LTS cycle, which only gives updates every 2 years. Therefore, Utile OS releases are going to be scheduled for August each year. This should already make sense given the previous table of codenames.
 
 Let's take the [release cycle of Ubuntu 24.04](https://documentation.ubuntu.com/release-notes/24.04/schedule/) - the last LTS - for example. Ubuntu **24.04** LTS was released on **April 25th** 2024, similar to this year's **26.04** (released on **April 23rd**). This is *before* LTS upgrade prompts are sent to LTS users, since the standard LTS version isn't stable enough. This title goes to the **LTS .1** release, which, for **24.04.1**, was released on **August 29th** 2024. Ubuntu **22.04.1** was also released in **August**, and Ubuntu **26.04.1** LTS is scheduled for **August** as well.
 
-This makes the August release cycle for Utile OS very robust, as it immediately jumps to the stable version of the next Ubuntu LTS, and also allows me to work on the upgrade process from April till August.
+This makes the August release cycle for Utile OS very robust, as it immediately jumps to the stable version of the next Ubuntu LTS, and also allows me to work on the upgrade process from April to August.
 
 But this would only make sense if the August .1 plan worked *every* year, which isn't true, since Ubuntu LTS versions are only released every two years, and interim releases are only supported for 9 months, which wouldn't make them adequate for a 12-month upgrade cycle.
 
