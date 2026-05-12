@@ -27,7 +27,7 @@ jobs:
       - name: Install OS Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync zsync
+          sudo apt-get install -y squashfs-tools xorriso mtools fdisk rsync
 
       - name: Compile Bash Script (Node.js)
         env:
@@ -298,7 +298,7 @@ jobs:
           CONTENT_ID=$(echo "$RESPONSE" | jq -r '.data.id')
           echo "Uploaded ISO to Gofile with ID: $CONTENT_ID"
 
-          DIRECT_LINK=$(curl --retry 3 -X POST -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" -H "Accept: application/json" "https://api.gofile.io/contents/${CONTENT_ID}/directlinks")
+          DIRECT_LINK=$(curl --retry 3 -X POST -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" -H "Accept: application/json" "https://api.gofile.io/contents/"$CONTENT_ID"/directlinks")
           echo "Direct link: $(echo "$DIRECT_LINK")"
           
           # calculate sha256 checksum
