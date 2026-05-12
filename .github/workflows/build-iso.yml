@@ -90,7 +90,15 @@ jobs:
           echo "MINIMAL_SIZE=$MINIMAL_SIZE" >> $GITHUB_ENV
           echo "STANDARD_SIZE=$STANDARD_SIZE" >> $GITHUB_ENV
 
-          echo "Found root filesystem: $MINIMAL_SQUASH"
+          lang_count="$(
+            find "$casper" -maxdepth 1 -name 'minimal.*.squashfs' \
+                ! -name 'minimal.standard.squashfs' \
+                ! -name 'minimal.standard.live.squashfs' \
+                ! -name 'minimal.enhanced-secureboot.squashfs' \
+            | wc -l
+          )"
+
+          echo "Found $lang_count languages, will be stripped"
           
           STAGING="$(sudo mktemp -d)"
 
@@ -180,7 +188,9 @@ jobs:
 
       - name: Copy INITRD to match Plymouth
         run: |
-          sudo cp squashfs-root/boot/initrd.img-* custom-iso/casper/initrd
+          # Copy the most recent initrd (by version sort)
+          INITRD=$(ls -v squashfs-root/boot/initrd.img-* | tail -n 1)
+          sudo cp "$INITRD" custom-iso/casper/initrd
     
       - name: Re-generate Manifests
         run: |
@@ -205,16 +215,73 @@ jobs:
           echo -e "\nGenerated Manifests"
 
           echo "Copying primary manifest to standard manifests"
-          cat "$manifest" | sudo tee "custom-iso/casper/${{ env.STANDARD_MANIFEST_FULL }}"
+          sudo cp "custom-iso/casper/${{ env.MINIMAL_MANIFEST }}" "custom-iso/casper/${{ env.STANDARD_MANIFEST_FULL }}"
           # minimal.standard.manifest only contains packages added over minimal.manifest, so it should be empty
           echo -e "" | sudo tee "custom-iso/casper/${{ env.STANDARD_MANIFEST }}"
 
           echo "Calculating combined squashfs size"
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
+          printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.STANDARD_SIZE }}"
 
-          echo "Symlinking standard squashfs size to primary squashfs size"
-          sudo ln -sf "${{ env.MINIMAL_SIZE }}" "custom-iso/casper/${{ env.STANDARD_SIZE }}"
+      - name: Strip Language Layer
+        run: |
+          patterns=(
+            # Per-language minimal files (minimal.de.squashfs etc.)
+            'minimal.[a-z][a-z].squashfs'
+            'minimal.[a-z][a-z].manifest'
+            'minimal.[a-z][a-z].manifest.full'
+            'minimal.[a-z][a-z].size'
+            # no-languages variants
+            'minimal.no-languages.squashfs'
+            'minimal.no-languages.manifest'
+            'minimal.no-languages.manifest.full'
+            'minimal.no-languages.size'
+            # enhanced-secureboot variants (plain)
+            'minimal.enhanced-secureboot.squashfs'
+            'minimal.enhanced-secureboot.manifest'
+            'minimal.enhanced-secureboot.manifest.full'
+            'minimal.enhanced-secureboot.size'
+            # enhanced-secureboot per-language
+            'minimal.enhanced-secureboot.[a-z][a-z].squashfs'
+            'minimal.enhanced-secureboot.[a-z][a-z].manifest'
+            'minimal.enhanced-secureboot.[a-z][a-z].manifest.full'
+            'minimal.enhanced-secureboot.[a-z][a-z].size'
+            'minimal.enhanced-secureboot.no-languages.squashfs'
+            'minimal.enhanced-secureboot.no-languages.manifest'
+            'minimal.enhanced-secureboot.no-languages.manifest.full'
+            'minimal.enhanced-secureboot.no-languages.size'
+            # minimal.standard per-language
+            'minimal.standard.[a-z][a-z].squashfs'
+            'minimal.standard.[a-z][a-z].manifest'
+            'minimal.standard.[a-z][a-z].manifest.full'
+            'minimal.standard.[a-z][a-z].size'
+            'minimal.standard.no-languages.squashfs'
+            'minimal.standard.no-languages.manifest'
+            'minimal.standard.no-languages.manifest.full'
+            'minimal.standard.no-languages.size'
+            # minimal.standard.enhanced-secureboot variants
+            'minimal.standard.enhanced-secureboot.squashfs'
+            'minimal.standard.enhanced-secureboot.manifest'
+            'minimal.standard.enhanced-secureboot.manifest.full'
+            'minimal.standard.enhanced-secureboot.size'
+            'minimal.standard.enhanced-secureboot.[a-z][a-z].squashfs'
+            'minimal.standard.enhanced-secureboot.[a-z][a-z].manifest'
+            'minimal.standard.enhanced-secureboot.[a-z][a-z].manifest.full'
+            'minimal.standard.enhanced-secureboot.[a-z][a-z].size'
+            'minimal.standard.enhanced-secureboot.no-languages.squashfs'
+            'minimal.standard.enhanced-secureboot.no-languages.manifest'
+            'minimal.standard.enhanced-secureboot.no-languages.manifest.full'
+            'minimal.standard.enhanced-secureboot.no-languages.size'
+          )
+
+          for pattern in "${patterns[@]}"; do
+            while IFS= read -r -d '' f; do
+                rm -f "$f"
+                _log "  Removed: $(basename "$f")"
+                (( removed++ )) || true
+            done < <(find "$casper" -maxdepth 1 -name "$pattern" -print0 2>/dev/null)
+          done
 
       - name: Apply Custom System Metadata
         run: |
@@ -252,7 +319,7 @@ jobs:
           sudo cp -r $THEME_PATH/* custom-iso/boot/grub/themes/utile/
 
           original_grub_config=$(cat custom-iso/boot/grub/grub.cfg)
-          echo "set theme=$(root)/boot/grub/themes/utile/theme.txt" | sudo tee custom-iso/boot/grub/grub.cfg
+          echo "set theme=($root)/boot/grub/themes/utile/theme.txt" | sudo tee custom-iso/boot/grub/grub.cfg
           echo "$original_grub_config" | sudo tee -a custom-iso/boot/grub/grub.cfg
 
           sudo sed 's/--class ubuntu/--class utile/g' -i custom-iso/boot/grub/grub.cfg

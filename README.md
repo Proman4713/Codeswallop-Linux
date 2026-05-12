@@ -81,7 +81,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Should I create an extension to reduce the size of the headerbar in GNOME, especially with fractional scaling?</li>
 		<li>Should I include a pre-configure 'Dash2Dock Animated' extension? Is that too much like macOS in a way that it shouldn't be?</li>
 		<li>Similarly, what about the 'Compiz alike magic lamp effect' extension? This could be too much, but maybe another extension that provides a springier minimise animation than the default?</li>
-		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well></li>
+		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well?</li>
 		<li>The average user does not have NAS devices and doesn't use <a href="https://ubuntu.com/server/docs/how-to/networking/install-nfs/">NFS</a>, should I disable the NetworkManager-wait-online.service to speed up boot time? What are the tradeoffs?</li>
 	</ol>
 </details>

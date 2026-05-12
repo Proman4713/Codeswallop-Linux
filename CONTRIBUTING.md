@@ -68,7 +68,7 @@ I am unsure of whether I will be able to work on .2 and .4 LTS releases as well,
 - **Ubuntu 26.04.3** will become **Utile OS 27**
 - **Ubuntu 26.04.4** will become **Utile OS 27.1**
 
-This puts the Utile OS .1 releases at an also very consistent **February** release period, and the major Utile OS upgrades at the already discussed **August** release period. However, for now, only August releases are expected.
+This also puts the Utile OS .1 releases at a very consistent **February** release period, and the major Utile OS upgrades at the already discussed **August** release period. However, for now, only August releases are expected.
 
 ## Contributing
 Contributing is as simple as submitting an Issue or Pull Request with a good description and valuable information. I currently see no need to restrict how contributions can be made.

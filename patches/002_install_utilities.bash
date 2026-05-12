@@ -13,6 +13,51 @@ apt-get purge -y transmission-gtk transmission-common \
 				ubuntu-desktop \
 				xul-ext-ubufox # Courtesy of Pop!_OS's ISO Builder repo
 
+#! Non-English Language packs, this is to emulate the minimal.en.manifest without actually accounting for it in the GitHub workflow, this needs to one day change so that multiple languages are supported
+apt-get purge -y fonts-arphic-ukai \
+				fonts-arphic-uming \
+				gnome-user-docs-de \
+				gnome-user-docs-es \
+				gnome-user-docs-fr \
+				gnome-user-docs-it \
+				gnome-user-docs-pt \
+				gnome-user-docs-ru \
+				gnome-user-docs-zh-hans \
+				ibus-chewing \
+				ibus-libpinyin \
+				ibus-m17n \
+				ibus-table-cangjie \
+				ibus-table-quick-classic \
+				ibus-table-wubi \
+				language-pack-de \
+				language-pack-de-base \
+				language-pack-es \
+				language-pack-es-base \
+				language-pack-fr \
+				language-pack-fr-base \
+				language-pack-gnome-de \
+				language-pack-gnome-de-base \
+				language-pack-gnome-es \
+				language-pack-gnome-es-base \
+				language-pack-gnome-fr \
+				language-pack-gnome-fr-base \
+				language-pack-gnome-it \
+				language-pack-gnome-it-base \
+				language-pack-gnome-pt \
+				language-pack-gnome-pt-base \
+				language-pack-gnome-ru \
+				language-pack-gnome-ru-base \
+				language-pack-gnome-zh-hans \
+				language-pack-gnome-zh-hans-base \
+				language-pack-it \
+				language-pack-it-base \
+				language-pack-pt \
+				language-pack-pt-base \
+				language-pack-ru \
+				language-pack-ru-base \
+				language-pack-zh-hans \
+				language-pack-zh-hans-base
+
 # TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
 # TODO: Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu, also only available as Flatpak
 install_packages gdebi \
