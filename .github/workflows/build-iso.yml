@@ -225,15 +225,7 @@ jobs:
           combined_squash_bytes="$(sudo du -sx --block-size=1 "squashfs-root" | awk '{print $1}')"
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.MINIMAL_SIZE }}"
           printf '%s\n' "$combined_squash_bytes" | sudo tee "custom-iso/casper/${{ env.STANDARD_SIZE }}"
-
-          echo "Removing unwanted casper/ files"
-          yq -i '
-            .sources |= map(select(.id == "ubuntu-desktop-minimal")) |
-            .sources[0].preinstalled_langs = ["en", ""] |
-            .sources[0].size = ($combined_squash_bytes | idiv(1)) |
-            .sources[0].variations.minimal.size = ($size | idiv(1)) |
-            del(.sources[0].variations.minimal-enhanced-secureboot)
-          ' custom-iso/casper/install-sources.yaml
+          echo "COMBINED_SIZE=$combined_squash_bytes" >> $GITHUB_ENV
 
       - name: Strip Language Layer
         run: |
@@ -297,6 +289,17 @@ jobs:
             done < <(find "custom-iso/casper" -maxdepth 1 -name "$pattern" -print0 2>/dev/null)
           done
           echo "Stripped $removed variants from custom-iso/casper"
+    
+      - name: Patch install-sources.yaml
+        run: |
+          echo "Removing unwanted casper/ files"
+          yq -i '
+            .sources |= map(select(.id == "ubuntu-desktop-minimal")) |
+            .sources[0].preinstalled_langs = ["en", ""] |
+            .sources[0].size = ${{ env.COMBINED_SIZE }} |
+            .sources[0].variations.minimal.size = ${{ env.COMBINED_SIZE }} |
+            del(.sources[0].variations."minimal-enhanced-secureboot")
+          ' custom-iso/casper/install-sources.yaml
 
       - name: Apply Custom System Metadata
         run: |
@@ -348,8 +351,11 @@ jobs:
           
           # Calculate new checksums for integrity verification during boot
           echo "Calculating MD5 checksums"
-          sudo find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
-          echo "Calculated MD5 checksums"
+          sudo find . -type f \
+            ! -name "md5sum.txt" \
+            ! -path "./boot/*" \
+            ! -name "boot.catalog" \
+            -print0 | xargs -0 md5sum | sudo tee md5sum.txt
           cd ..
 
       - name: Generate Final ISO
