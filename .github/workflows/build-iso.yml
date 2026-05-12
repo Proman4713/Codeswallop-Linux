@@ -230,10 +230,10 @@ jobs:
           yq -i '
             .sources |= map(select(.id == "ubuntu-desktop-minimal")) |
             .sources[0].preinstalled_langs = ["en", ""] |
-            .sources[0].size = ($size | idiv(1)) |
+            .sources[0].size = ($combined_squash_bytes | idiv(1)) |
             .sources[0].variations.minimal.size = ($size | idiv(1)) |
             del(.sources[0].variations.minimal-enhanced-secureboot)
-          ' --arg size="$combined_squash_bytes" custom-iso/casper/install-sources.yaml
+          ' custom-iso/casper/install-sources.yaml
 
       - name: Strip Language Layer
         run: |
