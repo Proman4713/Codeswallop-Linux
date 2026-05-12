@@ -91,7 +91,7 @@ jobs:
           echo "STANDARD_SIZE=$STANDARD_SIZE" >> $GITHUB_ENV
 
           lang_count="$(
-            find "$casper" -maxdepth 1 -name 'minimal.*.squashfs' \
+            find "custom-iso/casper" -maxdepth 1 -name 'minimal.*.squashfs' \
                 ! -name 'minimal.standard.squashfs' \
                 ! -name 'minimal.standard.live.squashfs' \
                 ! -name 'minimal.enhanced-secureboot.squashfs' \
@@ -166,20 +166,14 @@ jobs:
           sudo mount -t proc /proc squashfs-root/proc
           sudo mount -t sysfs /sys squashfs-root/sys
           sudo mount --bind /run squashfs-root/run
-          
-          # Fix for the "same file" error: Remove and copy with dereference
-          sudo rm -f squashfs-root/etc/resolv.conf
-          sudo cp -L /etc/resolv.conf squashfs-root/etc/resolv.conf
+          sudo mount --bind /etc/resolv.conf squashfs-root/etc/resolv.conf
 
           # Execute in chroot
           sudo chroot squashfs-root /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
           sudo rm -f squashfs-root/opt/${{ env.SH_NAME }}
 
-          # Restore original resolv.conf
-          sudo rm -f squashfs-root/etc/resolv.conf
-          sudo chroot squashfs-root /bin/bash -xlc "sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
-
           # Proper Cleanup (Unmount in reverse order)
+          sudo umount --lazy squashfs-root/etc/resolv.conf
           sudo umount --lazy squashfs-root/run
           sudo umount --lazy squashfs-root/sys
           sudo umount --lazy squashfs-root/proc
@@ -226,6 +220,8 @@ jobs:
 
       - name: Strip Language Layer
         run: |
+          set -euo pipefail
+
           patterns=(
             # Per-language minimal files (minimal.de.squashfs etc.)
             'minimal.[a-z][a-z].squashfs'
@@ -275,13 +271,15 @@ jobs:
             'minimal.standard.enhanced-secureboot.no-languages.size'
           )
 
+          removed=0
           for pattern in "${patterns[@]}"; do
             while IFS= read -r -d '' f; do
                 rm -f "$f"
-                _log "  Removed: $(basename "$f")"
+                echo "  Removed: $(basename "$f")"
                 (( removed++ )) || true
-            done < <(find "$casper" -maxdepth 1 -name "$pattern" -print0 2>/dev/null)
+            done < <(find "custom-iso/casper" -maxdepth 1 -name "$pattern" -print0 2>/dev/null)
           done
+          echo "Stripped $removed variants from custom-iso/casper"
 
       - name: Apply Custom System Metadata
         run: |
@@ -307,6 +305,15 @@ jobs:
           rmdir "$empty_directory"
 
           echo "Created empty standard squashfs"
+
+          echo "Removing unwanted casper/ files"
+          yq -i "
+            .sources |= map(select(.id == 'ubuntu-desktop-minimal')) |
+            .sources[0].preinstalled_langs = ['en', ''] |
+            .sources[0].size = $combined_squash_bytes |
+            .sources[0].variations.minimal.size = $combined_squash_bytes |
+            del(.sources[0].variations.minimal-enhanced-secureboot)
+          " custom-iso/casper/install-sources.yaml
 
       - name: Inject GRUB theme into Live USB
         run: |
