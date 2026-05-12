@@ -27,8 +27,6 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 	5. VRAM: **256MB** minimum, **1GB or more** recommended. **3D Acceleration** strongly recommended.
 	6. Secure Boot: Optional, although **Disabled** gives you a better-looking boot screen.
 
-While this project is primarily focused on modifying the base Ubuntu ISO to generate what is essentially a new distribution, it can be used as a bash script to modify an existing Ubuntu installation (note: this is no longer completely true, the script is now less considerate of existing installations). The script will modify both user configurations and system defaults. See the [Structure](#structure) section for more details.
-
 ## Disclaimers & Agreements
 - This project is **not** designed for personal use by anyone other than myself. I claim no liability over anything this project may do to your system as of now. If you use this project, you do so at your own risk.
 - I do not make the ISOs easily accessible for download on the repository's homepage for multiple reasons:
@@ -37,7 +35,7 @@ While this project is primarily focused on modifying the base Ubuntu ISO to gene
 	3. The ISOs have not yet been completely rid of Ubuntu branding. So it may be the case that they are not completely out of the scope of Canonical's trademarks, which is something that needs to change before this project is ready for distribution.
 	4. The above means that I'm not claiming any rights over Canonical/Ubuntu brand elements that are still user-facing and yet to be removed. Nor am I suggesting that this is a project made by Canonical Ubuntu. It is simply a matter of time before the situation changes.
 - The ISOs have not been tested with offline Ubuntu installations.
-- The bash scripts available in my [releases](https://github.com/Proman4713/Utile-OS/releases) assume a specific Ubuntu version depending on their filename and also assume that they are the first thing being run on your system. The vast majority of any customisations you may have applied will be overridden.
+- The bash scripts available in my [releases](https://github.com/Proman4713/Utile-OS/releases) are not intended for use on an existing system. They assume a specific Ubuntu version depending on their filename and also assume that they are the first thing being run on your system. The vast majority of any customisations you may have applied will be overridden.
 - This project has already modified enough that Ubuntu upgrades may not go smoothly. This is something that even I am not willing to risk on my own system. This shall change before the final release with a custom upgrade solution.
 - This project uninstalls some packages from the Extended Selection, so be wary of that if you run it on an Ubuntu extended installation.
 - Considering that this project is mainly targeted at ISOs, the bash scripts are not [idempotent](https://en.wikipedia.org/wiki/Idempotence), and they also modify **both** system and user defaults, so creating a new user after running this project does not uninstall the changes applied by the script.

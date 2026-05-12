@@ -13,7 +13,6 @@ fi
 if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ] && getent passwd "$SUDO_USER" >/dev/null 2>&1; then
 	ENV_MODE="POST"
 	TARGET_USER="$SUDO_USER"
-	TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
 	echo "Environment: Post-Install (Configuring for future users AND $TARGET_USER)"
 else
 	ENV_MODE="ISO"
