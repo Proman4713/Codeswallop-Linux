@@ -42,9 +42,9 @@ find /usr/share/bash-completion -name "*thunderbird*" -delete
 find /var/cache/apparmor -name "*firefox*" -delete
 find /var/cache/apparmor -name "*thunderbird*" -delete
 
-sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.minimal
-sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop
-sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.main
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.minimal || true
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop || true
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.main || true
 
 sudo rm -rf /var/cache/snapd/
 
