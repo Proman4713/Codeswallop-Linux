@@ -143,17 +143,6 @@ jobs:
             echo "EOF"
           } >> $GITHUB_ENV
 
-      #- name: Inject GRUB theme into ISO and installed system
-        #run: |
-          ## Installed System
-          #sudo mkdir -p squashfs-root/usr/share/grub/themes/utile
-          #sudo cp grub/theme.txt squashfs-root/usr/share/grub/themes/utile/
-
-          #sudo mkdir -p squashfs-root/usr/share/grub/themes/utile/icons
-          #sudo cp -r grub/icons/* squashfs-root/usr/share/grub/themes/utile/icons 2>/dev/null || true
-
-          #sudo cp -r grub/*.pf2 squashfs-root/usr/share/grub/themes/utile/ 2>/dev/null || true
-
       - name: Setup Chroot Environment & Run Custom Script
         run: |
           # Copy script
@@ -328,6 +317,8 @@ jobs:
 
       - name: Inject GRUB theme into Live USB
         run: |
+          set -exuo pipefail # Strict
+
           mkdir -p temp-grub/
           wget -qO utile-grub-theme.deb "https://github.com/Proman4713/Utile-OS-debian/raw/refs/heads/main/builds/utile-grub-theme-abstract_all.deb"
           sudo dpkg -x utile-grub-theme.deb temp-grub/
