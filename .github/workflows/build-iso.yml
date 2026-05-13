@@ -320,7 +320,15 @@ jobs:
           set -exuo pipefail # Strict
 
           mkdir -p temp-grub/
-          wget -qO utile-grub-theme.deb "https://github.com/Proman4713/Utile-OS-debian/raw/refs/heads/main/builds/utile-grub-theme-abstract_all.deb"
+
+          if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg; then
+            echo "Error: Failed to download or install Utile GPG key" >&2
+            exit 1
+          fi
+          echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main upstream universe" | sudo tee /etc/apt/sources.list.d/utile.list
+          apt_get_update
+
+          wget -qO utile-grub-theme.deb $(apt download --print-uris utile-grub-theme 2>/dev/null | awk -F"'" '{print $2}')
           sudo dpkg -x utile-grub-theme.deb temp-grub/
 
           sudo mkdir -p custom-iso/boot/grub/themes/utile

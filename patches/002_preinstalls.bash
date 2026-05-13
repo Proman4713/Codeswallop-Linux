@@ -13,7 +13,8 @@ apt-get purge -y transmission-gtk transmission-common \
 				ubuntu-desktop \
 				xul-ext-ubufox # Courtesy of Pop!_OS's ISO Builder repo
 
-#! Non-English Language packs, this is to emulate the minimal.en.manifest without actually accounting for it in the GitHub workflow, this needs to one day change so that multiple languages are supported
+#! Actually not an accessibility risk much! Only some languages are there, which means that the system somehow would've done something else if I chose Arabic, for example.
+#!	So it seems like the installer somehow does something else depending on the language chosen for the installation.
 apt-get purge -y fonts-arphic-ukai \
 				fonts-arphic-uming \
 				gnome-user-docs-de \
