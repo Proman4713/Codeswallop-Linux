@@ -26,6 +26,7 @@ rm -rf /var/lib/snapd/desktop/applications/*thunderbird*
 if [ -f /var/lib/snapd/seed/seed.yaml ]; then
 	sed -i '/firefox/d' /var/lib/snapd/seed/seed.yaml
 	sed -i '/thunderbird/d' /var/lib/snapd/seed/seed.yaml
+	cat /var/lib/snapd/seed/seed.yaml
 fi
 
 # Leftovers
@@ -40,6 +41,12 @@ find /usr/share/bash-completion -name "*thunderbird*" -delete
 
 find /var/cache/apparmor -name "*firefox*" -delete
 find /var/cache/apparmor -name "*thunderbird*" -delete
+
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.minimal
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop
+sed -i '/firefox/d' /usr/share/ubuntu-seeds/desktop.main
+
+sudo rm -rf /var/cache/snapd/
 
 #* echo "Remaining Firefox entries:"
 #* find /usr /var -name "*firefox*"
