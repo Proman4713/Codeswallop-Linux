@@ -326,7 +326,7 @@ jobs:
             exit 1
           fi
           echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main upstream universe" | sudo tee /etc/apt/sources.list.d/utile.list
-          apt-get update
+          sudo apt-get update
 
           wget -qO utile-grub-theme.deb $(apt download --print-uris utile-grub-theme 2>/dev/null | awk -F"'" '{print $2}')
           sudo dpkg -x utile-grub-theme.deb temp-grub/
