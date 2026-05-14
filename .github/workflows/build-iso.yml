@@ -336,7 +336,7 @@ jobs:
           sudo cp -r $THEME_PATH/* custom-iso/boot/grub/themes/utile/
 
           original_grub_config=$(cat custom-iso/boot/grub/grub.cfg)
-          echo "set theme=($root)/boot/grub/themes/utile/theme.txt" | sudo tee custom-iso/boot/grub/grub.cfg
+          echo 'set theme=($root)/boot/grub/themes/utile/theme.txt' | sudo tee custom-iso/boot/grub/grub.cfg
           echo "$original_grub_config" | sudo tee -a custom-iso/boot/grub/grub.cfg
 
           sudo sed 's/--class ubuntu/--class utile/g' -i custom-iso/boot/grub/grub.cfg
