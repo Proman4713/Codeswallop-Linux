@@ -61,9 +61,11 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 	<summary>Plans</summary>
 	<ol>
 		<li><strike>Make my own APT repository and Debian packages.</strike></li>
-		<li><strike>Override upstream's <code>base-files</code> package to provide logos and release metadata</strike></li>
-		<li><strike>Change bashrc to use a lighter colour for the <code>user@computer</code> text</strike></li>
-		<li><strike>Either contribute my distribution's ASCII symbol to <code>fastfetch</code> or include it in a debian package and set the <code>--logo</code> argument in a bashrc alias of <code>fastfetch</code>/<code>neofetch</code></strike></li>
+		<li><strike>Override upstream's <code>base-files</code> package to provide logos and release metadata.</strike></li>
+		<li><strike>Change bashrc to use a lighter colour for the <code>user@computer</code> text.</strike></li>
+		<li><strike>Either contribute my distribution's ASCII symbol to <code>fastfetch</code> or include it in a debian package and set the <code>--logo</code> argument in a bashrc alias of <code>fastfetch</code>/<code>neofetch</code>.</strike></li>
+		<li>Implement icon theme overrides to the Yaru theme to remove Ubuntu's trademarks from many places.</li>
+		<li>Implement an installer that allows me to follow Utile OS's philosophies while also making the user manually choose to install codecs to avoid legal grey areas.</li>
 		<li>Implement my own Plymouth theme.</li>
 		<li>Figure out a way to use/implement an equivalent of the <code>Customised Workspaces</code>, <code>Customize Clock on Lock Screen</code>, and <code>Lock screen background</code> extensions without cluttering the UI</li>
 		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
