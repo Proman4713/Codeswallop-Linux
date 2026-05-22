@@ -27,15 +27,16 @@ jobs:
             mkdir -p /workspace/build
             cd /workspace/build
             lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse"
-            tar -czf live-build-config.tar.gz auto/ config/ local/
             chown -R $(id -u):$(id -g) /workspace/build
           "
     
-      - name: List build directory
+      - name: Compress Build Directory
         run: |
           echo "Workspace: $GITHUB_WORKSPACE"
           ls -la $GITHUB_WORKSPACE || true
           ls -la $GITHUB_WORKSPACE/build || true
+
+          tar -czvf build/live-build-config.tar.gz -C build .
 
       - name: Upload Build Directory
         uses: actions/upload-artifact@v7
