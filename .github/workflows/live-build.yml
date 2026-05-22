@@ -94,7 +94,7 @@ jobs:
           mkdir -p /workspace/build/config/preseed
           cp -r /workspace/tooling/config/preseed/* /workspace/build/config/preseed/
 
-          lb build --verbose --color
+          lb build --verbose
           lb clean --purge
           mv *.iso /workspace/${{ env.ISO_NAME }}-amd64.iso
           EOF
