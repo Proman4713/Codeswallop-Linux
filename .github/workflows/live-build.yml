@@ -19,14 +19,12 @@ jobs:
         run: |
           docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash -c "
             set -exuo pipefail # Strict
-            # Switch to sudo
-            sudo -i
             uname -m
             export DEBIAN_FRONTEND=noninteractive
-            sudo apt-get update && sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
-            sudo apt-get upgrade -y
+            apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
+            apt-get upgrade -y
 
-            sudo mkdir -p /workspace/build
+            mkdir -p /workspace/build
             cd /workspace/build
             lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse"
             tar -czf live-build-config.tar.gz auto/ config/ local/
