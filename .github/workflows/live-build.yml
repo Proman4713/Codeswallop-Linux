@@ -44,30 +44,23 @@ jobs:
 
             mkdir -p /workspace/build
             cd /workspace/build
-            lb config \
-                --mode ubuntu \
-                --distribution resolute \
-                --architecture amd64 \
-                --archive-areas "main restricted universe multiverse" \
-                --iso-application "Utile OS Live" \
-                --iso-volume "Utile OS 26 amd64" \
-                --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
+            lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse" --iso-application "Utile OS Live" --iso-volume "Utile OS 26 amd64" --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
 
-            mkdir -p ./config/archives
-            cp -r /workspace/tooling/config/archives/* ./config/archives/
+            mkdir -p /workspace/build/archives
+            cp -r /workspace/tooling/config/archives/* /workspace/build/archives/
 
-            mkdir -p ./config/hooks
-            cp -r /workspace/tooling/config/hooks/* ./config/hooks/
-            chmod +x ./config/hooks/*
+            mkdir -p /workspace/build/hooks
+            cp -r /workspace/tooling/config/hooks/* /workspace/build/hooks/
+            chmod +x /workspace/build/hooks/*
 
-            mkdir -p ./config/package-lists
-            cp -r /workspace/tooling/config/package-lists/* ./config/package-lists/
+            mkdir -p /workspace/build/package-lists
+            cp -r /workspace/tooling/config/package-lists/* /workspace/build/package-lists/
 
-            mkdir -p ./config/includes.chroot
-            cp -r /workspace/tooling/config/includes.chroot/* ./config/includes.chroot/
+            mkdir -p /workspace/build/includes.chroot
+            cp -r /workspace/tooling/config/includes.chroot/* /workspace/build/includes.chroot/
 
-            mkdir -p ./config/preseed
-            cp -r /workspace/tooling/config/preseed/* ./config/preseed/
+            mkdir -p /workspace/build/preseed
+            cp -r /workspace/tooling/config/preseed/* /workspace/build/preseed/
           "
     
       - name: Compress Build Directory
