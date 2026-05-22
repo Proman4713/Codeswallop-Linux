@@ -61,10 +61,7 @@ jobs:
           (cat << 'EOF'
           set -exuo pipefail
           export DEBIAN_FRONTEND=noninteractive
-          echo 'deb http://deb.debian.org/debian trixie main' >> /etc/apt/sources.list.d/debian.list
-          apt-get update && apt-get install -t trixie -y live-build debootstrap squashfs-tools xorriso
-          rm /etc/apt/sources.list.d/debian.list
-          apt-get update
+          apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
           apt-get upgrade -y
 
           mkdir -p /workspace/build
@@ -114,7 +111,7 @@ jobs:
           EOF
           ) > ${{ github.workspace }}/temp/docker-live-build.sh
 
-          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash /workspace/temp/docker-live-build.sh
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace debian:trixie /bin/bash /workspace/temp/docker-live-build.sh
     
       - name: Compress Build Directory
         run: |
