@@ -35,16 +35,22 @@ jobs:
     
       - name: Build
         run: |
-          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash -c "
-            set -exuo pipefail # Strict
-            uname -m
+          cat > ${{ github.workspace }}/temp/docker-live-build.sh << 'EOF'
+            set -exuo pipefail
             export DEBIAN_FRONTEND=noninteractive
             apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
             apt-get upgrade -y
 
             mkdir -p /workspace/build
             cd /workspace/build
-            lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse" --iso-application "Utile OS Live" --iso-volume "Utile OS 26 amd64" --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
+            lb config \
+            --mode ubuntu \
+            --distribution resolute \
+            --architecture amd64 \
+            --archive-areas "main restricted universe multiverse" \
+            --iso-application "Utile OS Live" \
+            --iso-volume "Utile OS 26 amd64" \
+            --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
 
             mkdir -p /workspace/build/config/archives
             cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/
@@ -59,9 +65,14 @@ jobs:
             mkdir -p /workspace/build/config/includes.chroot
             cp -r /workspace/tooling/config/includes.chroot/* /workspace/build/config/includes.chroot/
 
+            mkdir -p /workspace/build/config/includes.binary
+            cp -r /workspace/tooling/config/includes.binary/* /workspace/build/config/includes.binary/
+
             mkdir -p /workspace/build/config/preseed
             cp -r /workspace/tooling/config/preseed/* /workspace/build/config/preseed/
-          "
+            EOF
+
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash /workspace/temp/docker-live-build.sh
     
       - name: Compress Build Directory
         run: |
@@ -69,7 +80,7 @@ jobs:
 
           echo "Workspace: $GITHUB_WORKSPACE"
           sudo chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE/build
-          ls -la $GITHUB_WORKSPACE || true
+          tree $GITHUB_WORKSPACE/tooling/config || true
           tree $GITHUB_WORKSPACE/build || true
 
           tar -czvf live-build-config.tar.gz -C $GITHUB_WORKSPACE/build .

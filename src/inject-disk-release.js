@@ -25,7 +25,7 @@ const SCRIPT_VERSION = process.env.BUILD_TYPE === "release" && process.env.GITHU
 	`${UTILE_OS_VERSION}-${process.env.GITHUB_REF_NAME}` :
 	`${UTILE_OS_VERSION}-nightly-${now.getFullYear().toString().slice(-2)}w${weekNumber.toString().padStart(2, "0")}${dayLetter}`;
 
-const binaryIncludePath = path.join(__dirname, "..", "config", "includes.binary");
+const binaryIncludePath = path.join(__dirname, "..", "tooling", "config", "includes.binary");
 fs.mkdirSync(path.join(binaryIncludePath, ".disk"), { recursive: true });
 
 fs.writeFileSync(
