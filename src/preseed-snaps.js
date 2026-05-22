@@ -29,9 +29,32 @@ const RETRY_DELAY_MS = 2000;
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
 
+async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
+	let lastError;
+	for (let attempt = 1; attempt <= retries; attempt++) {
+		try {
+			const response = await fetch(url, options);
+			if (!response.ok) {
+				lastError = new Error(`Request failed: ${response.status} ${response.statusText}`);
+				console.warn(`Attempt ${attempt}/${retries} failed: ${lastError.message}`);
+			} else {
+				return response;
+			}
+		} catch (error) {
+			lastError = error;
+			console.warn(`Attempt ${attempt}/${retries} failed: ${error.message}`);
+		}
+
+		if (attempt < retries) {
+			await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+		}
+	}
+	throw lastError || new Error('Failed to fetch after retries');
+}
+
 async function fetchSnapInfo(snapName) {
 	const url = `https://api.snapcraft.io/v2/snaps/info/${snapName}`;
-	const response = await fetch(url, {
+	const response = await fetchWithRetry(url, {
 		headers: {
 			'Snap-Device-Series': '16',
 			'Content-Type': 'application/json',
@@ -59,38 +82,19 @@ async function fetchSnapInfo(snapName) {
 }
 
 async function downloadSnap(url, outputPath) {
-    let lastError;
-
-    for (let attempt = 1; attempt <= DOWNLOAD_RETRIES; attempt++) {
-        try {
-            const snapRes = await fetch(url);
-
-            if (!snapRes.ok) {
-                lastError = new Error(`Failed to download snap: ${snapRes.status} ${snapRes.statusText}`);
-                console.warn(`Download attempt ${attempt}/${DOWNLOAD_RETRIES} failed: ${lastError.message}`);
-            } else {
-                await pipeline(
-                    Readable.fromWeb(snapRes.body),
-                    fs.createWriteStream(outputPath)
-                );
-                return;
-            }
-        } catch (error) {
-            lastError = error;
-            console.warn(`Download attempt ${attempt}/${DOWNLOAD_RETRIES} failed: ${error.message}`);
-        }
-
-        if (attempt < DOWNLOAD_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        }
-    }
-
-    console.error(lastError ? lastError.message : 'Failed to download snap after retries');
-    process.exit(1);
+	fetchWithRetry(url).then(async (snapRes) => {
+		await pipeline(
+			Readable.fromWeb(snapRes.body),
+			fs.createWriteStream(outputPath)
+		);
+	}).catch(error => {
+		console.error(`Failed to download snap: ${error.message}`);
+		process.exit(1);
+	});
 }
 
 async function fetchAssertion(snapId, revision, outputPath) {
-	const assertionRes = await fetch(
+	const assertionRes = await fetchWithRetry(
 		`https://api.snapcraft.io/api/v1/snaps/assertions/snap-declaration/16/${snapId}?max-format=3`, {
 			headers: {
 				Accept: 'application/x.ubuntu.assertion'
