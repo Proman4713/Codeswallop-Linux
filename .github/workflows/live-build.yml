@@ -49,8 +49,9 @@ jobs:
                 --distribution resolute \
                 --architecture amd64 \
                 --archive-areas "main restricted universe multiverse" \
+                --iso-application "Utile OS Live" \
                 --iso-volume "Utile OS 26 amd64" \
-                --iso-publisher "Utile; http://utile-os-web.mailworker.workers.dev/; proman4713@gmail.com"
+                --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
 
             mkdir -p ./config/archives
             cp -r /workspace/tooling/config/archives/* ./config/archives/
