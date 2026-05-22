@@ -78,8 +78,11 @@ jobs:
             --mirror-bootstrap http://archive.ubuntu.com/ubuntu/ \
             --mirror-binary http://archive.ubuntu.com/ubuntu/ \
             --mirror-binary-security http://security.ubuntu.com/ubuntu/ \
+            --mirror-chroot http://archive.ubuntu.com/ubuntu/ \
+            --mirror-chroot-security http://security.ubuntu.com/ubuntu/ \
             --bootloaders "grub-pc,grub-efi" \
             --bootappend-live "boot=casper quiet splash" \
+            --initramfs casper \
             --binary-images iso-hybrid \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
