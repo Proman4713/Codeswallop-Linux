@@ -1,8 +1,8 @@
 name: Build Utile OS 26 ISO
 
 on:
-  push:
-    branches: [ "main" ]
+#   push:
+#     branches: [ "main" ]
   workflow_dispatch:
 
 jobs:

@@ -1,8 +1,8 @@
 name: Generate Utile OS 26 ISO
 
 on:
-#   push:
-#     branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -15,9 +15,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6.0.2
     
-      - name: Use Docker
+      - name: Build
         run: |
-          docker run -it --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash
             set -exuo pipefail # Strict
             uname -m
             export DEBIAN_FRONTEND=noninteractive
