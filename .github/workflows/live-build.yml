@@ -46,33 +46,33 @@ jobs:
             cd /workspace/build
             lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse" --iso-application "Utile OS Live" --iso-volume "Utile OS 26 amd64" --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
 
-            mkdir -p /workspace/build/archives
-            cp -r /workspace/tooling/config/archives/* /workspace/build/archives/
+            mkdir -p /workspace/build/config/archives
+            cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/
 
-            mkdir -p /workspace/build/hooks
-            cp -r /workspace/tooling/config/hooks/* /workspace/build/hooks/
-            chmod +x /workspace/build/hooks/*
+            mkdir -p /workspace/build/config/hooks
+            cp -r /workspace/tooling/config/hooks/* /workspace/build/config/hooks/
+            chmod +x /workspace/build/config/hooks/*
 
-            mkdir -p /workspace/build/package-lists
-            cp -r /workspace/tooling/config/package-lists/* /workspace/build/package-lists/
+            mkdir -p /workspace/build/config/package-lists
+            cp -r /workspace/tooling/config/package-lists/* /workspace/build/config/package-lists/
 
-            mkdir -p /workspace/build/includes.chroot
-            cp -r /workspace/tooling/config/includes.chroot/* /workspace/build/includes.chroot/
+            mkdir -p /workspace/build/config/includes.chroot
+            cp -r /workspace/tooling/config/includes.chroot/* /workspace/build/config/includes.chroot/
 
-            mkdir -p /workspace/build/preseed
-            cp -r /workspace/tooling/config/preseed/* /workspace/build/preseed/
+            mkdir -p /workspace/build/config/preseed
+            cp -r /workspace/tooling/config/preseed/* /workspace/build/config/preseed/
           "
     
       - name: Compress Build Directory
         run: |
-          set -exuo pipefail # Strict
+          set -euo pipefail # Strict
 
           echo "Workspace: $GITHUB_WORKSPACE"
           sudo chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE/build
           ls -la $GITHUB_WORKSPACE || true
-          ls -la $GITHUB_WORKSPACE/build || true
+          tree $GITHUB_WORKSPACE/build || true
 
-          tar -czvf live-build-config.tar.gz -C build .
+          tar -czvf live-build-config.tar.gz -C $GITHUB_WORKSPACE/build .
 
       - name: Upload Build Directory
         uses: actions/upload-artifact@v7
