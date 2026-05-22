@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-custom-iso:
+  gen-custom-iso:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -31,7 +31,7 @@ jobs:
             exit
     
       - name: Upload Build Directory
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: live-build-config
           path: ${{ github.workspace }}/build/live-build-config.tar.gz
