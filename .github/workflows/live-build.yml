@@ -38,11 +38,11 @@ jobs:
           ls -la $GITHUB_WORKSPACE || true
           ls -la $GITHUB_WORKSPACE/build || true
 
-          tar -czvf build/live-build-config.tar.gz -C build .
+          tar -czvf live-build-config.tar.gz -C build .
 
       - name: Upload Build Directory
         uses: actions/upload-artifact@v7
         with:
           name: live-build-config
-          path: build/live-build-config.tar.gz
+          path: live-build-config.tar.gz
           if-no-files-found: error
