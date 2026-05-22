@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+echo "Running environment hook..."
+BRAVE_DESKTOP="/usr/share/applications/brave-browser.desktop"
+if [ -f "$BRAVE_DESKTOP" ]; then
+	echo "Applying custom flags to Brave .desktop file..."
+
+	# Add Wayland support, middle-click to scroll, and hopefully (untested) better touchpad support
+	sed -i 's|Exec=/usr/bin/brave-browser-stable|Exec=/usr/bin/brave-browser-stable --enable-blink-features=MiddleClickAutoscroll --enable-features=UseOzonePlatform,TouchpadOverscrollHistoryNavigation,VaapiVideoDecoder --ozone-platform=wayland|g' "$BRAVE_DESKTOP"
+
+	# Set Brave as the default handler for web browser schemes
+	# This is a system-wide association
+	update-desktop-database /usr/share/applications
+else
+	echo "Warning: Brave .desktop file not found at $BRAVE_DESKTOP"
+fi
+
+apt-get autoremove -y --purge
+apt-get clean
+
+TARGET_DIR="/var/lib/snapd/seed/snaps"
+mkdir -p "$TARGET_DIR"
+mkdir -p "/var/lib/snapd/seed/assertions"
+
+cat <<EOF > /var/lib/snapd/seed/seed.yaml
+snaps:
+  - name: core22
+    channel: stable
+    file: core22_latest.snap
+  - name: snapd
+    channel: stable
+    file: snapd_latest.snap
+EOF
