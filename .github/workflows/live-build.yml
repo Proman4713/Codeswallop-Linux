@@ -122,7 +122,7 @@ jobs:
           EOF
           ) > ${{ github.workspace }}/temp/docker-live-build.sh
 
-          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:resolute /bin/bash /workspace/temp/docker-live-build.sh
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash /workspace/temp/docker-live-build.sh
     
       - name: Compress Build Directory
         run: |
