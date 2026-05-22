@@ -14,6 +14,24 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6.0.2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Preseed snaps
+        env:
+          # If this was triggered by a tag (release), set to release. Otherwise, nightly will automatically be used.
+          BUILD_TYPE: ${{ startsWith(github.ref, 'refs/tags/') && 'release' || '' }}
+        run: |
+          pnpm install
+          node src/preseed-snaps.js
+          node src/inject-disk-release.js
     
       - name: Build
         run: |
@@ -26,7 +44,29 @@ jobs:
 
             mkdir -p /workspace/build
             cd /workspace/build
-            lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse"
+            lb config \
+                --mode ubuntu \
+                --distribution resolute \
+                --architecture amd64 \
+                --archive-areas "main restricted universe multiverse" \
+                --iso-volume "Utile OS 26 amd64" \
+                --iso-publisher "Utile; http://utile-os-web.mailworker.workers.dev/; proman4713@gmail.com"
+
+            mkdir -p ./config/archives
+            cp -r /workspace/tooling/config/archives/* ./config/archives/
+
+            mkdir -p ./config/hooks
+            cp -r /workspace/tooling/config/hooks/* ./config/hooks/
+            chmod +x ./config/hooks/*
+
+            mkdir -p ./config/package-lists
+            cp -r /workspace/tooling/config/package-lists/* ./config/package-lists/
+
+            mkdir -p ./config/includes.chroot
+            cp -r /workspace/tooling/config/includes.chroot/* ./config/includes.chroot/
+
+            mkdir -p ./config/preseed
+            cp -r /workspace/tooling/config/preseed/* ./config/preseed/
           "
     
       - name: Compress Build Directory

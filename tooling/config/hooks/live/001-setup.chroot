@@ -18,17 +18,3 @@ fi
 
 apt-get autoremove -y --purge
 apt-get clean
-
-TARGET_DIR="/var/lib/snapd/seed/snaps"
-mkdir -p "$TARGET_DIR"
-mkdir -p "/var/lib/snapd/seed/assertions"
-
-cat <<EOF > /var/lib/snapd/seed/seed.yaml
-snaps:
-  - name: core22
-    channel: stable
-    file: core22_latest.snap
-  - name: snapd
-    channel: stable
-    file: snapd_latest.snap
-EOF
