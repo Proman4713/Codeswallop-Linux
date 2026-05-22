@@ -35,6 +35,7 @@ jobs:
     
       - name: Build
         run: |
+          touch ${{ github.workspace }}/temp/docker-live-build.sh
           (cat << 'EOF'
           set -exuo pipefail
           export DEBIAN_FRONTEND=noninteractive
