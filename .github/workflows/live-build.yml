@@ -21,8 +21,8 @@ jobs:
             set -exuo pipefail # Strict
             uname -m
             export DEBIAN_FRONTEND=noninteractive
-            apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
-            apt-get upgrade -y
+            sudo apt-get update && sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
+            sudo apt-get upgrade -y
 
             mkdir -p /workspace/build
             cd /workspace/build
