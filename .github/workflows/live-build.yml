@@ -61,7 +61,14 @@ jobs:
           (cat << 'EOF'
           set -exuo pipefail
           export DEBIAN_FRONTEND=noninteractive
-          apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
+          apt-get update && apt-get install -y \
+            live-build \
+            debootstrap \
+            ubuntu-keyring \
+            squashfs-tools \
+            xorriso \
+            syslinux-utils \
+            cpio
           apt-get upgrade -y
 
           mkdir -p /workspace/build
@@ -69,21 +76,28 @@ jobs:
           # MEMTEST DISABLED, AS IT CAUSES ISSUES WITH LEGACY LIVE-BUILD HARDCODE. SHOULD BE RE-ENABLED IN THE FUTURE IF A SOLUTION IS FOUND.
           lb config \
             --mode ubuntu \
+            --bootstrap debootstrap \
+            --bootstrap-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \
             --distribution resolute \
-            --architecture amd64 \
+            --parent-distribution resolute \
+            --architectures amd64 \
             --archive-areas "main restricted universe multiverse" \
+            --parent-archive-areas "main restricted universe multiverse" \
             --mirror-bootstrap http://archive.ubuntu.com/ubuntu/ \
             --mirror-binary http://archive.ubuntu.com/ubuntu/ \
             --mirror-binary-security http://security.ubuntu.com/ubuntu/ \
             --mirror-chroot http://archive.ubuntu.com/ubuntu/ \
             --mirror-chroot-security http://security.ubuntu.com/ubuntu/ \
-            --bootloaders "grub-pc,grub-efi" \
-            --bootappend-live "boot=casper quiet splash" \
+            --bootloader grub \
+            --bootappend-live "boot=casper username=ubuntu quiet splash" \
+            --initramfs casper \
             --binary-images iso-hybrid \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
             --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com' \
             --memtest none
+
+          export DEBOOTSTRAP_OPTIONS="--variant=minbase --include=apt,ubuntu-keyring,gnupg,initramfs-tools,casper"
 
           mkdir -p /workspace/build/config/archives
           cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/
@@ -105,12 +119,12 @@ jobs:
           cp -r /workspace/tooling/config/preseed/* /workspace/build/config/preseed/
 
           lb build --verbose
-          lb clean --purge
           mv *.iso /workspace/${{ env.ISO_NAME }}-amd64.iso
+          lb clean --purge
           EOF
           ) > ${{ github.workspace }}/temp/docker-live-build.sh
 
-          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace debian:trixie /bin/bash /workspace/temp/docker-live-build.sh
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:resolute /bin/bash /workspace/temp/docker-live-build.sh
     
       - name: Compress Build Directory
         run: |
