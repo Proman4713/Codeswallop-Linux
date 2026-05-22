@@ -61,7 +61,10 @@ jobs:
           (cat << 'EOF'
           set -exuo pipefail
           export DEBIAN_FRONTEND=noninteractive
-          apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
+          echo 'deb http://deb.debian.org/debian trixie main' >> /etc/apt/sources.list.d/debian.list
+          apt-get update && apt-get install -t trixie -y live-build debootstrap squashfs-tools xorriso
+          rm /etc/apt/sources.list.d/debian.list
+          apt-get update
           apt-get upgrade -y
 
           mkdir -p /workspace/build
@@ -72,7 +75,10 @@ jobs:
             --distribution resolute \
             --architecture amd64 \
             --archive-areas "main restricted universe multiverse" \
-            --bootloader grub \
+            --mirror-bootstrap http://archive.ubuntu.com/ubuntu/ \
+            --mirror-binary http://archive.ubuntu.com/ubuntu/ \
+            --mirror-binary-security http://security.ubuntu.com/ubuntu/ \
+            --bootloaders "grub-pc,grub-efi" \
             --bootappend-live "boot=casper quiet splash" \
             --binary-images iso-hybrid \
             --iso-application "Utile OS Live" \
