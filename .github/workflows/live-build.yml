@@ -24,7 +24,7 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: Preseed snaps
+      - name: Preseed snaps and inject disk release
         env:
           # If this was triggered by a tag (release), set to release. Otherwise, nightly will automatically be used.
           BUILD_TYPE: ${{ startsWith(github.ref, 'refs/tags/') && 'release' || '' }}
@@ -32,6 +32,26 @@ jobs:
           pnpm install
           node src/preseed-snaps.js
           node src/inject-disk-release.js
+    
+      - name: Inject GRUB theme
+        run: |
+          set -exuo pipefail # Strict
+
+          mkdir -p temp-grub/
+
+          if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg; then
+            echo "Error: Failed to download or install Utile GPG key" >&2
+            exit 1
+          fi
+          echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main upstream universe" | sudo tee /etc/apt/sources.list.d/utile.list
+          sudo apt-get update
+
+          wget -qO utile-grub-theme.deb $(apt download --print-uris utile-grub-theme 2>/dev/null | awk -F"'" '{print $2}')
+          sudo dpkg -x utile-grub-theme.deb temp-grub/
+
+          sudo mkdir -p tooling/config/includes.binary/grub/themes/utile
+          THEME_PATH="temp-grub/boot/grub/themes/utile"
+          sudo cp -r $THEME_PATH/* tooling/config/includes.binary/grub/themes/utile/
     
       - name: Build
         run: |
