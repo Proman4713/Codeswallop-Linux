@@ -218,7 +218,7 @@ jobs:
 
       - name: Strip Language Layer
         run: |
-          set -euo pipefail
+          set -exuo pipefail # Strict
 
           patterns=(
             # Per-language minimal files (minimal.de.squashfs etc.)

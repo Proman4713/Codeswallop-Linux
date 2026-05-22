@@ -4,7 +4,7 @@
 
 if [ "$ENV_MODE" == "ISO" ]; then
 	# APT Repository
-	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg; then
+	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmour -o /etc/apt/keyrings/utile.gpg; then
 		echo "Error: Failed to download or install Utile GPG key" >&2
 		exit 1
 	fi

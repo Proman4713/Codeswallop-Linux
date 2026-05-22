@@ -24,7 +24,8 @@ The first thing to understand about this project is when to say 'Utile', 'Utile 
 	- In general OS name declarations (e.g. `NAME="Utile OS"` in `/etc/os-release`)
 	- In formal references (e.g. `Utile OS comes with ABSOLUTELY NO WARRANTY` in `/etc/legal`)
 - **Utile 26**:
-	- This should be avoided in most cases. Preferably kept only for casual discussion.
+	- In public announcements, blog posts, PR mentions, etc.
+	- This should be avoided in most other cases. Preferably kept only for casual discussion.
 - **Utile OS 26**:
 	- In user-facing version-specific text (e.g. `Utile OS 26 has experienced an internal error.` and other error messages, `Utile OS 26` in Settings > System > About)
 	- In OS-differentiating locations (e.g. `PRETTY_NAME="Utile OS 26"` in `/etc/os-release`, which is used by neofetch/fastfetch, `Utile OS 26` in the post-install walkthrough dialogue). In other words, places where screenshots are taken.
