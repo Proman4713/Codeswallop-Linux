@@ -17,18 +17,21 @@ jobs:
     
       - name: Build
         run: |
-          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash
+          docker run --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash -c "
             set -exuo pipefail # Strict
+            # Switch to sudo
+            sudo -i
             uname -m
             export DEBIAN_FRONTEND=noninteractive
             sudo apt-get update && sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
             sudo apt-get upgrade -y
 
-            mkdir -p /workspace/build
+            sudo mkdir -p /workspace/build
             cd /workspace/build
             lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse"
             tar -czf live-build-config.tar.gz auto/ config/ local/
-            exit
+            chown -R $(id -u):$(id -g) /workspace/build
+          "
     
       - name: Upload Build Directory
         uses: actions/upload-artifact@v7
