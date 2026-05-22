@@ -22,6 +22,8 @@ const CHANNEL = 'stable';
 const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'config', 'includes.chroot', 'var', 'lib', 'snapd', 'seed');
 const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');
+const DOWNLOAD_RETRIES = 3;
+const RETRY_DELAY_MS = 2000;
 
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
@@ -56,17 +58,34 @@ async function fetchSnapInfo(snapName) {
 }
 
 async function downloadSnap(url, outputPath) {
-    const snapRes = await fetch(url);
+    let lastError;
 
-    if (!snapRes.ok) {
-		console.error(`Failed to download snap: ${snapRes.status} ${snapRes.statusText}`);
-		process.exit(1);
-	}
+    for (let attempt = 1; attempt <= DOWNLOAD_RETRIES; attempt++) {
+        try {
+            const snapRes = await fetch(url);
 
-    await pipeline(
-    	Readable.fromWeb(snapRes.body),
-    	fs.createWriteStream(outputPath)
-    );
+            if (!snapRes.ok) {
+                lastError = new Error(`Failed to download snap: ${snapRes.status} ${snapRes.statusText}`);
+                console.warn(`Download attempt ${attempt}/${DOWNLOAD_RETRIES} failed: ${lastError.message}`);
+            } else {
+                await pipeline(
+                    Readable.fromWeb(snapRes.body),
+                    fs.createWriteStream(outputPath)
+                );
+                return;
+            }
+        } catch (error) {
+            lastError = error;
+            console.warn(`Download attempt ${attempt}/${DOWNLOAD_RETRIES} failed: ${error.message}`);
+        }
+
+        if (attempt < DOWNLOAD_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        }
+    }
+
+    console.error(lastError ? lastError.message : 'Failed to download snap after retries');
+    process.exit(1);
 }
 
 async function fetchAssertion(snapId, revision, outputPath) {
