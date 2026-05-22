@@ -66,6 +66,7 @@ jobs:
 
           mkdir -p /workspace/build
           cd /workspace/build
+          # MEMTEST DISABLED, AS IT CAUSES ISSUES WITH LEGACY LIVE-BUILD HARDCODE. SHOULD BE RE-ENABLED IN THE FUTURE IF A SOLUTION IS FOUND.
           lb config \
             --mode ubuntu \
             --distribution resolute \
@@ -73,7 +74,8 @@ jobs:
             --archive-areas "main restricted universe multiverse" \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
-            --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
+            --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com' \
+            --memtest none
 
           mkdir -p /workspace/build/config/archives
           cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/

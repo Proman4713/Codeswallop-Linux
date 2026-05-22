@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-# Ubuntu 26.04 has memtest in a .EFI file, but live-build script expects a legacy .bin file.
-# We duplicate it to let it go cleanly.
-if [ -f /boot/memtest86+.efi ] && [ ! -f /boot/memtest86+.bin ]; then
-    cp /boot/memtest86+.efi /boot/memtest86+.bin
-fi
