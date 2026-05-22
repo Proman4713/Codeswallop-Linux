@@ -14,7 +14,8 @@ const SNAPS = [
 	'mesa-2404',
 	'prompting-client',
 	'snap-store',
-	'snapd-desktop-integration'
+	'snapd-desktop-integration',
+	'ubuntu-desktop-bootstrap'
 ];
 const ARCHITECTURE = 'amd64';
 const CHANNEL = 'stable';
