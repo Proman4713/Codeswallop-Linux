@@ -71,7 +71,6 @@ jobs:
             --distribution resolute \
             --architecture amd64 \
             --archive-areas "main restricted universe multiverse" \
-            --image-name "${{ env.ISO_NAME }}-amd64" \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
             --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com'
@@ -97,7 +96,7 @@ jobs:
 
           lb build --verbose --color
           lb clean --purge
-          mv *.iso /workspace/
+          mv *.iso /workspace/${{ env.ISO_NAME }}-amd64.iso
           EOF
           ) > ${{ github.workspace }}/temp/docker-live-build.sh
 
