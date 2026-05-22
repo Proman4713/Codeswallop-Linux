@@ -37,3 +37,5 @@ fs.writeFileSync(
 	path.join(binaryIncludePath, ".disk", "release_notes_url"),
 	`https://github.com/Proman4713/Utile-OS/releases/tag/${SCRIPT_VERSION}`
 );
+
+console.log(`\nutile-os-${SCRIPT_VERSION}`)
