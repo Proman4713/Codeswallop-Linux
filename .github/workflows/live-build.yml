@@ -79,7 +79,6 @@ jobs:
             --mirror-chroot-security http://security.ubuntu.com/ubuntu/ \
             --bootloaders "grub-pc,grub-efi" \
             --bootappend-live "boot=casper quiet splash" \
-            --initramfs casper \
             --binary-images iso-hybrid \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
