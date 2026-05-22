@@ -72,6 +72,9 @@ jobs:
             --distribution resolute \
             --architecture amd64 \
             --archive-areas "main restricted universe multiverse" \
+            --bootloader grub \
+            --bootappend-live "boot=casper quiet splash" \
+            --binary-images iso-hybrid \
             --iso-application "Utile OS Live" \
             --iso-volume "Utile OS 26 amd64" \
             --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com' \
