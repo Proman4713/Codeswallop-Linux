@@ -34,7 +34,7 @@ jobs:
           set -exuo pipefail # Strict
 
           echo "Workspace: $GITHUB_WORKSPACE"
-          chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE/build
+          sudo chown -R $(id -u):$(id -g) $GITHUB_WORKSPACE/build
           ls -la $GITHUB_WORKSPACE || true
           ls -la $GITHUB_WORKSPACE/build || true
 
