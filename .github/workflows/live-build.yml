@@ -97,8 +97,6 @@ jobs:
             --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com' \
             --memtest none
 
-          export DEBOOTSTRAP_OPTIONS="--variant=minbase --include=apt,ubuntu-keyring,gnupg,initramfs-tools,casper"
-
           mkdir -p /workspace/build/config/archives
           cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/
 
