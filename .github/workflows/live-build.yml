@@ -1,0 +1,38 @@
+name: Generate Utile OS 26 ISO
+
+on:
+#   push:
+#     branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-custom-iso:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6.0.2
+    
+      - name: Use Docker
+        run: |
+          docker run -it --privileged -v ${{ github.workspace }}:/workspace --platform linux/amd64 --name utile-build-container -w /workspace ubuntu:26.04 /bin/bash
+            set -exuo pipefail # Strict
+            uname -m
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update && apt-get install -y live-build debootstrap squashfs-tools xorriso
+            apt-get upgrade -y
+
+            mkdir -p /workspace/build
+            cd /workspace/build
+            lb config --mode ubuntu --distribution resolute --architecture amd64 --archive-areas "main restricted universe multiverse"
+            tar -czf live-build-config.tar.gz auto/ config/ local/
+            exit
+    
+      - name: Upload Build Directory
+        uses: actions/upload-artifact@v3
+        with:
+          name: live-build-config
+          path: ${{ github.workspace }}/build/live-build-config.tar.gz
+          if-no-files-found: error
