@@ -15,9 +15,9 @@ gnome-snapshot
 gnome-tweaks
 gparted
 grub-efi-amd64
+grub-gfxpayload-lists
 grub-pc
 grub2-common
-grub-gfxpayload-lists
 gst-audio-thumbnailer
 gst-video-thumbnailer
 htop
