@@ -140,10 +140,17 @@ jobs:
           mount --bind /run /workspace/chroot/run
           mount --bind /etc/resolv.conf /workspace/chroot/etc/resolv.conf
 
+          sudo rm -f /workspace/chroot/etc/resolv.conf
+          sudo cp -L /etc/resolv.conf /workspace/chroot/etc/resolv.conf
+
           cp /workspace/dist/${{ env.SH_NAME }} /workspace/chroot/opt/
           chmod +x /workspace/chroot/opt/${{ env.SH_NAME }}
           chroot /workspace/chroot /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
           rm -f /workspace/chroot/opt/${{ env.SH_NAME }}
+
+          # Restore original resolv.conf
+          sudo rm -f /workspace/chroot/etc/resolv.conf
+          sudo chroot /workspace/chroot /bin/bash -xlc "sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
           # Snap seed
           mkdir -p /workspace/chroot/var/lib/snapd/seed/
