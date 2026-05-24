@@ -1,31 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const { version } = require("../package.json");
+// Get required version from common
+const { common } = require("./common");
+const SCRIPT_VERSION = new common(process.env.BUILD_TYPE === "release", process.env.GITHUB_REF_NAME).init().SCRIPT_VERSION;
 
-const UTILE_OS_VERSION = version.replace(/(\.0+)+$/, '');
-
-const now = new Date();
-// Jan 1st
-const startOfYear = new Date(now.getFullYear(), 0, 1);
-// Number of days since Jan 1st
-const numOfDays = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-const weekNumber = Math.floor((numOfDays + startOfYear.getDay()) / 7) + 1;
-const letters = "abcdefg";
-const dayLetter = letters[now.getDay()];
-
-console.log(`WEEK DAY: ${now.getDay()} == ${now.toLocaleDateString("en-US", { weekday: "long" })}`);
-
-/*
-	Example Nightly:	utile-os-26-nightly-26w18a
-	Example Beta:		utile-os-26-v1.0.0-beta1
-	Example Release:	utile-os-26-v1.0.0
-*/
-const SCRIPT_VERSION = process.env.BUILD_TYPE === "release" && process.env.GITHUB_REF_NAME ?
-	`${UTILE_OS_VERSION}-${process.env.GITHUB_REF_NAME}` :
-	`${UTILE_OS_VERSION}-nightly-${now.getFullYear().toString().slice(-2)}w${weekNumber.toString().padStart(2, "0")}${dayLetter}`;
-
-const binaryIncludePath = path.join(__dirname, "..", "tooling", "config", "includes.binary");
+const binaryIncludePath = path.join(__dirname, "..", "tooling");
 fs.mkdirSync(path.join(binaryIncludePath, ".disk"), { recursive: true });
 
 fs.writeFileSync(

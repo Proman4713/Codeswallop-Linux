@@ -20,7 +20,7 @@ const SNAPS = [
 const ARCHITECTURE = 'amd64';
 const CHANNEL = 'stable';
 
-const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'config', 'includes.chroot', 'var', 'lib', 'snapd', 'seed');
+const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed');
 const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');
 const DOWNLOAD_RETRIES = 3;

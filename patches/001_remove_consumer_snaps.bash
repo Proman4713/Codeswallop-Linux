@@ -23,15 +23,6 @@ rm -rf /usr/share/applications/*thunderbird*
 rm -rf /var/lib/snapd/desktop/applications/*firefox*
 rm -rf /var/lib/snapd/desktop/applications/*thunderbird*
 
-if [ -f /var/lib/snapd/seed/seed.yaml ]; then
-	wget -qO yq.sh https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_amd64
-	chmod +x ./yq.sh
-	./yq.sh -i 'del(.snaps[] | select(.name == "firefox"))' /var/lib/snapd/seed/seed.yaml
-	./yq.sh -i 'del(.snaps[] | select(.name == "thunderbird"))' /var/lib/snapd/seed/seed.yaml
-	cat /var/lib/snapd/seed/seed.yaml
-	rm -f ./yq.sh
-fi
-
 # Leftovers
 find /var/lib/snapd -name "*firefox*" -delete
 find /var/lib/snapd -name "*thunderbird*" -delete

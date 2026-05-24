@@ -4,5 +4,6 @@ custom-iso/
 source-iso/
 squashfs-root/
 temp/
+chroot/
 *.iso
 *.bin
