@@ -138,7 +138,6 @@ jobs:
           mount -t proc /proc /workspace/chroot/proc
           mount -t sysfs /sys /workspace/chroot/sys
           mount --bind /run /workspace/chroot/run
-          mount --bind /etc/resolv.conf /workspace/chroot/etc/resolv.conf
 
           sudo rm -f /workspace/chroot/etc/resolv.conf
           sudo cp -L /etc/resolv.conf /workspace/chroot/etc/resolv.conf
@@ -156,7 +155,6 @@ jobs:
           mkdir -p /workspace/chroot/var/lib/snapd/seed/
           cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
 
-          umount --lazy /workspace/chroot/etc/resolv.conf
           umount --lazy /workspace/chroot/run
           umount --lazy /workspace/chroot/sys
           umount --lazy /workspace/chroot/proc
