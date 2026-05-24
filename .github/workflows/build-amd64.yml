@@ -139,8 +139,8 @@ jobs:
           mount -t sysfs /sys /workspace/chroot/sys
           mount --bind /run /workspace/chroot/run
 
-          sudo rm -f /workspace/chroot/etc/resolv.conf
-          sudo cp -L /etc/resolv.conf /workspace/chroot/etc/resolv.conf
+          rm -f /workspace/chroot/etc/resolv.conf
+          cp -L /etc/resolv.conf /workspace/chroot/etc/resolv.conf
 
           cp /workspace/dist/${{ env.SH_NAME }} /workspace/chroot/opt/
           chmod +x /workspace/chroot/opt/${{ env.SH_NAME }}
@@ -148,8 +148,8 @@ jobs:
           rm -f /workspace/chroot/opt/${{ env.SH_NAME }}
 
           # Restore original resolv.conf
-          sudo rm -f /workspace/chroot/etc/resolv.conf
-          sudo chroot /workspace/chroot /bin/bash -xlc "sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+          rm -f /workspace/chroot/etc/resolv.conf
+          chroot /workspace/chroot /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
           # Snap seed
           mkdir -p /workspace/chroot/var/lib/snapd/seed/
