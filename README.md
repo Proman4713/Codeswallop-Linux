@@ -33,14 +33,14 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 	2. The ISOs are neither feature-complete nor bug-free.
 	3. The ISOs have not yet been completely rid of Ubuntu branding. So it may be the case that they are not completely out of the scope of Canonical's trademarks, which is something that needs to change before this project is ready for distribution.
 	4. The above means that I'm not claiming any rights over Canonical/Ubuntu brand elements that are still user-facing and yet to be removed. Nor am I suggesting that this is a project made by Canonical Ubuntu. It is simply a matter of time before the situation changes.
-- The ISOs have not been tested with offline Ubuntu installations.
-- The bash scripts available in my [releases](https://github.com/Proman4713/Utile-OS/releases) are not intended for use on an existing system. They assume a specific Ubuntu version depending on their filename and also assume that they are the first thing being run on your system. The vast majority of any customisations you may have applied will be overridden.
+- The ISOs have not been tested with offline installations.
+- The bash scripts available in my [releases](https://github.com/Proman4713/Utile-OS/releases) are not intended for use on a long-running system. They assume a specific Ubuntu version depending on their filename and also assume that they are the *first thing* being run on your system. The vast majority of any customisations you may have applied will be overridden.
 - This project has already modified enough that Ubuntu upgrades may not go smoothly. This is something that even I am not willing to risk on my own system. This shall change before the final release with a custom upgrade solution.
-- This project uninstalls some packages from the Extended Selection, so be wary of that if you run it on an Ubuntu extended installation.
+- This project uninstalls crucial packages from the Extended Selection, so do not run the bash script on an Ubuntu extended installation.
 - Considering that this project is mainly targeted at ISOs, the bash scripts are not [idempotent](https://en.wikipedia.org/wiki/Idempotence), and they also modify **both** system and user defaults, so creating a new user after running this project does not uninstall the changes applied by the script.
 - This project is ***not*** endorsed or supported by Canonical, Ubuntu, or any other Linux distribution. It is a personal project somewhere between base Ubuntu and a custom Ubuntu derivative.
 - I am the only maintainer of this project. If you have any suggestions, please open an issue on the [Issues](https://github.com/Proman4713/Utile-OS/issues) page, but don't expect much from me. This is largely a hobby project dedicated to myself and learning some things about Linux.
-- By using this project, you also agree to the **[Microsoft Core Fonts EULA](https://corefonts.sourceforge.net/eula.htm).** Because it is automatically accepted during the installation of LibreOffice onto your system or onto the ISO.
+- By using this project, you agree to the **[Microsoft Core Fonts EULA](https://corefonts.sourceforge.net/eula.htm).** Because it is automatically accepted during the installation of LibreOffice onto your system or onto the ISO.
 
 ## Support me
 If you somehow found this project useful, or used my wallpapers for your desktop, then please consider [buying me a coffee](https://buymeacoffee.com/codeswallop) :)
@@ -52,7 +52,7 @@ The patches are 'compiled' through the NodeJS [`compile.js`](./src/compile.js) s
 
 The reason the patches are given the .bash extension, even though the product script is given the .sh extension, is to allow the [ShellCheck VSCode extension](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck) to provide errors and warnings without repetitive shebangs in each patch.
 
-Local development & build instructions are not yet available. Although if you really wanted to, you could check out the [ISO Build workflow](https://github.com/Proman4713/Utile-OS/blob/main/.github/workflows/build-iso.yml), which uses the NodeJS script, to replicate a similar process locally. If this works out, feel free to contribute your solution to the repository.
+Local development & build instructions are not yet available. Although if you really wanted to, you could check out the [ISO Build workflow](https://github.com/Proman4713/Utile-OS/blob/main/.github/workflows/build-amd64.yml), which uses the NodeJS script, to replicate a similar process locally. If this works out, feel free to contribute your solution to the repository.
 
 ## Plans
 Before starting this project, I detailed a specific plan in [an older readme](./README.old.md#plan); however, I have since realised that those plans were not realistically laid out due to various intricacies around how Ubuntu and apt/debian packages work. So this section is being repurposed for future plans. I write these plans when I think of them, and they are subject to change.
@@ -69,10 +69,10 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Implement my own Plymouth theme.</li>
 		<li>Figure out a way to use/implement an equivalent of the <code>Customised Workspaces</code>, <code>Customize Clock on Lock Screen</code>, and <code>Lock screen background</code> extensions without cluttering the UI</li>
 		<li>Fully transition to use Debian packages (i.e. make more packages) to make modifications rather than manually executing commands.</li>
-		<li>Similarly, make a <code>utile-gnome-shell-extensions</code> package to be able to install preferred extensions as system extensions and update them without needing the hacky <code>seed_extension</code> function in patch 000.</li>
-		<li>Create a <code>utile-gnome-defaults</code> package for the gsettings/dconf changes</li>
+		<li><strike>Similarly, make a <code>utile-gnome-shell-extensions</code> package to be able to install preferred extensions as system extensions and update them without needing the hacky <code>seed_extension</code> function in patch 000.</strike></li>
+		<li><strike>Create a <code>utile-gnome-defaults</code> package for the gsettings/dconf changes</strike></li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
-		<li>Implement my own app store (packaged in Debian, not a Snap), which makes the issue of Snap vs. Debian less of a technical dilemma and more of a user-friendly choice. This app store must also improve on the UI/UX of usual Linux app stores, which, in my opinion, are developed by people who are too tech-centric to dedicate enough thought to the appeal of their UI. Additionally, I would like to allow developers to publish Debian-packaged apps to this store even if they don't come from the device's apt sources. This could potentially be done by verifying a developer's identity and their app's safety, then only adding their app's source repository if the user chooses to install the app.</li>
+		<li>Implement my own app store (packaged in Debian, not a Snap), which makes the issue of Snap vs. Debian less of a technical dilemma and more of a user-friendly choice. This app store must also improve on the UI/UX of usual Linux app stores, which, in my opinion, are developed by people who are too tech-centric to dedicate enough thought to the appeal of their UI. Additionally, I would like to allow developers to publish Debian-packaged apps to this store even if they don't come from the device's apt sources. This could potentially be done by verifying a developer's identity and their app's safety, then only adding their app's source repository if the user chooses to install the app. Could paid apps be a thing? I think we should generally learn from the macOS App Store.</li>
 	</ol>
 </details>
 <details>
@@ -80,8 +80,8 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 	<ol>
 		<li>Should I add ClamAV? Potentially with a custom extension to go with it to provide a GUI in the top bar/quick settings?</li>
 		<li>Should I allow a custom wallpaper for the lock screen through extensions (potentially custom, to unify GDM login and lock screen)?</li>
-		<li>Should I create an extension to reduce the size of the headerbar in GNOME, especially with fractional scaling?</li>
-		<li>Should I include a pre-configure 'Dash2Dock Animated' extension? Is that too much like macOS in a way that it shouldn't be?</li>
+		<li>Should I create an extension to reduce the size of the headerbar in GNOME, especially with fractional scaling? I think the fact that it is so <b><i>thick</b></i> right now shows how negligent GNOME is of more restricted users without 2,000" Ultrawide monitors. macOS does have thick window controls, but they are <i>floating,</i> GNOME takes the thickness of macOS controls and merges it with Windows's boxy headerbar layout.</li>
+		<li>Should I include a pre-configured 'Dash2Dock Animated' extension? Is that too much like macOS in a way that it shouldn't be?</li>
 		<li>Similarly, what about the 'Compiz alike magic lamp effect' extension? This could be too much, but maybe another extension that provides a springier minimise animation than the default?</li>
 		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well?</li>
 		<li>The average user does not have NAS devices and doesn't use <a href="https://ubuntu.com/server/docs/how-to/networking/install-nfs/">NFS</a>, should I disable the NetworkManager-wait-online.service to speed up boot time? What are the tradeoffs?</li>
@@ -101,4 +101,4 @@ This project serves as a container for everything that I dare to try to address 
 
 ## Rights & Licensing
 - This project is licensed under the well-known GPL v3, which covers all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md).
-- On the other hand, media files available at [`resources/`](resources/) are licensed using Creative Commons, which covers images, designs, audio, video, and everything else that may exist in that folder as long as it contains the same Creative Commons license. The license available at [`resources/LICENSE.md`](resources/LICENSE.md).
+- On the other hand, media files available at [`resources/`](resources/) are licensed using Creative Commons, which covers images, designs, audio, video, and everything else that may exist in that folder as long as it contains the same Creative Commons license. The license is available at [`resources/LICENSE.md`](resources/LICENSE.md).
