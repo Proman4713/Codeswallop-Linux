@@ -120,6 +120,9 @@ jobs:
             dosfstools \
             mtools \
             syslinux-utils \
+            grub-common \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
             cpio
           apt-get upgrade -y
 
