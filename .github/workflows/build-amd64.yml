@@ -117,6 +117,8 @@ jobs:
             ubuntu-keyring \
             squashfs-tools \
             xorriso \
+            dosfstools \
+            mtools \
             syslinux-utils \
             cpio
           apt-get upgrade -y
@@ -124,7 +126,7 @@ jobs:
           mkdir -p /workspace/chroot
           debootstrap \
             --arch=amd64 \
-            --include=base-files,cryptsetup,cryptsetup-initramfs,curl,deja-dup,ffmpegthumbnailer,gdebi,git,gnome-calendar,gnome-music,gnome-session-canberra,gnome-shell-extension-manager,gnome-snapshot,gnome-tweaks,gparted,grub-gfxpayload-lists,grub-pc,grub2-common,gst-audio-thumbnailer,gst-video-thumbnailer,htop,libfuse2t64,mdadm,realmd,shim-signed,showtime,snapd,sssd,ubuntu-desktop-minimal,ubuntu-restricted-extras,ubuntu-standard,unzip,wget,zfsutils-linux \
+            --include=base-files,cryptsetup,cryptsetup-initramfs,curl,deja-dup,ffmpegthumbnailer,gdebi,git,gnome-calendar,gnome-music,gnome-session-canberra,gnome-shell-extension-manager,gnome-snapshot,gnome-tweaks,gparted,grub-gfxpayload-lists,grub-pc,grub2-common,gst-audio-thumbnailer,gst-video-thumbnailer,htop,libfuse2t64,linux-generic-hwe-26.04,mdadm,realmd,shim-signed,showtime,snapd,sssd,ubuntu-desktop-minimal,ubuntu-restricted-extras,ubuntu-standard,unzip,wget,zfsutils-linux \
             --components=main,restricted,universe,multiverse \
             --keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg \
             --verbose \

@@ -9,7 +9,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		exit 1
 	fi
 
-	# Use modern Debian repository source format in /etc/apt/sources.list.d/utile.sources
+	# Use deb822 source format in /etc/apt/sources.list.d/utile.sources
 	(cat << 'EOF'
 ## Utiie distribution repository
 ##
