@@ -64,7 +64,7 @@ jobs:
           wget -qO utile-grub-theme.deb $(apt download --print-uris utile-grub-theme 2>/dev/null | awk -F"'" '{print $2}')
           sudo dpkg -x utile-grub-theme.deb temp-grub/
 
-          sudo mkdir -p tooling/iso_overlay/grub/themes/utile
+          sudo mkdir -p tooling/iso_overlay/boot/grub/themes/utile
           THEME_PATH="temp-grub/boot/grub/themes/utile"
           sudo cp -r $THEME_PATH/* tooling/iso_overlay/boot/grub/themes/utile/
     
