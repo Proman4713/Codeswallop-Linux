@@ -66,7 +66,7 @@ jobs:
 
           sudo mkdir -p tooling/iso_overlay/grub/themes/utile
           THEME_PATH="temp-grub/boot/grub/themes/utile"
-          sudo cp -r $THEME_PATH/* tooling/iso_overlay/grub/themes/utile/
+          sudo cp -r $THEME_PATH/* tooling/iso_overlay/boot/grub/themes/utile/
     
       - name: Inject GRUB config
         run: |
@@ -124,7 +124,6 @@ jobs:
             grub-pc-bin \
             grub-efi-amd64-bin \
             cpio
-          apt-get upgrade -y
 
           mkdir -p /workspace/chroot
           debootstrap \
@@ -168,7 +167,7 @@ jobs:
 
           # Make squashfs
           mkdir -p /workspace/custom-iso/casper
-          mksquashfs /workspace/chroot /workspace/custom-iso/casper/filesystem.squashfs -comp xz -noappend -e /workspace/chroot/boot
+          mksquashfs /workspace/chroot /workspace/custom-iso/casper/filesystem.squashfs -comp xz -noappend -e boot
 
           # Kernel and INITRD
           VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
@@ -221,6 +220,7 @@ jobs:
           cp /tmp/efi.img /workspace/custom-iso/boot/grub/efi.img
 
           xorriso -as mkisofs \
+            -rockridge \
             -iso-level 3 \
             -full-iso9660-filenames \
             -volid "Utile OS 26 amd64" \
