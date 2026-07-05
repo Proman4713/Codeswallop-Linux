@@ -74,6 +74,8 @@ jobs:
           sudo tee tooling/iso_overlay/boot/grub/grub.cfg << 'EOF'
           set timeout=10
           set gfxmode=1920x1080,auto
+          # https://www.gnu.org/software/grub/manual/grub/grub.html#GNU_002fLinux (REMOVE WHEN USING UBUNTU OFFICIAL GRUB)
+          search --set=root --file /casper/vmlinuz
 
           loadfont unicode
           loadfont ubuntu-sans-bold-18
