@@ -90,10 +90,9 @@ apt_get_update
 # Seeding happens here now, since Debootstrap doesn't install recommends of packages
 if [ "$ENV_MODE" == "ISO" ]; then
 	install_packages base-files \
-	cryptsetup \
-	cryptsetup-initramfs \
 	curl \
 	deja-dup \
+	dracut \
 	ffmpegthumbnailer \
 	gdebi \
 	git \
@@ -104,6 +103,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	gnome-snapshot \
 	gnome-tweaks \
 	gparted \
+	grub-common \
 	grub-gfxpayload-lists \
 	grub-pc \
 	grub2-common \
@@ -111,10 +111,8 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	gst-video-thumbnailer \
 	htop \
 	libfuse2t64 \
+	linux-generic-hwe-24.04 \
 	linux-generic-hwe-26.04 \
-	mdadm \
-	realmd \
-	shim-signed \
 	showtime \
 	snapd \
 	sssd \
@@ -122,6 +120,5 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	ubuntu-restricted-extras \
 	ubuntu-standard \
 	unzip \
-	wget \
-	zfsutils-linux
+	wget
 fi

@@ -3,7 +3,7 @@
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
 apt-get purge -y transmission-gtk transmission-common \
 				shotwell shotwell-common \
-				gnome-mines gnome-sudoku gnome-mahjongg aisleriot \
+				gnome-mines gnome-sudoku gnome-mahjongg aisleriot gnome-terminal \
 				remmina* \
 				simple-scan \
 				usb-creator* \
@@ -58,6 +58,12 @@ apt-get purge -y fonts-arphic-ukai \
 				language-pack-ru-base \
 				language-pack-zh-hans \
 				language-pack-zh-hans-base
+
+# English Language packages
+install_packages language-pack-en \
+				language-pack-en-base \
+				language-pack-gnome-en \
+				language-pack-gnome-en-base
 
 # TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
 # TODO: Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu, also only available as Flatpak
