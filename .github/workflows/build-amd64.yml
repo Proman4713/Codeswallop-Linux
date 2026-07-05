@@ -67,15 +67,28 @@ jobs:
           sudo mkdir -p tooling/iso_overlay/boot/grub/themes/utile
           THEME_PATH="temp-grub/boot/grub/themes/utile"
           sudo cp -r $THEME_PATH/* tooling/iso_overlay/boot/grub/themes/utile/
+          # Remove fonts from theme folder and copy them to /boot/grub/fonts instead
+          sudo rm -f tooling/iso_overlay/boot/grub/themes/utile/*.pf2
+          sudo cp -r $THEME_PATH/*.pf2 tooling/iso_overlay/boot/grub/fonts/
     
       - name: Inject GRUB config
         run: |
           sudo mkdir -p tooling/iso_overlay/boot/grub
           sudo tee tooling/iso_overlay/boot/grub/grub.cfg << 'EOF'
+          # To render the theme
+          insmod gfxterm
+          insmod video_fb
+          insmod efi_gop
+          # For the icons
+          insmod png
+
           set timeout=10
           set gfxmode=1920x1080,auto
           # https://www.gnu.org/software/grub/manual/grub/grub.html#GNU_002fLinux (REMOVE WHEN USING UBUNTU OFFICIAL GRUB)
           search --set=root --file /casper/vmlinuz
+
+          # Set terminal output mode
+          terminal_output gfxterm
 
           loadfont unicode
           loadfont ubuntu-sans-bold-18
@@ -193,10 +206,7 @@ jobs:
           grub-mkstandalone \
             --format=i386-pc \
             --output=/tmp/core.img \
-            --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
             --modules="linux normal iso9660 biosdisk search" \
-            --locales="" \
-            --fonts="" \
             "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
 
           cat /usr/lib/grub/i386-pc/cdboot.img /tmp/core.img \
@@ -206,13 +216,15 @@ jobs:
           grub-mkstandalone \
             --format=x86_64-efi \
             --output=/tmp/bootx64.efi \
-            --locales="" \
-            --fonts="" \
             "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
 
+          # Copy 10 MBs from /dev/zero to an image file to create it
           dd if=/dev/zero of=/tmp/efi.img bs=1M count=10
-          mkfs.vfat /tmp/efi.img
+          # Create a FAT filesystem there
+          mkfs.fat /tmp/efi.img
+          # Create the EFI/BOOT folder inside the image (-i to specify an image file)
           mmd -i /tmp/efi.img ::/EFI ::/EFI/BOOT
+          # Copy the GRUB UEFI image to the EFI/BOOT directory inside this image
           mcopy -i /tmp/efi.img /tmp/bootx64.efi ::/EFI/BOOT/bootx64.efi
 
           mkdir -p /workspace/custom-iso/EFI/BOOT
