@@ -219,7 +219,6 @@ jobs:
           cp /tmp/efi.img /workspace/custom-iso/boot/grub/efi.img
 
           xorriso -as mkisofs \
-            -rockridge \
             -iso-level 3 \
             -full-iso9660-filenames \
             -volid "Utile OS 26 amd64" \
