@@ -86,3 +86,42 @@ EOF
 ) | sudo tee /etc/apt/sources.list.d/ubuntu.sources
 
 apt_get_update
+
+# Seeding happens here now, since Debootstrap doesn't install recommends of packages
+if [ "$ENV_MODE" == "ISO" ]; then
+	install_packages base-files \
+	cryptsetup \
+	cryptsetup-initramfs \
+	curl \
+	deja-dup \
+	ffmpegthumbnailer \
+	gdebi \
+	git \
+	gnome-calendar \
+	gnome-music \
+	gnome-session-canberra \
+	gnome-shell-extension-manager \
+	gnome-snapshot \
+	gnome-tweaks \
+	gparted \
+	grub-gfxpayload-lists \
+	grub-pc \
+	grub2-common \
+	gst-audio-thumbnailer \
+	gst-video-thumbnailer \
+	htop \
+	libfuse2t64 \
+	linux-generic-hwe-26.04 \
+	mdadm \
+	realmd \
+	shim-signed \
+	showtime \
+	snapd \
+	sssd \
+	ubuntu-desktop-minimal \
+	ubuntu-restricted-extras \
+	ubuntu-standard \
+	unzip \
+	wget \
+	zfsutils-linux
+fi
