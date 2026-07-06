@@ -241,6 +241,7 @@ jobs:
 
           xorriso -as mkisofs \
             -iso-level 3 \
+            -joliet \
             -full-iso9660-filenames \
             -volid "Utile OS 26 amd64" \
             -eltorito-boot boot/grub/bios.img \
