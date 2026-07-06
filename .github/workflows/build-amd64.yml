@@ -175,7 +175,7 @@ jobs:
           cp "$INITRD" /workspace/custom-iso/casper/initrd
 
           # Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
-          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get autoremove -y --purger && apt-get clean"
+          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get autoremove -y --purge && apt-get clean"
 
           # Restore original resolv.conf
           rm -f /workspace/chroot/etc/resolv.conf
