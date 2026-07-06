@@ -48,57 +48,17 @@ jobs:
 
           node src/inject-disk-release.js
     
-      - name: Inject GRUB theme
-        run: |
-          set -exuo pipefail # Strict
-
-          mkdir -p temp-grub/
-
-          if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmor -o /etc/apt/keyrings/utile.gpg; then
-            echo "Error: Failed to download or install Utile GPG key" >&2
-            exit 1
-          fi
-          echo "deb [signed-by=/etc/apt/keyrings/utile.gpg] https://proman4713.github.io/Utile-OS-apt/ abstract main upstream universe" | sudo tee /etc/apt/sources.list.d/utile.list
-          sudo apt-get update
-
-          wget -qO utile-grub-theme.deb $(apt download --print-uris utile-grub-theme 2>/dev/null | awk -F"'" '{print $2}')
-          sudo dpkg -x utile-grub-theme.deb temp-grub/
-
-          sudo mkdir -p tooling/iso_overlay/boot/grub/themes/utile
-          sudo mkdir -p tooling/iso_overlay/boot/grub/fonts/
-
-          THEME_PATH="temp-grub/boot/grub/themes/utile"
-          sudo cp -r $THEME_PATH/* tooling/iso_overlay/boot/grub/themes/utile/
-          # Remove fonts from theme folder and copy them to /boot/grub/fonts instead
-          sudo rm -f tooling/iso_overlay/boot/grub/themes/utile/*.pf2
-          sudo cp -r $THEME_PATH/*.pf2 tooling/iso_overlay/boot/grub/fonts/
-    
       - name: Inject GRUB config
         run: |
           sudo mkdir -p tooling/iso_overlay/boot/grub
           sudo tee tooling/iso_overlay/boot/grub/grub.cfg << 'EOF'
-          # To render the theme
-          insmod gfxterm
-          insmod video_fb
-          insmod efi_gop
-          # For the icons
-          insmod png
+          set timeout=30
 
-          set timeout=10
-          set gfxmode=1920x1080,auto
           # https://www.gnu.org/software/grub/manual/grub/grub.html#GNU_002fLinux (REMOVE WHEN USING UBUNTU OFFICIAL GRUB)
-          search --set=root --file /casper/vmlinuz
-
-          # Set terminal output mode
-          terminal_output gfxterm
+          # search --set=root --file /casper/vmlinuz
 
           loadfont unicode
-          loadfont ubuntu-sans-bold-18
-          loadfont ubuntu-sans-bold-20
-          loadfont ubuntu-sans-bold-24
-          loadfont ubuntu-sans-extrabold-20
 
-          set theme=($root)/boot/grub/themes/utile/theme.txt
           set menu_color_normal=white/black
           set menu_color_highlight=black/light-gray
 
@@ -142,70 +102,79 @@ jobs:
             grub-efi-amd64-bin \
             cpio
 
-          mkdir -p /workspace/chroot
+          export CHROOT_DIR="/workspace/chroot"
+          mkdir -p "$CHROOT_DIR"
           debootstrap \
             --arch=amd64 \
             --components=main,restricted,universe,multiverse \
             --keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg \
             --verbose \
             resolute \
-            /workspace/chroot \
+            "$CHROOT_DIR" \
             http://archive.ubuntu.com/ubuntu
 
           # Mount host directories inside chroot
-          mount --bind /dev /workspace/chroot/dev
-          mount --bind /dev/pts /workspace/chroot/dev/pts
-          mount -t proc /proc /workspace/chroot/proc
-          mount -t sysfs /sys /workspace/chroot/sys
-          mount --bind /run /workspace/chroot/run
+          mount --bind /dev "$CHROOT_DIR/dev"
+          mount --bind /dev/pts "$CHROOT_DIR/dev/pts"
+          mount -t proc /proc "$CHROOT_DIR/proc"
+          mount -t sysfs /sys "$CHROOT_DIR/sys"
+          mount --bind /run "$CHROOT_DIR/run"
 
-          rm -f /workspace/chroot/etc/resolv.conf
-          cp -L /etc/resolv.conf /workspace/chroot/etc/resolv.conf
+          rm -f "$CHROOT_DIR/etc/resolv.conf"
+          cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
-          cp /workspace/dist/${{ env.SH_NAME }} /workspace/chroot/opt/
-          chmod +x /workspace/chroot/opt/${{ env.SH_NAME }}
-          chroot /workspace/chroot /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
-          rm -f /workspace/chroot/opt/${{ env.SH_NAME }}
+          cp /workspace/dist/${{ env.SH_NAME }} "$CHROOT_DIR/opt/"
+          chmod +x "$CHROOT_DIR/opt/${{ env.SH_NAME }}"
+          chroot "$CHROOT_DIR" /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
+          rm -f "$CHROOT_DIR/opt/${{ env.SH_NAME }}"
 
           # Kernel and INITRD
-          mkdir -p /workspace/custom-iso/casper
-          VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
-          INITRD=$(ls -1 /workspace/chroot/boot/initrd.img-* | tail -n 1)
-          cp "$VMLINUZ" /workspace/custom-iso/casper/vmlinuz
-          cp "$INITRD" /workspace/custom-iso/casper/initrd
+          export ISO_DIR="/workspace/custom-iso"
+          mkdir -p "$ISO_DIR/casper"
+          VMLINUZ=$(ls -1 "$CHROOT_DIR/boot/vmlinuz-*" | tail -n 1)
+          INITRD=$(ls -1 "$CHROOT_DIR/boot/initrd.img-*" | tail -n 1)
+          cp "$VMLINUZ" "$ISO_DIR/casper/vmlinuz"
+          cp "$INITRD" "$ISO_DIR/casper/initrd"
 
           # Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
-          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get autoremove -y --purge && apt-get clean"
+          chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get purge -y initramfs-tools && apt-get autoremove -y --purge && apt-get clean"
 
           # Restore original resolv.conf
-          rm -f /workspace/chroot/etc/resolv.conf
-          chroot /workspace/chroot /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+          rm -f "$CHROOT_DIR/etc/resolv.conf"
+          chroot "$CHROOT_DIR" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
           # Snap seed
-          mkdir -p /workspace/chroot/var/lib/snapd/seed/
-          cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
+          mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
+          cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
-          umount --lazy /workspace/chroot/run
-          umount --lazy /workspace/chroot/sys
-          umount --lazy /workspace/chroot/proc
-          umount --lazy /workspace/chroot/dev/pts
-          umount --lazy /workspace/chroot/dev
+          umount --lazy "$CHROOT_DIR/run"
+          umount --lazy "$CHROOT_DIR/sys"
+          umount --lazy "$CHROOT_DIR/proc"
+          umount --lazy "$CHROOT_DIR/dev/pts"
+          umount --lazy "$CHROOT_DIR/dev"
 
           # Make squashfs
-          mksquashfs /workspace/chroot /workspace/custom-iso/casper/filesystem.squashfs -comp xz -noappend -e boot
+          mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
 
           # Casper metadata
-          printf '%s' "$(du -sx --block-size=1 /workspace/chroot | cut -f1)" \
-            > /workspace/custom-iso/casper/filesystem.size
-          chroot /workspace/chroot dpkg-query \
+          printf '%s' "$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)" \
+            > "$ISO_DIR/casper/filesystem.size"
+          chroot "$CHROOT_DIR" dpkg-query \
             -W --showformat='${Package} ${Version}\n' | sort \
-            > /workspace/custom-iso/casper/filesystem.manifest  
+            > "$ISO_DIR/casper/filesystem.manifest"
 
           # .disk/ and iso_overlay/
-          cp -r /workspace/tooling/.disk /workspace/custom-iso/
+          cp -r /workspace/tooling/.disk "$ISO_DIR"
           if [ -d /workspace/tooling/iso_overlay ]; then
-            cp -r /workspace/tooling/iso_overlay/* /workspace/custom-iso/
+            cp -r /workspace/tooling/iso_overlay/* "$ISO_DIR"
           fi
+
+          # Parity with official ISOs
+          ln -s . "$ISO_DIR/ubuntu"
+          touch "$ISO_DIR/.disk/base_installable"
+          echo "full_cd/single" > "$ISO_DIR/.disk/cd_type"
+          mkdir -p "$ISO_DIR/boot/grub/fonts"
+          cp /usr/share/grub/unicode.pf2 "$ISO_DIR/boot/grub/fonts" || true
 
           # GRUB BIOS
           grub-mkstandalone \
@@ -215,101 +184,67 @@ jobs:
             --modules="linux normal iso9660 biosdisk search" \
             --locales="" \
             --fonts="" \
-            "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
+            "boot/grub/grub.cfg=$ISO_DIR/boot/grub/grub.cfg"
 
           cat /usr/lib/grub/i386-pc/cdboot.img /tmp/core.img \
-            > /workspace/custom-iso/boot/grub/bios.img
+            > "$ISO_DIR/boot/grub/bios.img"
 
-          # GRUB UEFI
-          grub-mkstandalone \
-            --format=x86_64-efi \
-            --output=/tmp/bootx64.efi \
-            --locales="" \
-            --fonts="" \
-            "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
+          # Official GRUB images
+                OFFICIAL_IMAGES="/tmp/extracted-uefi-images"
+                mkdir -p "$OFFICIAL_IMAGES"
+                apt-get download shim-signed grub-efi-amd64-signed grub-pc-bin grub-efi-amd64-bin
+                for deb in *.deb; do dpkg -x "$deb" "$OFFICIAL_IMAGES"; done
+
+                # boot/grub/
+                mkdir -p "$ISO_DIR/boot/grub/x86_64-efi/"
+                cp "$OFFICIAL_IMAGES/usr/lib/grub/x86_64-efi/." "$ISO_DIR/boot/grub/x86_64-efi/"
+                mkdir -p "$ISO_DIR/boot/grub/i386-pc/"
+                cp "$OFFICIAL_IMAGES/usr/lib/grub/i386-pc/." "$ISO_DIR/boot/grub/i386-pc/"
+
+                # EFI/boot
+                mkdir -p "$ISO_DIR/EFI/boot"
+                cp "$OFFICIAL_IMAGES/usr/lib/shim/shimx64.efi" "$ISO_DIR/EFI/boot/bootx64.efi"
+                cp "$OFFICIAL_IMAGES/usr/lib/shim/mmx64.efi" "$ISO_DIR/EFI/boot/mmx64.efi"
+                cp "$OFFICIAL_IMAGES/usr/lib/grub/grubx64.efi.signed" "$ISO_DIR/EFI/boot/grubx64.efi"
 
           # Copy 10 MBs from /dev/zero to an image file to create it
           dd if=/dev/zero of=/tmp/efi.img bs=1M count=10
           # Create a FAT filesystem there
           mkfs.fat /tmp/efi.img
-          # Create the EFI/BOOT folder inside the image (-i to specify an image file)
-          mmd -i /tmp/efi.img ::/EFI ::/EFI/BOOT
-          # Copy the GRUB UEFI image to the EFI/BOOT directory inside this image
-          mcopy -i /tmp/efi.img /tmp/bootx64.efi ::/EFI/BOOT/bootx64.efi
+          # Create the EFI/boot folder inside the image (-i to specify an image file)
+          mmd -i /tmp/efi.img ::/EFI ::/EFI/boot
 
-          mkdir -p /workspace/custom-iso/EFI/BOOT
-          cp /tmp/bootx64.efi /workspace/custom-iso/EFI/BOOT/bootx64.efi
-          # Keep a copy of the FAT image alongside the ISO content for xorriso
-          cp /tmp/efi.img /workspace/custom-iso/boot/grub/efi.img
+          # Copy the official UEFI images to the EFI/boot directory inside this image
+          mcopy -i /tmp/efi.img "$ISO_DIR/EFI/boot/bootx64.efi" ::/EFI/boot/bootx64.efi
+          mcopy -i /tmp/efi.img "$ISO_DIR/EFI/boot/grubx64.efi" ::/EFI/boot/grubx64.efi
+          mcopy -i /tmp/efi.img "$ISO_DIR/EFI/boot/mmx64.efi" ::/EFI/boot/mmx64.efi
+
+          # md5sum
+          (cd "$ISO_DIR" && find . -type f ! -name "md5sum.txt" ! -name "eltorito.img" ! -name "grub.cfg" -print0 | sort -z | xargs -0 md5sum > "$ISO_DIR/md5sum.txt")
 
           xorriso -as mkisofs \
             -iso-level 3 \
             -joliet \
             -full-iso9660-filenames \
             -volid "Utile OS 26 amd64" \
+            --mbr-force-bootable \
             -eltorito-boot boot/grub/bios.img \
               -no-emul-boot \
               -boot-load-size 4 \
               -boot-info-table \
-              --eltorito-catalog boot.catalog \
               --grub2-boot-info \
               --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
             -eltorito-alt-boot \
-              -e boot/grub/efi.img \
+              -e --interval:appended_partition_2:all:: \
               -no-emul-boot \
               --protective-msdos-label \
             -append_partition 2 0xef /tmp/efi.img \
+            -appended_part_as_gpt \
+            -c boot.catalog \
             -o /workspace/${{ env.ISO_NAME }}-amd64.iso \
-            /workspace/custom-iso
+            "$ISO_DIR"
         
           echo "ISO created: $(ls -lh /workspace/${{ env.ISO_NAME }}-amd64.iso)"
-
-          # MEMTEST DISABLED, AS IT CAUSES ISSUES WITH LEGACY LIVE-BUILD HARDCODE. SHOULD BE RE-ENABLED IN THE FUTURE IF A SOLUTION IS FOUND.
-          # lb config \
-          #   --mode ubuntu \
-          #   --bootstrap debootstrap \
-          #   --bootstrap-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \
-          #   --distribution resolute \
-          #   --parent-distribution resolute \
-          #   --architectures amd64 \
-          #   --archive-areas "main restricted universe multiverse" \
-          #   --parent-archive-areas "main restricted universe multiverse" \
-          #   --mirror-bootstrap http://archive.ubuntu.com/ubuntu/ \
-          #   --mirror-binary http://archive.ubuntu.com/ubuntu/ \
-          #   --mirror-binary-security http://security.ubuntu.com/ubuntu/ \
-          #   --mirror-chroot http://archive.ubuntu.com/ubuntu/ \
-          #   --mirror-chroot-security http://security.ubuntu.com/ubuntu/ \
-          #   --bootloader grub \
-          #   --bootappend-live "boot=casper username=ubuntu quiet splash" \
-          #   --initramfs casper \
-          #   --binary-images iso-hybrid \
-          #   --iso-application "Utile OS Live" \
-          #   --iso-volume "Utile OS 26 amd64" \
-          #   --iso-publisher 'Utile; https://utile-os-web.mailworker.workers.dev; proman4713@gmail.com' \
-          #   --memtest none
-
-          # mkdir -p /workspace/build/config/archives
-          # cp -r /workspace/tooling/config/archives/* /workspace/build/config/archives/
-
-          # mkdir -p /workspace/build/config/hooks
-          # cp -r /workspace/tooling/config/hooks/* /workspace/build/config/hooks/
-          # chmod +x /workspace/build/config/hooks/*
-
-          # mkdir -p /workspace/build/config/package-lists
-          # cp -r /workspace/tooling/config/package-lists/* /workspace/build/config/package-lists/
-
-          # mkdir -p /workspace/build/config/includes.chroot
-          # cp -r /workspace/tooling/config/includes.chroot/* /workspace/build/config/includes.chroot/
-
-          # mkdir -p /workspace/build/config/includes.binary
-          # cp -r /workspace/tooling/config/includes.binary/* /workspace/build/config/includes.binary/
-
-          # mkdir -p /workspace/build/config/preseed
-          # cp -r /workspace/tooling/config/preseed/* /workspace/build/config/preseed/
-
-          # lb build --verbose
-          # mv *.iso /workspace/${{ env.ISO_NAME }}-amd64.iso
-          # lb clean --purge
           EOF
           ) > ${{ github.workspace }}/temp/docker-live-build.sh
 
