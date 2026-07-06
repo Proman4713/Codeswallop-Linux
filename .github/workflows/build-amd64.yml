@@ -167,14 +167,6 @@ jobs:
           chroot /workspace/chroot /bin/bash -xlc "/opt/${{ env.SH_NAME }}"
           rm -f /workspace/chroot/opt/${{ env.SH_NAME }}
 
-          # Restore original resolv.conf
-          rm -f /workspace/chroot/etc/resolv.conf
-          chroot /workspace/chroot /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
-
-          # Snap seed
-          mkdir -p /workspace/chroot/var/lib/snapd/seed/
-          cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
-          
           # Kernel and INITRD
           mkdir -p /workspace/custom-iso/casper
           VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
@@ -184,6 +176,14 @@ jobs:
 
           # Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
           chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get autoremove -y --purger && apt-get clean"
+
+          # Restore original resolv.conf
+          rm -f /workspace/chroot/etc/resolv.conf
+          chroot /workspace/chroot /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+
+          # Snap seed
+          mkdir -p /workspace/chroot/var/lib/snapd/seed/
+          cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
 
           umount --lazy /workspace/chroot/run
           umount --lazy /workspace/chroot/sys
