@@ -210,6 +210,7 @@ jobs:
             --output=/tmp/core.img \
             --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
             --modules="linux normal iso9660 biosdisk search" \
+            --locales="" \
             "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
 
           cat /usr/lib/grub/i386-pc/cdboot.img /tmp/core.img \
@@ -219,6 +220,7 @@ jobs:
           grub-mkstandalone \
             --format=x86_64-efi \
             --output=/tmp/bootx64.efi \
+            --locales="" \
             "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
 
           # Copy 10 MBs from /dev/zero to an image file to create it
