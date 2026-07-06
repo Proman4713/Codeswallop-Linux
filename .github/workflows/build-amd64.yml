@@ -176,13 +176,14 @@ jobs:
           cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
           
           # Kernel and INITRD
+          mkdir -p /workspace/custom-iso/casper
           VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
           INITRD=$(ls -1 /workspace/chroot/boot/initrd.img-* | tail -n 1)
           cp "$VMLINUZ" /workspace/custom-iso/casper/vmlinuz
           cp "$INITRD" /workspace/custom-iso/casper/initrd
 
-          # Remove casper from inside the chroot after copying the casper-enabled initrd out of it
-          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get autoremove -y --purger && apt-get clean"
+          # Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
+          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get autoremove -y --purger && apt-get clean"
 
           umount --lazy /workspace/chroot/run
           umount --lazy /workspace/chroot/sys
@@ -191,7 +192,6 @@ jobs:
           umount --lazy /workspace/chroot/dev
 
           # Make squashfs
-          mkdir -p /workspace/custom-iso/casper
           mksquashfs /workspace/chroot /workspace/custom-iso/casper/filesystem.squashfs -comp xz -noappend -e boot
 
           # Casper metadata
