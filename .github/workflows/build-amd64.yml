@@ -65,6 +65,8 @@ jobs:
           sudo dpkg -x utile-grub-theme.deb temp-grub/
 
           sudo mkdir -p tooling/iso_overlay/boot/grub/themes/utile
+          sudo mkdir -p tooling/iso_overlay/boot/grub/fonts/
+
           THEME_PATH="temp-grub/boot/grub/themes/utile"
           sudo cp -r $THEME_PATH/* tooling/iso_overlay/boot/grub/themes/utile/
           # Remove fonts from theme folder and copy them to /boot/grub/fonts instead
