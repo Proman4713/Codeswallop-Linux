@@ -174,6 +174,15 @@ jobs:
           # Snap seed
           mkdir -p /workspace/chroot/var/lib/snapd/seed/
           cp -r /workspace/tooling/seed/* /workspace/chroot/var/lib/snapd/seed/
+          
+          # Kernel and INITRD
+          VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
+          INITRD=$(ls -1 /workspace/chroot/boot/initrd.img-* | tail -n 1)
+          cp "$VMLINUZ" /workspace/custom-iso/casper/vmlinuz
+          cp "$INITRD" /workspace/custom-iso/casper/initrd
+
+          # Remove casper from inside the chroot after copying the casper-enabled initrd out of it
+          chroot /workspace/chroot /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get autoremove -y --purger && apt-get clean"
 
           umount --lazy /workspace/chroot/run
           umount --lazy /workspace/chroot/sys
@@ -184,12 +193,6 @@ jobs:
           # Make squashfs
           mkdir -p /workspace/custom-iso/casper
           mksquashfs /workspace/chroot /workspace/custom-iso/casper/filesystem.squashfs -comp xz -noappend -e boot
-
-          # Kernel and INITRD
-          VMLINUZ=$(ls -1 /workspace/chroot/boot/vmlinuz-* | tail -n 1)
-          INITRD=$(ls -1 /workspace/chroot/boot/initrd.img-* | tail -n 1)
-          cp "$VMLINUZ" /workspace/custom-iso/casper/vmlinuz
-          cp "$INITRD" /workspace/custom-iso/casper/initrd
 
           # Casper metadata
           printf '%s' "$(du -sx --block-size=1 /workspace/chroot | cut -f1)" \
