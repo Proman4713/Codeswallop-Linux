@@ -247,7 +247,7 @@ jobs:
               -no-emul-boot \
               -boot-load-size 4 \
               -boot-info-table \
-              --eltorito-catalog boot/grub/boot.cat \
+              --eltorito-catalog boot.catalog \
               --grub2-boot-info \
               --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
             -eltorito-alt-boot \
