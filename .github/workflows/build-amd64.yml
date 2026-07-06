@@ -208,6 +208,7 @@ jobs:
           grub-mkstandalone \
             --format=i386-pc \
             --output=/tmp/core.img \
+            --install-modules="linux normal iso9660 biosdisk memdisk search tar ls" \
             --modules="linux normal iso9660 biosdisk search" \
             "boot/grub/grub.cfg=/workspace/custom-iso/boot/grub/grub.cfg"
 
