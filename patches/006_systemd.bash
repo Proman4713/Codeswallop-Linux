@@ -5,5 +5,9 @@
 #	THIS BY NATURE REMOVES DRACUT BECAUSE IT DEPENDS ON INITRAMFS-TOOLS
 install_packages casper
 
+export CASPER_GENERATE_UUID=1
+export LAYERFS_PATH=filesystem.squashfs
+update-initramfs -c -k all
+
 apt-get autoremove -y --purge
 apt-get clean
