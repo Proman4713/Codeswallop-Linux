@@ -92,7 +92,7 @@ jobs:
             --platform linux/amd64 \
             --name utile-build-container \
             -w /workspace \
-            ubuntu:26.04 /bin/bash "ISO_NAME=${{ env.ISO_NAME }} SH_NAME=${{ env.SH_NAME }} /workspace/tooling/isobuild.sh"
+            ubuntu:26.04 /bin/bash /workspace/tooling/isobuild.sh
 
       - name: Upload script to GitHub Releases
         uses: softprops/action-gh-release@v3.0.0
