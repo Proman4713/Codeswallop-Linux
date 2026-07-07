@@ -33,7 +33,6 @@ jobs:
 
           pnpm install
           node src/preseed-snaps.js
-          sudo apt install snapd
           snap debug validate-seed tooling/seed/
 
           # Run the compilation script
