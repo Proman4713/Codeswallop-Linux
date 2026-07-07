@@ -44,8 +44,8 @@ rm -f "$CHROOT_DIR/opt/${SH_NAME}"
 # Kernel and INITRD
 export ISO_DIR="/workspace/custom-iso"
 mkdir -p "$ISO_DIR/casper"
-VMLINUZ=$(ls -1 "$CHROOT_DIR/boot/vmlinuz-*" | tail -n 1)
-INITRD=$(ls -1 "$CHROOT_DIR/boot/initrd.img-*" | tail -n 1)
+VMLINUZ=$(ls -1 "$CHROOT_DIR/boot/vmlinuz-"* | tail -n 1)
+INITRD=$(ls -1 "$CHROOT_DIR/boot/initrd.img-"* | tail -n 1)
 cp "$VMLINUZ" "$ISO_DIR/casper/vmlinuz"
 cp "$INITRD" "$ISO_DIR/casper/initrd"
 
