@@ -1,15 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
-const { pipeline } = require("stream/promises");
-const { Readable } = require("stream");
+const crypto = require('crypto');
+const { pipeline } = require('stream/promises');
+const { Readable } = require('stream');
 
 const SNAPS = [
 	'snapd',
 	'desktop-security-center',
 	'firmware-updater',
+	'gnome-42-2204',
 	'gnome-46-2404',
 	'bare',
+	'core24',
+	'core22',
 	'gtk-common-themes',
 	'mesa-2404',
 	'prompting-client',
@@ -19,6 +23,9 @@ const SNAPS = [
 ];
 const ARCHITECTURE = 'amd64';
 const CHANNEL = 'stable';
+const API = 'https://api.snapcraft.io/v2';
+const SNAP_SERIES = 16;
+const SIGN_KEY_REGEX = /^sign-key-sha3-384:\s*(\S+)/m;
 
 const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed');
 const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
@@ -29,6 +36,13 @@ const RETRY_DELAY_MS = 2000;
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
 
+/**
+ * 
+ * @param {string | URL | Request} url 
+ * @param {RequestInit} options 
+ * @param {number} retries 
+ * @returns 
+ */
 async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 	let lastError;
 	for (let attempt = 1; attempt <= retries; attempt++) {
@@ -53,10 +67,10 @@ async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 }
 
 async function fetchSnapInfo(snapName) {
-	const url = `https://api.snapcraft.io/v2/snaps/info/${snapName}`;
+	const url = `${API}/snaps/info/${snapName}`;
 	const response = await fetchWithRetry(url, {
 		headers: {
-			'Snap-Device-Series': '16',
+			'Snap-Device-Series': SNAP_SERIES,
 			'Content-Type': 'application/json',
 		}
 	});
@@ -67,7 +81,7 @@ async function fetchSnapInfo(snapName) {
 		process.exit(1);
 	}
 	const data = await response.json();
-	// console.log(data);
+	//dbg console.log(data);
 
 	const target = data['channel-map'].find(item =>
 		item.channel.name === CHANNEL && item.channel.architecture === ARCHITECTURE
@@ -82,7 +96,7 @@ async function fetchSnapInfo(snapName) {
 }
 
 async function downloadSnap(url, outputPath) {
-	fetchWithRetry(url).then(async (snapRes) => {
+	await fetchWithRetry(url).then(async (snapRes) => {
 		await pipeline(
 			Readable.fromWeb(snapRes.body),
 			fs.createWriteStream(outputPath)
@@ -93,9 +107,9 @@ async function downloadSnap(url, outputPath) {
 	});
 }
 
-async function fetchAssertion(snapId, revision, outputPath) {
+async function fetchAssertion(assertionType, path, outputPath) {
 	const assertionRes = await fetchWithRetry(
-		`https://api.snapcraft.io/api/v1/snaps/assertions/snap-declaration/16/${snapId}?max-format=3`, {
+		`${API}/assertions/${assertionType}/${path}${assertionType === 'snap-declaration' ? '?max-format=3' : ''}`, {
 			headers: {
 				Accept: 'application/x.ubuntu.assertion'
 			},
@@ -107,11 +121,34 @@ async function fetchAssertion(snapId, revision, outputPath) {
 	}
 
     const assertion = await assertionRes.text();
-    fs.writeFileSync(outputPath, assertion);
-	console.log(`Saved ${outputPath}`);
+    if (outputPath) {
+		fs.writeFileSync(outputPath, assertion);
+		console.log(`Saved ${outputPath}`);
+	}
+	return assertion;
 }
 
 async function main() {
+	//* Model and account assertions
+	try {
+		const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model.assert');
+		const modelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
+		// Get account signing key
+		const modelAccountKeyAssertion = await fetchAssertion('account-key', modelAssertion.match(SIGN_KEY_REGEX)[1]);
+		fs.writeFileSync(modelAssertionFile, modelAccountKeyAssertion + '\n' + modelAssertion);
+		console.log(`Saved ${modelAssertionFile}`);
+
+		// No SNAP_SERIES, simply because we get an incorrect response when we include the series. There is no relevant documentation.
+		const accountAssertionFile = path.join(ASSERTIONS_DIR, 'account.assert');
+		const accountAssertion = await fetchAssertion('account', `generic`);
+		const accountKeyAssertion = await fetchAssertion('account-key', accountAssertion.match(SIGN_KEY_REGEX)[1]);
+		fs.writeFileSync(accountAssertionFile, accountKeyAssertion + '\n' + accountAssertion);
+		console.log(`Saved ${accountAssertionFile}`);
+	} catch (error) {
+		console.error(`Error handling special assertions:`, error.message);
+		process.exit(1);
+	}
+
 	const seedManifest = {
 		snaps: []
 	};
@@ -120,7 +157,7 @@ async function main() {
 		console.log(`\nProcessing: ${snapName}...`);
 		try {
 			const info = await fetchSnapInfo(snapName);
-			console.log(info)
+			//dbg console.log(info)
 
 			const snapFile = `${snapName}_${info.revision}`;
 
@@ -131,7 +168,19 @@ async function main() {
 			await downloadSnap(info.downloadUrl, snapPath);
 
 			console.log(`Downloading snap assertion...`);
-			await fetchAssertion(info.snapId, info.revision, assertPath);
+
+			const snapDeclarationAssertion = await fetchAssertion('snap-declaration', `${SNAP_SERIES}/${info.snapId}`);
+
+			// Get Canonical account key assertion (since we're using official snaps) among any others if we use third-party snaps
+			const accountKeyAssertion = await fetchAssertion('account-key', snapDeclarationAssertion.match(SIGN_KEY_REGEX)[1]);
+
+			// Get the assertion
+			const snapFileBuffer = fs.readFileSync(snapPath);
+			const snapRevisionHash = crypto.createHash('sha3-384').update(snapFileBuffer).digest('base64url');
+			//dbg console.log(snapRevisionHash);
+			const snapRevisionAssertion = await fetchAssertion('snap-revision', snapRevisionHash);
+
+			fs.writeFileSync(assertPath, accountKeyAssertion + '\n' + snapDeclarationAssertion + '\n' + snapRevisionAssertion)
 
 			seedManifest.snaps.push({
 				name: snapName,
