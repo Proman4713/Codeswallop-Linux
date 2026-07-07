@@ -32,8 +32,10 @@ const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');
 const DOWNLOAD_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
+
 /**
- * @type {{ [x:string]: Response }} requestCache
+ * @type {{ [x:string]: Response }}
+ * @description We've been getting lots of 429s
  */
 let requestCache = {};
 
@@ -51,9 +53,14 @@ async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 	let lastError;
 	for (let attempt = 1; attempt <= retries; attempt++) {
 		try {
-			const RES_HASH = url + JSON.stringify(options);
-			if (Object.keys(requestCache).includes(RES_HASH)) {
-				const response = requestCache[url];
+			const REQ_HASH = url + JSON.stringify(options);
+			//dbg console.log(`Request hash: ${REQ_HASH}`)
+			if (Object.keys(requestCache).includes(REQ_HASH)) {
+				const response = requestCache[REQ_HASH];
+				//dbg console.log(`Request is cached, returning ${response.url} ${response.ok}`)
+
+				// Clone it so it can be consumed again
+				requestCache[REQ_HASH] = response.clone();
 				// If it's been cached then it was successful
 				return response;
 			}
@@ -63,7 +70,9 @@ async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 				lastError = new Error(`Request failed: ${response.status} ${response.statusText}`);
 				console.warn(`Attempt ${attempt}/${retries} failed: ${lastError.message}`);
 			} else {
-				requestCache[RES_HASH] = response;
+				//dbg console.log(`Request was successful, caching request hash ${REQ_HASH} at ${response.url} ${response.ok}`)
+
+				requestCache[REQ_HASH] = response.clone();
 				return response;
 			}
 		} catch (error) {
