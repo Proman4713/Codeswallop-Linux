@@ -32,26 +32,38 @@ const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');
 const DOWNLOAD_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
+/**
+ * @type {{ [x:string]: Response }} requestCache
+ */
+let requestCache = {};
 
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
 
 /**
  * 
- * @param {string | URL | Request} url 
+ * @param {string} url 
  * @param {RequestInit} options 
  * @param {number} retries 
- * @returns 
+ * @returns {Response}
  */
 async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 	let lastError;
 	for (let attempt = 1; attempt <= retries; attempt++) {
 		try {
+			const RES_HASH = url + JSON.stringify(options);
+			if (Object.keys(requestCache).includes(RES_HASH)) {
+				const response = requestCache[url];
+				// If it's been cached then it was successful
+				return response;
+			}
+
 			const response = await fetch(url, options);
 			if (!response.ok) {
 				lastError = new Error(`Request failed: ${response.status} ${response.statusText}`);
 				console.warn(`Attempt ${attempt}/${retries} failed: ${lastError.message}`);
 			} else {
+				requestCache[RES_HASH] = response;
 				return response;
 			}
 		} catch (error) {
