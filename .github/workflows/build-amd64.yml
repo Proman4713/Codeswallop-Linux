@@ -54,20 +54,17 @@ jobs:
           sudo tee tooling/iso_overlay/boot/grub/grub.cfg << 'EOF'
           set timeout=30
 
-          # https://www.gnu.org/software/grub/manual/grub/grub.html#GNU_002fLinux (REMOVE WHEN USING UBUNTU OFFICIAL GRUB)
-          # search --set=root --file /casper/vmlinuz
-
           loadfont unicode
 
           set menu_color_normal=white/black
           set menu_color_highlight=black/light-gray
 
-          menuentry "Try or Install Utile" --class utile --class ubuntu --class gnu-linux --class gnu --class os {
+          menuentry "Try or Install Utile OS" {
               set gfxpayload=keep
               linux  /casper/vmlinuz  --- quiet splash
               initrd /casper/initrd
           }
-          menuentry "Utile (safe graphics)" --class utile --class ubuntu --class gnu-linux --class gnu --class os {
+          menuentry "Utile OS (safe graphics)" {
               set gfxpayload=keep
               linux  /casper/vmlinuz nomodeset  --- quiet splash
               initrd /casper/initrd
