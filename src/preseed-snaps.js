@@ -19,7 +19,7 @@ const SNAPS = [
 	'prompting-client',
 	'snap-store',
 	'snapd-desktop-integration',
-	'ubuntu-desktop-bootstrap?classic=true'
+	'ubuntu-desktop-bootstrap?{ "classic": true }'
 ];
 const ARCHITECTURE = 'amd64';
 const CHANNEL = 'stable';
@@ -205,17 +205,7 @@ async function main() {
 
 			fs.writeFileSync(assertPath, accountKeyAssertion + '\n' + snapDeclarationAssertion + '\n' + snapRevisionAssertion);
 
-			const extraOptions = Object.fromEntries(
-				Array.from(new URLSearchParams(snapOptions || '').entries()).map(([key, value]) => {
-					return [
-						key, value.toLowerCase() === 'true'
-														? true
-														: value.toLowerCase() === 'false'
-																				? false
-																				: value
-					];
-				})
-			);
+			let extraOptions = JSON.parse(snapOptions || '{}');
 			//dbg console.log(extraOptions)
 
 			seedManifest.snaps.push({
