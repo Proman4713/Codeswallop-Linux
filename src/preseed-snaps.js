@@ -130,7 +130,7 @@ async function downloadSnap(url, outputPath) {
 
 async function fetchAssertion(assertionType, path, outputPath) {
 	const assertionRes = await fetchWithRetry(
-		`${API}/assertions/${assertionType}/${path}${assertionType === 'snap-declaration' ? '?max-format=3' : ''}`, {
+		`${API}/assertions/${assertionType}/${path}`, {
 			headers: {
 				Accept: 'application/x.ubuntu.assertion'
 			},
