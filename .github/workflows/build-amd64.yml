@@ -108,7 +108,7 @@ jobs:
         env:
           GOFILE_KEY: ${{ secrets.GOFILE_KEY }}
         run: |
-          RESPONSE=$(curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso" -F "folderId=99d5ecff-d083-417b-9c48-c04d0b6eae11" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" "https://upload.gofile.io/contents/uploadfile")
+          RESPONSE=$(curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" "https://upload.gofile.io/contents/uploadfile")
           CONTENT_ID=$(echo "$RESPONSE" | jq -r '.data.id')
           echo "Uploaded ISO to Gofile with ID: $CONTENT_ID"
           
@@ -117,4 +117,4 @@ jobs:
           echo "sha256sum: $(cat ${{ env.ISO_NAME }}-amd64.iso.sha256sum)"
           
           # Upload checksum to Gofile
-          curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso.sha256sum" -F "folderId=99d5ecff-d083-417b-9c48-c04d0b6eae11" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"
+          curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso.sha256sum" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"

@@ -33,9 +33,11 @@ mount -t proc /proc "$CHROOT_DIR/proc"
 mount -t sysfs /sys "$CHROOT_DIR/sys"
 mount --bind /run "$CHROOT_DIR/run"
 
+# Place host resolv.conf for network access
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
+# Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"
 chmod +x "$CHROOT_DIR/opt/${SH_NAME}"
 chroot "$CHROOT_DIR" /bin/bash -xlc "/opt/${SH_NAME}"
