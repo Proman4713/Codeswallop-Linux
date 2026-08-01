@@ -74,7 +74,7 @@ chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 chroot "$CHROOT_DIR" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
-umount --lazy "$CHROOT_DIR/sys/kernel/security"
+umount --lazy "$CHROOT_DIR/sys/kernel/security" --recursive
 umount --lazy "$CHROOT_DIR/run"
 umount --lazy "$CHROOT_DIR/sys"
 umount --lazy "$CHROOT_DIR/proc"

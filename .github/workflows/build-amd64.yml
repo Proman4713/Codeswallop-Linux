@@ -93,7 +93,9 @@ jobs:
       - name: Build
         run: |
           docker run --privileged \
+            --security-opt apparmor=unconfined \
             -v ${{ github.workspace }}:/workspace \
+            -v /sys/kernel/security:/sys/kernel/security \
             -e ISO_NAME="${{ env.ISO_NAME }}" \
             -e SH_NAME="${{ env.SH_NAME }}" \
             --platform linux/amd64 \
