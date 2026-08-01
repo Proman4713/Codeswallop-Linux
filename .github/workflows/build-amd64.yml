@@ -34,7 +34,6 @@ jobs:
 
           pnpm install
           sudo snap install snapcraft --classic
-          snapcraft login
           snapcraft whoami
           snapcraft keys
           node src/preseed-snaps.js
