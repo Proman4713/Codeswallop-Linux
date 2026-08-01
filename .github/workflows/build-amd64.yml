@@ -35,6 +35,8 @@ jobs:
           pnpm install
           sudo snap install snapcraft --classic
           snapcraft whoami
+          mkdir -p ~/.snap/gnupg && chmod 0700 ~/.snap/gnupg
+          gpg --homedir ~/.snap/gnupg --list-keys
           echo '${{ secrets.SNAPCRAFT_UTILE_MODEL_ACTIONS_KEY }}' | gpg --homedir ~/.snap/gnupg --import
           snapcraft keys
           node src/preseed-snaps.js
