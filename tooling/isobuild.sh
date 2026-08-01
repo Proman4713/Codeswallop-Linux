@@ -40,10 +40,17 @@ rm -f "$CHROOT_DIR/etc/resolv.conf"
 cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
 #^ Snaps
+chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update \
+&& apt-get install -y squashfs-tools" # Apparently needed by snap-preseed, even though we already installed it on the host
+
 mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
 /usr/lib/snapd/snap-preseed "$CHROOT_DIR"
+
+chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
+&& apt-get purge -y squashfs-tools"
 
 #^ Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"
