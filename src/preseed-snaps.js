@@ -249,7 +249,7 @@ async function main() {
 
 			const snapChannel = (info.targetChannel.channel.name.includes(`/${CHANNEL}`))
 									? `${info.targetChannel.channel.name}/ubuntu-${UBUNTU_VERSION}`
-									: `${info.targetChannel.channel.name}`;
+									: `${info.targetChannel.channel.track}/${info.targetChannel.channel.name}`;
 			seedManifest.snaps.push({
 				name: snapName,
 				channel: snapChannel,
