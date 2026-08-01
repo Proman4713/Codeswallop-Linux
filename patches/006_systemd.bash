@@ -15,7 +15,7 @@ EOF
 cat <<EOF > /etc/initramfs-tools/conf.d/default-layer.conf
 LAYERFS_PATH=filesystem.squashfs
 EOF
-update-initramfs -c -v -k all
+update-initramfs -c -k all
 
 apt-get autoremove -y --purge
 apt-get clean

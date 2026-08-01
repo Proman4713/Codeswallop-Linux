@@ -51,8 +51,8 @@ cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
 /usr/lib/snapd/snap-preseed "$CHROOT_DIR"
 chroot "$CHROOT_DIR" /bin/bash -xlc "export CASPER_GENERATE_UUID=1
-&& export LAYERFS_PATH=filesystem.squashfs
-&& update-initramfs -c -v -k all" #! This is redundant with 006_systemd.sh, should potentially be improved. But snap preseeding presumably does modify the initramfs.
+export LAYERFS_PATH=filesystem.squashfs
+update-initramfs -c -v -k all" #! This is redundant with 006_systemd.sh, should potentially be improved. But snap preseeding presumably does modify the initramfs.
 
 # Kernel and INITRD
 
