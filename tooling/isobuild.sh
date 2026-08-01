@@ -2,19 +2,20 @@
 set -exuo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get install -y \
-	debootstrap \
-	ubuntu-keyring \
-	squashfs-tools \
-	xorriso \
-	dosfstools \
-	mtools \
-	syslinux-utils \
-	grub-common \
-	grub-pc-bin \
-	grub-efi-amd64-bin \
 	cpio \
+	debootstrap \
+	dosfstools \
+	grub-common \
+	grub-efi-amd64-bin \
+	grub-pc-bin \
 	initramfs-tools-core \
-	snapd
+	mtools \
+	snapd \
+	squashfs-tools \
+	syslinux-utils \
+	tree \
+	ubuntu-keyring \
+	xorriso
 
 export CHROOT_DIR="/workspace/chroot"
 mkdir -p "$CHROOT_DIR"
@@ -52,7 +53,7 @@ cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 /usr/lib/snapd/snap-preseed "$CHROOT_DIR"
 chroot "$CHROOT_DIR" /bin/bash -xlc "export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
-update-initramfs -c -v -k all" #! This is redundant with 006_systemd.sh, should potentially be improved. But snap preseeding presumably does modify the initramfs.
+update-initramfs -c -k all" #! This is redundant with 006_systemd.sh, should potentially be improved; snap preseeding should add files to /etc/.
 tree "$CHROOT_DIR/var/lib/snapd/"
 
 # Kernel and INITRD
