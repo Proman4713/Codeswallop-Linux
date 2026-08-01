@@ -47,6 +47,7 @@ echo "#!/bin/bash
 set -exuo pipefail
 export DEBIAN_FRONTEND=noninteractive
 /opt/snapd-bin/snap-preseed \"$CHROOT_DIR\"" > "$CHROOT_DIR/opt/snap-preseed.sh"
+chmod +x "$CHROOT_DIR/opt/snap-preseed.sh"
 
 mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
