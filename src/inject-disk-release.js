@@ -10,7 +10,11 @@ fs.mkdirSync(path.join(binaryIncludePath, ".disk"), { recursive: true });
 
 fs.writeFileSync(
 	path.join(binaryIncludePath, ".disk", "info"),
-	`Utile OS 26 "Abstract Assembly" - Release amd64 (${SCRIPT_VERSION})`
+	/*
+		! LTS HERE ONLY! Some behaviour suggests that the Ubuntu Flutter installer is hardcoded for Ubuntu; in that case,
+		! I would like it to think this is an LTS. There isn't enough documentation to even be sure that this text is used.
+	*/
+	`Utile OS 26 LTS "Abstract Assembly" - Release amd64 (${SCRIPT_VERSION})`
 );
 
 fs.writeFileSync(

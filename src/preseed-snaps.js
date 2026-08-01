@@ -10,11 +10,9 @@ const SNAPS = [
 	'snapd',
 	'desktop-security-center',
 	'firmware-updater',
-	'gnome-42-2204',
 	'gnome-46-2404',
 	'bare',
 	'core24',
-	'core22',
 	'gtk-common-themes',
 	'mesa-2404',
 	'prompting-client',
@@ -126,7 +124,7 @@ async function fetchSnapInfo(snapName) {
 		}
 	}
 
-	if (!target) throw new Error(`Could not find stable ${ARCHITECTURE} track for ${snapName}`);
+	if (!target) throw new Error(`Could not find ${CHANNEL} ${ARCHITECTURE} track for ${snapName}`);
 
 	return {
 		downloadUrl: target.download.url,
@@ -249,17 +247,18 @@ async function main() {
 			let extraOptions = JSON.parse(snapOptions || '{}');
 			//dbg console.log(extraOptions)
 
+			const snapChannel = (info.targetChannel.channel.name.includes(`/${CHANNEL}`))
+									? `${info.targetChannel.channel.name}/ubuntu-${UBUNTU_VERSION}`
+									: `${info.targetChannel.channel.name}`;
 			seedManifest.snaps.push({
 				name: snapName,
-				channel: CHANNEL,
+				channel: snapChannel,
 				file: `${snapFile}.snap`,
 				...extraOptions
 			});
 
 			GlobalModelAssertion.snaps.push({
-				'default-channel': info.targetChannel.channel.name.includes("/stable")
-									? `${info.targetChannel.channel.name}/ubuntu-${UBUNTU_VERSION}`
-									: `${info.targetChannel.channel.track}/${info.targetChannel.channel.name}`,
+				'default-channel': snapChannel,
 				'id': info.snapId,
 				'name': snapName,
 				'type': info.type
@@ -287,11 +286,11 @@ async function main() {
 	// Get account signing key
 	let modelAssertion = fs.readFileSync(modelAssertionFile, { encoding: "utf8" });
 	const accountKey = modelAssertion.match(SIGN_KEY_REGEX)[1];
-	const accountKeyFile = path.join(ASSERTIONS_DIR, `${accountKey}.account-key`);
+	const accountKeyFile = path.join(ASSERTIONS_DIR, `account-key`);
 	const modelAccountKeyAssertion = await fetchAssertion('account-key', accountKey);
 	fs.writeFileSync(accountKeyFile, modelAccountKeyAssertion);
 
-	const accountAssertionFile = path.join(ASSERTIONS_DIR, `${SNAP_ACCOUNT}.account`);
+	const accountAssertionFile = path.join(ASSERTIONS_DIR, `account`);
 	const accountAssertion = await fetchAssertion('account', SNAP_ACCOUNT);
 	fs.writeFileSync(accountAssertionFile, accountAssertion);
 	console.log(`Saved ${accountAssertionFile}`);

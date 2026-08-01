@@ -87,14 +87,21 @@ EOF
 
 apt_get_update
 
-# Seeding happens here now, since Debootstrap doesn't install recommends of packages
+# Package seeding happens here now, since Debootstrap doesn't install recommends of packages
 if [ "$ENV_MODE" == "ISO" ]; then
-	install_packages base-files \
+	install_packages adcli \
+	base-files \
+	btrfs-progs \
 	curl \
 	deja-dup \
 	dracut \
+	efibootmgr \
 	ffmpegthumbnailer \
+	file-roller \
+	finalrd \
+	gawk \
 	gdebi \
+	gdb \
 	git \
 	gnome-calendar \
 	gnome-music \
@@ -104,15 +111,28 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	gnome-tweaks \
 	gparted \
 	grub-common \
+	grub-efi-amd64-bin \
+	grub-efi-amd64-signed \
+	grub-efi-amd64-unsigned \
 	grub-gfxpayload-lists \
 	grub-pc \
 	grub2-common \
 	gst-audio-thumbnailer \
 	gst-video-thumbnailer \
 	htop \
+	keyutils \
 	libfuse2t64 \
 	linux-generic-hwe-24.04 \
 	linux-generic-hwe-26.04 \
+	linux-libc-dev \
+	localechooser-data \
+	lvm2 \
+	m17n-db \
+	mdadm \
+	media-player-info \
+	python3-pil \
+	realmd \
+	shim-signed \
 	showtime \
 	snapd \
 	sssd \
@@ -120,5 +140,8 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	ubuntu-restricted-extras \
 	ubuntu-standard \
 	unzip \
-	wget
+	user-setup \
+	wget \
+	xorriso \
+	zfsutils-linux
 fi

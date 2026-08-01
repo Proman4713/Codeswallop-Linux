@@ -73,11 +73,35 @@ umount --lazy "$CHROOT_DIR/dev"
 mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
 
 # Casper metadata
-printf '%s' "$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)" \
+
+FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
+printf '%s' "$FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.size"
 chroot "$CHROOT_DIR" dpkg-query \
-	-W --showformat='${Package} ${Version}\n' | sort \
+	-W --showformat='${Package}	${Version}\n' | sort \
 	> "$ISO_DIR/casper/filesystem.manifest"
+echo "kernel:
+  default: linux-generic-hwe-24.04
+sources:
+- default: true
+  description:
+    en: The full Utile OS experience.
+  id: ubuntu-desktop-minimal
+  locale_support: langpack
+  name:
+    en: Standard
+  path: filesystem.squashfs
+  preinstalled_langs:
+  - en
+  - ''
+  size: $FILESYSTEM_SIZE
+  type: fsimage
+  variant: desktop
+  variations:
+    standard:
+      path: filesystem.squashfs
+      size: $(stat -c %s "$ISO_DIR/casper/filesystem.squashfs")
+version: 2" > "$ISO_DIR/casper/install-sources.yaml"
 
 # .disk/ and iso_overlay/
 cp -r /workspace/tooling/.disk "$ISO_DIR"

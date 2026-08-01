@@ -2,7 +2,7 @@
 # A Minimum-Friction Linux Desktop
 Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 
-[![Build Utile OS 26 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-iso.yml)
+[![Build Utile OS 26 AMD64 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml)
 
 ###### [Debian packages](https://github.com/Proman4713/Utile-OS-debian), [APT repository](https://github.com/Proman4713/Utile-OS-apt), [Website Frontend](https://github.com/Proman4713/Utile-OS-web)
 
@@ -73,6 +73,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li><strike>Create a <code>utile-gnome-defaults</code> package for the gsettings/dconf changes</strike></li>
 		<li>Implement a custom upgrade solution to handle my own package repositories and hold Ubuntu upgrades until I finish syncing this project with upstream.</li>
 		<li>Implement my own app store (packaged in Debian, not a Snap), which makes the issue of Snap vs. Debian less of a technical dilemma and more of a user-friendly choice. This app store must also improve on the UI/UX of usual Linux app stores, which, in my opinion, are developed by people who are too tech-centric to dedicate enough thought to the appeal of their UI. Additionally, I would like to allow developers to publish Debian-packaged apps to this store even if they don't come from the device's apt sources. This could potentially be done by verifying a developer's identity and their app's safety, then only adding their app's source repository if the user chooses to install the app. Could paid apps be a thing? I think we should generally learn from the macOS App Store.</li>
+		<li><b>Support ARM in accordance to upstream. Currently, the <code>utile-wallpapers</code> package arm64 version (which was indeed cool for providing different defaults depending on the user's hardware) has become obsolete since we don't use arm <i>anywhere</i> in our distribution currently.</b></li>
 	</ol>
 </details>
 <details>
