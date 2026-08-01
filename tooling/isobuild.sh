@@ -13,7 +13,8 @@ apt-get update && apt-get install -y \
 	grub-pc-bin \
 	grub-efi-amd64-bin \
 	cpio \
-	initramfs-tools-core
+	initramfs-tools-core \
+	snapd
 
 export CHROOT_DIR="/workspace/chroot"
 mkdir -p "$CHROOT_DIR"
