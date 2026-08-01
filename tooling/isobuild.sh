@@ -37,9 +37,11 @@ mount --bind /run "$CHROOT_DIR/run"
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
-# Snap seed
+#^ Snaps
 mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
+
+/usr/lib/snapd/snap-preseed "$CHROOT_DIR"
 
 #^ Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"

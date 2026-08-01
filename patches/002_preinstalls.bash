@@ -1,6 +1,3 @@
-#^ Snaps
-/usr/lib/snapd/snap-preseed
-
 #^ Apps
 # Pretty unneeded for the average user, shotwell doesn't look good, and the games are unnecessary bloat for most.
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
