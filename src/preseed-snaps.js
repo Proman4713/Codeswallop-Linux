@@ -13,6 +13,7 @@ const SNAPS = [
 	'gnome-46-2404',
 	'bare',
 	'core24',
+	'core22',
 	'gtk-common-themes',
 	'mesa-2404',
 	'prompting-client',
@@ -29,6 +30,7 @@ const SNAP_SERIES = 16;
 const SNAP_ACCOUNT = 'wrtkSz6GPFgTcq4LGAN5OdKkGtyWEt3n';
 const SIGN_KEY_REGEX = /^sign-key-sha3-384:\s*(\S+)/m;
 
+// To be /var/lib/snapd/seed
 const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed');
 const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');

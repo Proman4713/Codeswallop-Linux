@@ -4,10 +4,18 @@
 #	but I found 
 #	THIS BY NATURE REMOVES DRACUT BECAUSE IT DEPENDS ON INITRAMFS-TOOLS
 install_packages casper
+install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs
 
 export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
-update-initramfs -c -k all
+mkdir -p "etc/initramfs-tools/conf.d"
+cat > etc/initramfs-tools/conf.d/casperize.conf <<EOF
+export CASPER_GENERATE_UUID=1
+EOF
+cat <<EOF > /etc/initramfs-tools/conf.d/default-layer.conf
+LAYERFS_PATH=filesystem.squashfs
+EOF
+update-initramfs -c -v -k all
 
 apt-get autoremove -y --purge
 apt-get clean

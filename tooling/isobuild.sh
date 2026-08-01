@@ -37,7 +37,11 @@ mount --bind /run "$CHROOT_DIR/run"
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
-# Copy setup script to chroot, run it, and then remove it
+# Snap seed
+mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
+cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
+
+#^ Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"
 chmod +x "$CHROOT_DIR/opt/${SH_NAME}"
 chroot "$CHROOT_DIR" /bin/bash -xlc "/opt/${SH_NAME}"
@@ -53,15 +57,18 @@ cp "$VMLINUZ" "$ISO_DIR/casper/vmlinuz"
 cp "$INITRD" "$ISO_DIR/casper/initrd"
 
 # Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
-chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive && apt-get purge -y casper && apt-get install -y dracut && apt-get purge -y initramfs-tools && apt-get autoremove -y --purge && apt-get clean && dracut --force"
+chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
+&& apt-get purge -y casper cryptsetup cryptsetup-bin cryptsetup-initramfs \
+&& apt-get install -y dracut \
+&& apt-get purge -y initramfs-tools \
+&& rm -rf etc/initramfs-tools/conf.d
+&& apt-get autoremove -y --purge \
+&& apt-get clean \
+&& dracut --force"
 
 # Restore original resolv.conf
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 chroot "$CHROOT_DIR" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
-
-# Snap seed
-mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
-cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
 umount --lazy "$CHROOT_DIR/run"
 umount --lazy "$CHROOT_DIR/sys"
@@ -93,7 +100,6 @@ sources:
   path: filesystem.squashfs
   preinstalled_langs:
   - en
-  - ''
   size: $FILESYSTEM_SIZE
   type: fsimage
   variant: desktop

@@ -1,4 +1,4 @@
-# Apps
+#^ Apps
 # Pretty unneeded for the average user, shotwell doesn't look good, and the games are unnecessary bloat for most.
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
 apt-get purge -y transmission-gtk transmission-common \
@@ -59,7 +59,7 @@ apt-get purge -y fonts-arphic-ukai \
 				language-pack-zh-hans \
 				language-pack-zh-hans-base
 
-# English Language packages
+#^ English Language packages
 install_packages language-pack-en \
 				language-pack-en-base \
 				language-pack-gnome-en \
@@ -72,13 +72,16 @@ install_packages gdebi \
 				gnome-calendar gnome-music showtime gnome-snapshot \
 				deja-dup
 
-# Tools
+#^ Tools
 install_packages htop curl wget git unzip
 
-# Canberra for startup sound
+#^ Canberra for startup sound
 install_packages libcanberra-gtk3-module libcanberra-gtk-module gnome-session-canberra || echo "Warning: Some Canberra modules not found, moving on..."
 
-# LibreOffice
+#^ LibreOffice
 	#! LICENSE AGREEMENT
 	echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
 	install_packages libreoffice
+
+# Snaps
+/usr/lib/snapd/snapd-preseed

@@ -108,6 +108,7 @@ jobs:
           name: Utile OS ${{ env.TAG_NAME }}
           files: |
             dist/${{ env.SH_NAME }}
+            tooling/isobuild.sh
           # Automatically mark as pre-release if it's a nightly or beta
           prerelease: ${{ contains(env.TAG_NAME, 'nightly') || contains(env.TAG_NAME, 'beta') }}
 
