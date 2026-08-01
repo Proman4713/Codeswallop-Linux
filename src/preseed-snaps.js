@@ -4,6 +4,7 @@ const yaml = require('js-yaml');
 const crypto = require('crypto');
 const { pipeline } = require('stream/promises');
 const { Readable } = require('stream');
+const { execSync } = require('child_process');
 
 const SNAPS = [
 	'snapd',
@@ -23,8 +24,11 @@ const SNAPS = [
 ];
 const ARCHITECTURE = 'amd64';
 const CHANNEL = 'stable';
+const UBUNTU_VERSION = '26.04';
+const UTILE_VERSION = '26';
 const API = 'https://api.snapcraft.io/v2';
 const SNAP_SERIES = 16;
+const SNAP_ACCOUNT = 'wrtkSz6GPFgTcq4LGAN5OdKkGtyWEt3n';
 const SIGN_KEY_REGEX = /^sign-key-sha3-384:\s*(\S+)/m;
 
 const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed');
@@ -38,6 +42,7 @@ const RETRY_DELAY_MS = 2000;
  * @description We've been getting lots of 429s
  */
 let requestCache = {};
+let GlobalModelAssertion = {};
 
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
@@ -104,15 +109,31 @@ async function fetchSnapInfo(snapName) {
 	const data = await response.json();
 	//dbg console.log(data);
 
-	const target = data['channel-map'].find(item =>
-		item.channel.name === CHANNEL && item.channel.architecture === ARCHITECTURE
-	);
+	let target = null;
+	const searchPattern = new RegExp(`^./${CHANNEL}`);
+	for (const potentialTarget of data['channel-map']) {
+		if (potentialTarget.channel.architecture !== ARCHITECTURE) continue;
+
+		if (potentialTarget.channel.name.match(searchPattern)) {
+			target = {...potentialTarget};
+			break;
+		};
+
+		if (potentialTarget.channel.name === CHANNEL) {
+			target = {...potentialTarget};
+			// Continue in case we find the `/${CHANNEL}` condition later (e.g., 1/stable for firmware-updater)
+			continue;
+		}
+	}
+
 	if (!target) throw new Error(`Could not find stable ${ARCHITECTURE} track for ${snapName}`);
 
 	return {
 		downloadUrl: target.download.url,
 		revision: target.revision,
+		type: target.type,
 		snapId: data['snap-id'],
+		targetChannel: target
 	};
 }
 
@@ -149,22 +170,42 @@ async function fetchAssertion(assertionType, path, outputPath) {
 	return assertion;
 }
 
+function parseAssertionBlock(assertionText = "") {
+	// Match two consecutive newlines
+	const assertionSegments = assertionText.split(/\r?\n\r?\n/);
+	const yamlSegment = assertionSegments[0]?.trim() || assertionText.trim();
+	if (!yamlSegment) {
+		return {};
+	}
+
+	const parsed = yaml.load(yamlSegment);
+
+	return parsed;
+}
+
 async function main() {
 	//* Model and account assertions
+	const modelFile = path.join(ASSERTIONS_DIR, 'model.json');
+	const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model');
 	try {
-		const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model.assert');
-		const modelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
-		// Get account signing key
-		const modelAccountKeyAssertion = await fetchAssertion('account-key', modelAssertion.match(SIGN_KEY_REGEX)[1]);
-		fs.writeFileSync(modelAssertionFile, modelAccountKeyAssertion + '\n' + modelAssertion);
-		console.log(`Saved ${modelAssertionFile}`);
+		let genericModelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
+		GlobalModelAssertion = parseAssertionBlock(genericModelAssertion);
+		//dbg console.log(GlobalModelAssertion);
 
-		// No SNAP_SERIES, simply because we get an incorrect response when we include the series. There is no relevant documentation.
-		const accountAssertionFile = path.join(ASSERTIONS_DIR, 'account.assert');
-		const accountAssertion = await fetchAssertion('account', `generic`);
-		const accountKeyAssertion = await fetchAssertion('account-key', accountAssertion.match(SIGN_KEY_REGEX)[1]);
-		fs.writeFileSync(accountAssertionFile, accountKeyAssertion + '\n' + accountAssertion);
-		console.log(`Saved ${accountAssertionFile}`);
+		GlobalModelAssertion = {
+			...GlobalModelAssertion,
+			series: SNAP_SERIES.toString(),
+			model: `utile-os-${UTILE_VERSION}-amd64`,
+			architecture: 'amd64',
+			base: 'core24',
+			distribution: 'utile',
+			grade: 'signed',
+			snaps: [],
+			'authority-id': SNAP_ACCOUNT,
+			'brand-id': SNAP_ACCOUNT,
+			classic: 'true'
+		};
+		delete GlobalModelAssertion['sign-key-sha3-384'];
 	} catch (error) {
 		console.error(`Error handling special assertions:`, error.message);
 		process.exit(1);
@@ -215,6 +256,15 @@ async function main() {
 				...extraOptions
 			});
 
+			GlobalModelAssertion.snaps.push({
+				'default-channel': info.targetChannel.channel.name.includes("/stable")
+									? `${info.targetChannel.channel.name}/ubuntu-${UBUNTU_VERSION}`
+									: `${info.targetChannel.channel.track}/${info.targetChannel.channel.name}`,
+				'id': info.snapId,
+				'name': snapName,
+				'type': info.type
+			});
+
 			//dbg console.log(seedManifest.snaps[length - 1]);
 
 			console.log(`Finished ${snapName}`);
@@ -224,7 +274,29 @@ async function main() {
 		}
 	}
 
-	// Write final seed.yaml
+	// Write final seed.yaml and model assertion
+	GlobalModelAssertion['timestamp'] = new Date().toISOString();
+	fs.writeFileSync(modelFile, JSON.stringify(GlobalModelAssertion, null, 4));
+	console.log('\nSigning and exporting model assertion...')
+	const snapCredentials = process.env.SNAPCRAFT_STORE_CREDENTIALS;
+	execSync(
+`export SNAPCRAFT_STORE_CREDENTIALS="${snapCredentials}" \
+&& snap sign -k utile-model-actions-key "${modelFile}" > "${modelAssertionFile}"`
+);
+
+	// Get account signing key
+	let modelAssertion = fs.readFileSync(modelAssertionFile, { encoding: "utf8" });
+	const accountKey = modelAssertion.match(SIGN_KEY_REGEX)[1];
+	const accountKeyFile = path.join(ASSERTIONS_DIR, `${accountKey}.account-key`);
+	const modelAccountKeyAssertion = await fetchAssertion('account-key', accountKey);
+	fs.writeFileSync(accountKeyFile, modelAccountKeyAssertion);
+
+	const accountAssertionFile = path.join(ASSERTIONS_DIR, `${SNAP_ACCOUNT}.account`);
+	const accountAssertion = await fetchAssertion('account', SNAP_ACCOUNT);
+	fs.writeFileSync(accountAssertionFile, accountAssertion);
+	console.log(`Saved ${accountAssertionFile}`);
+	fs.rmSync(modelFile, { force: true });
+
 	const yamlStr = yaml.dump(seedManifest);
 	fs.writeFileSync(path.join(BASE_SEED_DIR, 'seed.yaml'), yamlStr);
 	console.log('\nGenerated /var/lib/snapd/seed/seed.yaml');

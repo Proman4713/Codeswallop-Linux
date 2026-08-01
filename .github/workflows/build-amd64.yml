@@ -28,10 +28,14 @@ jobs:
         env:
           # If this was triggered by a tag (release), set to release. Otherwise, nightly will automatically be used.
           BUILD_TYPE: ${{ startsWith(github.ref, 'refs/tags/') && 'release' || '' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
           set -exuo pipefail # Strict
 
           pnpm install
+          snapcraft login
+          snapcraft whoami
+          snapcraft keys
           node src/preseed-snaps.js
           snap debug validate-seed tooling/seed/
 
