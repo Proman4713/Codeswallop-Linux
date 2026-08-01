@@ -33,7 +33,7 @@ mount --bind /dev/pts "$CHROOT_DIR/dev/pts"
 mount -t proc /proc "$CHROOT_DIR/proc"
 mount -t sysfs /sys "$CHROOT_DIR/sys"
 mount --bind /run "$CHROOT_DIR/run"
-sudo mount --rbind /sys/kernel/security "$CHROOT_DIR/sys/kernel/security" # For snap-preseed
+mount --rbind /sys/kernel/security "$CHROOT_DIR/sys/kernel/security" # For snap-preseed
 
 # Place host resolv.conf for network access
 rm -f "$CHROOT_DIR/etc/resolv.conf"
