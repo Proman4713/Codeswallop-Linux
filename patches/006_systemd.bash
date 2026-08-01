@@ -1,11 +1,11 @@
 # Install casper so that the initramfs is updated accordingly, will later uninstall through chroot after copying the
-#	INITRD and VMLINUZ files from the chroot. This could fix the problem with SystemD's
-#	`[FAILED] Failed to start initrd-switch-root.service - Switch Root.` error. Not that I did any research on it,
-#	but I found 
+#	INITRD and VMLINUZ files from the chroot.
 #	THIS BY NATURE REMOVES DRACUT BECAUSE IT DEPENDS ON INITRAMFS-TOOLS
 install_packages casper
-install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs
-apt-get purge -y dracut dracut-core dracut-install
+install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools
+# ~c matches all removed packages with remaining configuration files
+apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but isn't cleaned up, so we do that instead of manually removing it.
+apt-get purge -y dracut-install
 
 export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
