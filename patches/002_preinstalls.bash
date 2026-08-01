@@ -1,3 +1,6 @@
+#^ Snaps
+/usr/lib/snapd/snapd-preseed
+
 #^ Apps
 # Pretty unneeded for the average user, shotwell doesn't look good, and the games are unnecessary bloat for most.
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
@@ -82,6 +85,3 @@ install_packages libcanberra-gtk3-module libcanberra-gtk-module gnome-session-ca
 	#! LICENSE AGREEMENT
 	echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
 	install_packages libreoffice
-
-# Snaps
-/usr/lib/snapd/snapd-preseed
