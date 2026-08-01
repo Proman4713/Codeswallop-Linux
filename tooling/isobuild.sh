@@ -34,6 +34,7 @@ mount -t proc /proc "$CHROOT_DIR/proc"
 mount -t sysfs /sys "$CHROOT_DIR/sys"
 mount --bind /run "$CHROOT_DIR/run"
 mount --rbind /sys/kernel/security "$CHROOT_DIR/sys/kernel/security" # For snap-preseed
+mkdir -p "$CHROOT_DIR/opt/snapd-bin"
 mount --rbind /usr/lib/snapd "$CHROOT_DIR/opt/snapd-bin" # For snap-preseed
 
 # Place host resolv.conf for network access
