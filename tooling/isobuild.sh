@@ -34,29 +34,28 @@ mount -t proc /proc "$CHROOT_DIR/proc"
 mount -t sysfs /sys "$CHROOT_DIR/sys"
 mount --bind /run "$CHROOT_DIR/run"
 mount --rbind /sys/kernel/security "$CHROOT_DIR/sys/kernel/security" # For snap-preseed
+mount --rbind /usr/lib/snapd "$CHROOT_DIR/opt/snapd-bin" # For snap-preseed
 
 # Place host resolv.conf for network access
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
 #^ Snaps
-chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
-&& apt-get update \
-&& apt-get install -y squashfs-tools" # Apparently needed by snap-preseed, even though we already installed it on the host
+echo "#!/bin/bash
+
+set -exuo pipefail
+export DEBIAN_FRONTEND=noninteractive
+/opt/snapd-bin/snap-preseed \"$CHROOT_DIR\"" > "$CHROOT_DIR/opt/snap-preseed.sh"
 
 mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
-
-/usr/lib/snapd/snap-preseed "$CHROOT_DIR"
-
-chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
-&& apt-get purge -y squashfs-tools"
 
 #^ Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"
 chmod +x "$CHROOT_DIR/opt/${SH_NAME}"
 chroot "$CHROOT_DIR" /bin/bash -xlc "/opt/${SH_NAME}"
 rm -f "$CHROOT_DIR/opt/${SH_NAME}"
+rm -f "$CHROOT_DIR/opt/snap-preseed.sh"
 
 # Kernel and INITRD
 
@@ -81,6 +80,7 @@ chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
 rm -f "$CHROOT_DIR/etc/resolv.conf"
 chroot "$CHROOT_DIR" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
 
+umount --lazy "$CHROOT_DIR/opt/snapd-bin" --recursive
 umount --lazy "$CHROOT_DIR/sys/kernel/security" --recursive
 umount --lazy "$CHROOT_DIR/run"
 umount --lazy "$CHROOT_DIR/sys"
