@@ -1,8 +1,3 @@
-#^ Snaps
-install_packages squashfs-tools
-/opt/snap-preseed.sh
-apt-get purge -y squashfs-tools
-
 #^ Apps
 # Pretty unneeded for the average user, shotwell doesn't look good, and the games are unnecessary bloat for most.
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
