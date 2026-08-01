@@ -23,7 +23,7 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 	1. A USB drive of at least **8GBs**.
 	3. Internal Storage: **25GB** minimum.
 	4. RAM: **6GB** recommended.
-	5. VRAM: **256MB** minimum, **1GB or more** recommended. **3D Acceleration** strongly recommended.
+	5. VRAM: **256MB** minimum, **1GB or more** recommended. **3D Acceleration** strongly recommended in VMs.
 	6. Secure Boot: Optional, although **Disabled** gives you a better-looking boot screen.
 
 ## Disclaimers & Agreements

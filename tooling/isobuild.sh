@@ -53,6 +53,7 @@ cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 chroot "$CHROOT_DIR" /bin/bash -xlc "export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
 update-initramfs -c -v -k all" #! This is redundant with 006_systemd.sh, should potentially be improved. But snap preseeding presumably does modify the initramfs.
+tree "$CHROOT_DIR/var/lib/snapd/"
 
 # Kernel and INITRD
 
@@ -68,7 +69,7 @@ chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
 && apt-get purge -y casper cryptsetup cryptsetup-bin cryptsetup-initramfs \
 && apt-get install -y dracut \
 && apt-get purge -y initramfs-tools \
-&& rm -rf etc/initramfs-tools/conf.d
+&& rm -rf etc/initramfs-tools/conf.d \
 && apt-get autoremove -y --purge \
 && apt-get clean \
 && dracut --force"

@@ -5,6 +5,7 @@
 #	THIS BY NATURE REMOVES DRACUT BECAUSE IT DEPENDS ON INITRAMFS-TOOLS
 install_packages casper
 install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs
+apt-get purge -y dracut dracut-core dracut-install
 
 export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
