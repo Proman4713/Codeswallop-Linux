@@ -33,7 +33,7 @@ jobs:
           set -exuo pipefail # Strict
 
           pnpm install
-          snap install snapcraft --classic
+          sudo snap install snapcraft --classic
           snapcraft login
           snapcraft whoami
           snapcraft keys
