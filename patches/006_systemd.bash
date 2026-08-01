@@ -5,7 +5,6 @@ install_packages casper
 install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools
 # ~c matches all removed packages with remaining configuration files
 apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but isn't cleaned up, so we do that instead of manually removing it.
-apt-get purge -y dracut-install
 
 export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
