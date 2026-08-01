@@ -35,7 +35,7 @@ jobs:
           pnpm install
           sudo snap install snapcraft --classic
           snapcraft whoami
-          echo ${{ secrets.SNAPCRAFT_UTILE_MODEL_ACTIONS_KEY }} | gpg --homedir ~/.snap/gnupg --import
+          echo '${{ secrets.SNAPCRAFT_UTILE_MODEL_ACTIONS_KEY }}' | gpg --homedir ~/.snap/gnupg --import
           snapcraft keys
           node src/preseed-snaps.js
           snap debug validate-seed tooling/seed/
