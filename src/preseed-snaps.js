@@ -7,23 +7,20 @@ const { Readable } = require('stream');
 const { execSync } = require('child_process');
 
 const SNAPS = [
-	'core24',
-	'core22',
-	'snapd',
-	'desktop-security-center',
-	'firmware-updater',
-	'gnome-46-2404',
-	'bare',
-	'gtk-common-themes',
-	'mesa-2404',
-	'prompting-client',
-	'snap-store',
-	'snapd-desktop-integration',
-	'ubuntu-desktop-bootstrap?{ "classic": true }'
+	'core24?{}?stable',
+	'snapd?{}?stable',
+	'desktop-security-center?{}?1/stable/ubuntu-26.04',
+	'firmware-updater?{}?1/stable/ubuntu-26.04',
+	'gnome-46-2404?{}?stable/ubuntu-26.04',
+	'bare?{}?stable',
+	'gtk-common-themes?{}?stable/ubuntu-26.04',
+	'mesa-2404?{}?stable/ubuntu-26.04',
+	'prompting-client?{}?1/stable/ubuntu-26.04',
+	'snap-store?{}?2/stable/ubuntu-26.04',
+	'snapd-desktop-integration?{}?stable/ubuntu-26.04',
+	'ubuntu-desktop-bootstrap?{ "classic": true }?26.04/stable'
 ];
 const ARCHITECTURE = 'amd64';
-const CHANNEL = 'stable';
-const UBUNTU_VERSION = '26.04';
 const UTILE_VERSION = '26';
 const API = 'https://api.snapcraft.io/v2';
 const SNAP_SERIES = 16;
@@ -91,7 +88,7 @@ async function fetchWithRetry(url, options = {}, retries = DOWNLOAD_RETRIES) {
 	throw lastError || new Error('Failed to fetch after retries');
 }
 
-async function fetchSnapInfo(snapName) {
+async function fetchSnapInfo(snapName, snapChannel) {
 	const url = `${API}/snaps/info/${snapName}`;
 	const response = await fetchWithRetry(url, {
 		headers: {
@@ -108,24 +105,10 @@ async function fetchSnapInfo(snapName) {
 	const data = await response.json();
 	//dbg console.log(data);
 
-	let target = null;
-	const searchPattern = new RegExp(`^./${CHANNEL}`);
-	for (const potentialTarget of data['channel-map']) {
-		if (potentialTarget.channel.architecture !== ARCHITECTURE) continue;
-
-		if (potentialTarget.channel.name.match(searchPattern)) {
-			target = {...potentialTarget};
-			break;
-		};
-
-		if (potentialTarget.channel.name === CHANNEL) {
-			target = {...potentialTarget};
-			// Continue in case we find the `/${CHANNEL}` condition later (e.g., 1/stable for firmware-updater)
-			continue;
-		}
-	}
-
-	if (!target) throw new Error(`Could not find ${CHANNEL} ${ARCHITECTURE} track for ${snapName}`);
+	const target = data['channel-map'].find(item =>
+		item.channel.name === snapChannel.replace("/ubuntu-26.04", "") && item.channel.architecture === ARCHITECTURE
+	);
+	if (!target) throw new Error(`Could not find ${snapChannel} ${ARCHITECTURE} track for ${snapName}`);
 
 	return {
 		downloadUrl: target.download.url,
@@ -197,11 +180,11 @@ async function main() {
 	};
 
 	for (const snapQuery of SNAPS) {
-		const [snapName, snapOptions] = snapQuery.split('?');
+		const [snapName, snapOptions, snapChannel] = snapQuery.split('?');
 
 		console.log(`\nProcessing: ${snapName}...`);
 		try {
-			const info = await fetchSnapInfo(snapName);
+			const info = await fetchSnapInfo(snapName, snapChannel);
 			//dbg console.log(info)
 
 			const snapFile = `${snapName}_${info.revision}`;
@@ -227,17 +210,14 @@ async function main() {
 
 			fs.writeFileSync(assertPath, accountKeyAssertion + '\n' + snapDeclarationAssertion + '\n' + snapRevisionAssertion);
 
-			let extraOptions = JSON.parse(snapOptions || '{}');
+			let extraOptions = JSON.parse(snapOptions);
 			//dbg console.log(extraOptions)
 
-			const snapChannel = (info.targetChannel.channel.name.includes(`/${CHANNEL}`))
-									? `${info.targetChannel.channel.name}/ubuntu-${UBUNTU_VERSION}`
-									: `${info.targetChannel.channel.track}/${info.targetChannel.channel.name}`;
 			seedManifest.snaps.push({
 				name: snapName,
+				...extraOptions,
 				channel: snapChannel,
-				file: `${snapFile}.snap`,
-				...extraOptions
+				file: `${snapFile}.snap`
 			});
 
 			//dbg console.log(seedManifest.snaps[length - 1]);
