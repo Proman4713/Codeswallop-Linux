@@ -117,7 +117,8 @@ sources:
     standard:
       path: filesystem.squashfs
       size: $(stat -c %s "$ISO_DIR/casper/filesystem.squashfs")
-version: 2" > "$ISO_DIR/casper/install-sources.yaml"
+version: 2
+" > "$ISO_DIR/casper/install-sources.yaml"
 
 # .disk/ and iso_overlay/
 cp -r /workspace/tooling/.disk "$ISO_DIR"

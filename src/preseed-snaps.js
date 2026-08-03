@@ -7,13 +7,13 @@ const { Readable } = require('stream');
 const { execSync } = require('child_process');
 
 const SNAPS = [
+	'core24',
+	'core22',
 	'snapd',
 	'desktop-security-center',
 	'firmware-updater',
 	'gnome-46-2404',
 	'bare',
-	'core24',
-	'core22',
 	'gtk-common-themes',
 	'mesa-2404',
 	'prompting-client',
@@ -42,7 +42,6 @@ const RETRY_DELAY_MS = 2000;
  * @description We've been getting lots of 429s
  */
 let requestCache = {};
-let GlobalModelAssertion = {};
 
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
@@ -170,42 +169,24 @@ async function fetchAssertion(assertionType, path, outputPath) {
 	return assertion;
 }
 
-function parseAssertionBlock(assertionText = "") {
-	// Match two consecutive newlines
-	const assertionSegments = assertionText.split(/\r?\n\r?\n/);
-	const yamlSegment = assertionSegments[0]?.trim() || assertionText.trim();
-	if (!yamlSegment) {
-		return {};
-	}
-
-	const parsed = yaml.load(yamlSegment);
-
-	return parsed;
-}
-
 async function main() {
 	//* Model and account assertions
-	const modelFile = path.join(ASSERTIONS_DIR, 'model.json');
-	const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model');
 	try {
-		let genericModelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
-		GlobalModelAssertion = parseAssertionBlock(genericModelAssertion);
-		//dbg console.log(GlobalModelAssertion);
+		const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model');
+		let modelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
+		fs.writeFileSync(modelAssertionFile, modelAssertion);
+		console.log(`Saved ${modelAssertionFile}`);
 
-		GlobalModelAssertion = {
-			...GlobalModelAssertion,
-			series: SNAP_SERIES.toString(),
-			model: `utile-os-${UTILE_VERSION}-amd64`,
-			architecture: 'amd64',
-			base: 'core24',
-			distribution: 'utile',
-			grade: 'signed',
-			snaps: [],
-			'authority-id': SNAP_ACCOUNT,
-			'brand-id': SNAP_ACCOUNT,
-			classic: 'true'
-		};
-		delete GlobalModelAssertion['sign-key-sha3-384'];
+		// Get account signing key
+		const accountKeyFile = path.join(ASSERTIONS_DIR, `account-key`);
+		const modelAccountKeyAssertion = await fetchAssertion('account-key', modelAssertion.match(SIGN_KEY_REGEX)[1]);
+		fs.writeFileSync(accountKeyFile, modelAccountKeyAssertion);
+		console.log(`Saved ${accountKeyFile}`);
+
+		const accountAssertionFile = path.join(ASSERTIONS_DIR, `account`);
+		const accountAssertion = await fetchAssertion('account', `generic`);
+		fs.writeFileSync(accountAssertionFile, accountAssertion);
+		console.log(`Saved ${accountAssertionFile}`);
 	} catch (error) {
 		console.error(`Error handling special assertions:`, error.message);
 		process.exit(1);
@@ -259,13 +240,6 @@ async function main() {
 				...extraOptions
 			});
 
-			GlobalModelAssertion.snaps.push({
-				'default-channel': snapChannel,
-				'id': info.snapId,
-				'name': snapName,
-				'type': info.type
-			});
-
 			//dbg console.log(seedManifest.snaps[length - 1]);
 
 			console.log(`Finished ${snapName}`);
@@ -275,30 +249,7 @@ async function main() {
 		}
 	}
 
-	// Write final seed.yaml and model assertion
-	GlobalModelAssertion['timestamp'] = new Date().toISOString();
-	fs.writeFileSync(modelFile, JSON.stringify(GlobalModelAssertion, null, 4));
-	console.log('\nSigning and exporting model assertion...')
-	const snapCredentials = process.env.SNAPCRAFT_STORE_CREDENTIALS;
-	execSync(
-`export SNAPCRAFT_STORE_CREDENTIALS="${snapCredentials}" \
-&& snap sign -k utile-model-actions-key "${modelFile}" > "${modelAssertionFile}"`
-);
-
-	// Get account signing key
-	let modelAssertion = fs.readFileSync(modelAssertionFile, { encoding: "utf8" });
-	const accountKey = modelAssertion.match(SIGN_KEY_REGEX)[1];
-	const accountKeyFile = path.join(ASSERTIONS_DIR, `account-key`);
-	const modelAccountKeyAssertion = await fetchAssertion('account-key', accountKey);
-	fs.writeFileSync(accountKeyFile, modelAccountKeyAssertion);
-
-	const accountAssertionFile = path.join(ASSERTIONS_DIR, `account`);
-	const accountAssertion = await fetchAssertion('account', SNAP_ACCOUNT);
-	fs.writeFileSync(accountAssertionFile, accountAssertion);
-	console.log(`Saved ${accountAssertionFile}`);
-	fs.rmSync(modelFile, { force: true });
-
-	const yamlStr = yaml.dump(seedManifest);
+	const yamlStr = yaml.dump(seedManifest,).replaceAll('- ', '-\n    ');
 	fs.writeFileSync(path.join(BASE_SEED_DIR, 'seed.yaml'), yamlStr);
 	console.log('\nGenerated /var/lib/snapd/seed/seed.yaml');
 }
