@@ -109,7 +109,7 @@ sources:
     en: Standard
   path: filesystem.squashfs
   preinstalled_langs:
-  - en
+  - ''
   size: $FILESYSTEM_SIZE
   type: fsimage
   variant: desktop
