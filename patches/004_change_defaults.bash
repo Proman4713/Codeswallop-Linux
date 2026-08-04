@@ -2,8 +2,10 @@
 
 # We uninstalled Firefox as part of eliminating non-system snap packages, so we need a new default browser...
 # Brave is going to be it. For no particular reason other than its ease of installation in addition to being my personal default
-sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
+curl https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg |\
+	sudo install -DTm644 /dev/stdin "/usr/share/keyrings/brave-browser-archive-keyring.gpg"
+curl "https://brave-browser-apt-release.s3.brave.com/brave-browser.sources" |\
+    sudo install -DTm644 /dev/stdin "/etc/apt/sources.list.d/brave-browser-release.sources"
 apt_get_update
 install_packages brave-browser
 
