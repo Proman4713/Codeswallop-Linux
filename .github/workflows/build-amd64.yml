@@ -12,7 +12,7 @@ jobs:
       contents: write
     env:
         TZ: 'Africa/Cairo'
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6.0.2
@@ -54,12 +54,12 @@ jobs:
           echo "SH_NAME=$SH_NAME" >> $GITHUB_ENV
           echo "ISO_NAME=$ISO_NAME" >> $GITHUB_ENV
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-          
+
           # Verify the output exists
           ls -la "dist/$SH_NAME"
 
           node src/inject-disk-release.js
-    
+
       - name: Inject GRUB config
         run: |
           sudo mkdir -p tooling/iso_overlay/boot/grub
@@ -91,7 +91,7 @@ jobs:
           }
           fi
           EOF
-    
+
       - name: Build
         run: |
           docker run --privileged \
@@ -123,10 +123,10 @@ jobs:
           RESPONSE=$(curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" -H "Accept: application/json" "https://upload.gofile.io/contents/uploadfile")
           CONTENT_ID=$(echo "$RESPONSE" | jq -r '.data.id')
           echo "Uploaded ISO to Gofile with ID: $CONTENT_ID"
-          
+
           # calculate sha256 checksum
           sha256sum ${{ env.ISO_NAME }}-amd64.iso > ${{ env.ISO_NAME }}-amd64.iso.sha256sum
           echo "sha256sum: $(cat ${{ env.ISO_NAME }}-amd64.iso.sha256sum)"
-          
+
           # Upload checksum to Gofile
           curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso.sha256sum" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload.gofile.io/contents/uploadfile"

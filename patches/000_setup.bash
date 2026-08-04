@@ -1,7 +1,7 @@
 set -exuo pipefail # Strict
 
 # Ensure we are running as root, obviously
-if [ "$EUID" -ne 0 ]; then 
+if [ "$EUID" -ne 0 ]; then
   echo "Please run as root (sudo)"
   exit
 fi
