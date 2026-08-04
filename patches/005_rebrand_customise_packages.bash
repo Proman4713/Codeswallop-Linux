@@ -11,7 +11,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 
 	# Use deb822 source format in /etc/apt/sources.list.d/utile.sources
 	(cat << 'EOF'
-## Utiie distribution repository
+## Utile distribution repository
 ##
 ## Components: These are the components that exist inside Utile OS's package repositories
 ##   main  - Functional packages that make Utile OS what it is.

@@ -142,6 +142,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	unzip \
 	user-setup \
 	wget \
+	xfsprogs \
 	xorriso \
 	zfsutils-linux
 fi

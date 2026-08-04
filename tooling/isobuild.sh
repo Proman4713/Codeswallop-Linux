@@ -87,16 +87,43 @@ umount --lazy "$CHROOT_DIR/dev/pts"
 umount --lazy "$CHROOT_DIR/dev"
 
 # Make squashfs
+
+NO_LANGS_DIR="/workspace/no-langs"
 mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
+mkdir -p "$NO_LANGS_DIR"
+mksquashfs "$NO_LANGS_DIR" "$ISO_DIR/casper/filesystem.no-languages.squashfs" -comp xz -noappend -e boot # Just for subiquity
 
 # Casper metadata
 
 FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
 printf '%s' "$FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.size"
+FILESYSTEM_SIZE=$(du -sx --block-size=1 "$NO_LANGS_DIR" | cut -f1)
+printf '%s' "$FILESYSTEM_SIZE" \
+	> "$ISO_DIR/casper/filesystem.no-languages.size"
+rm -rf "$NO_LANGS_DIR"
+
+chroot "$CHROOT_DIR" echo \
+"--- /build/config/iso-dir/iso-root/casper/.manifest.full	1970-01-01 00:00:00.000000000 +0000
++++ /build/config/iso-dir/iso-root/casper/filesystem.manifest.full	1970-01-01 00:00:00.000000000 +0000
+" > "$ISO_DIR/casper/filesystem.manifest"
+
+chroot "$CHROOT_DIR" dpkg-query \
+	-W --showformat='+${Package}	${Version}\n' | sort \
+	>> "$ISO_DIR/casper/filesystem.manifest"
+
 chroot "$CHROOT_DIR" dpkg-query \
 	-W --showformat='${Package}	${Version}\n' | sort \
-	> "$ISO_DIR/casper/filesystem.manifest"
+	> "$ISO_DIR/casper/filesystem.manifest.full"
+chroot "$CHROOT_DIR" dpkg-query \
+	-W --showformat='${Package}	${Version}\n' | sort \
+	> "$ISO_DIR/casper/filesystem.no-languages.manifest.full"
+
+chroot "$CHROOT_DIR" echo \
+"--- /build/config/iso-dir/iso-root/casper/filesystem.manifest.full	$(stat -c '%w' "$ISO_DIR/casper/filesystem.manifest.full" || echo '1970-01-01 00:00:00.000000000 +0000')
++++ /build/config/iso-dir/iso-root/casper/filesystem.no-languages.manifest.full	$(date +"%F %T.%N %z" || echo '1970-01-01 00:00:00.000000000 +0000')
+" > "$ISO_DIR/casper/filesystem.no-languages.manifest"
+
 echo "kernel:
   default: linux-generic-hwe-24.04
 sources:
