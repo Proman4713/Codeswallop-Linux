@@ -2,7 +2,7 @@
 # A Minimum-Friction Linux Desktop
 Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 
-[![Build Utile OS 26 AMD64 ISO](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml)
+[![Build Utile OS 26 AMD64](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml/badge.svg)](https://github.com/Proman4713/Utile-OS/actions/workflows/build-amd64.yml)
 
 ###### [Debian packages](https://github.com/Proman4713/Utile-OS-debian), [APT repository](https://github.com/Proman4713/Utile-OS-apt), [Website Frontend](https://github.com/Proman4713/Utile-OS-web)
 

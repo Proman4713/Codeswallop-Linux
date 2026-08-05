@@ -1,4 +1,4 @@
-name: Build Utile OS 26 AMD64 ISO
+name: Build Utile OS 26 AMD64
 
 on:
   push:
