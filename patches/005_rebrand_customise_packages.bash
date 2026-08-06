@@ -4,7 +4,7 @@
 
 if [ "$ENV_MODE" == "ISO" ]; then
 	# APT Repository, GPG key is later overridden by the `utile-keyring` package depended on by `utile-desktop`, this is just here so that our first installs are trusted
-	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmour -o /usr/share/keyrings/utile-repository-keyring.gpg; then
+	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmour -o /usr/share/keyrings/utile-archive-keyring.gpg; then
 		echo "Error: Failed to download or install Utile GPG key" >&2
 		exit 1
 	fi
@@ -23,18 +23,18 @@ Types: deb
 URIs: http://proman4713.github.io/Utile-OS-apt/
 Suites: abstract
 Components: main upstream universe
-Signed-By: /usr/share/keyrings/utile-repository-keyring.gpg
+Signed-By: /usr/share/keyrings/utile-archive-keyring.gpg
 
 EOF
 ) | sudo tee /etc/apt/sources.list.d/utile.sources
 
-	# Prioritise Utile packages over Ubuntu ones
+	# Prioritise Utile packages over Ubuntu ones. Why not `utile.pref`? Not sure, `utile.pref` felt too short and unprofessional, so I followed Mint's lead.
 	(cat << 'EOF'
 Package: *
-Pin: origin proman4713.github.io
-Pin-Priority: 750
+Pin: release o="Utile OS",c=upstream
+Pin-Priority: 700
 EOF
-) | sudo tee /etc/apt/preferences.d/utile.pref
+) | sudo tee /etc/apt/preferences.d/official-package-repositories.pref
 
 	# Reflect the changes
 	apt_get_update
