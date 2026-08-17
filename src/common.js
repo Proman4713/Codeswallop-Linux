@@ -2,6 +2,11 @@ const {
 	version
 } = require("../package.json");
 
+/*
+	! This whole file could cause issues on 12:00 AM, and more issues on December 31st. This is because it is used
+	! and constructed on-access, and it is accessed multiple times over multiple files. I'm not sure if this is likely
+	! enough to warrant a dedicated fix.
+*/
 class common {
 	IS_RELEASE=false;
 	REL_TAG="";

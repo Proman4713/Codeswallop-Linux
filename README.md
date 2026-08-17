@@ -76,6 +76,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li><b>Support ARM in accordance to upstream. Currently, the <code>utile-wallpapers</code> package arm64 version (which was indeed cool for providing different defaults depending on the user's hardware) has become obsolete since we don't use arm <i>anywhere</i> in our distribution currently.</b></li>
 		<li>Set up build farms through a web app for Utile OS's repositories so that packages don't have to be manually built for every architecture (this <i>probably would</i> bring back ARM support, provided that I re-configure `utile-wallpapers` to be a single package source with multiple build targets)</li>
 		<li>Streamline feedback and bug reporting (even more than Ubuntu Apport does, more on that is described in private notes, it is also related to the App Store idea, which would be made first)</li>
+		<li>Implement native (and hopefully fancier) equivalents of Ubuntu snap system apps to avoid the over-dependence on the undocumented process of snap preseeding</li>
 	</ol>
 </details>
 <details>

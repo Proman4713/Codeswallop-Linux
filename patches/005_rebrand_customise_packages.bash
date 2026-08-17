@@ -44,7 +44,7 @@ EOF
 		echo "Error: Failed to upgrade base-files package" >&2
 		exit 1
 	fi
-	echo "Release $(lsb_release -a)\nCodename: $(lsb_release -cs)"
+	echo "Release $(lsb_release -a)"
 
 	# Desktop metapackage (GRUB Theme, Wallpapers, GNOME extensions, default configurations, etc.)
 	chmod -x /etc/grub.d/30_os-prober

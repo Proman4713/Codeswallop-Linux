@@ -6,6 +6,8 @@ install_packages cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools
 # ~c matches all removed packages with remaining configuration files
 apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but isn't cleaned up, so we do that instead of manually removing it.
 
+# This structure is deducted from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
+#	uses these configurations.
 export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
 mkdir -p "etc/initramfs-tools/conf.d"

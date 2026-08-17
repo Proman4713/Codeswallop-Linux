@@ -7,9 +7,9 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Determine environment
-# 	ISO: The chroot environment on the base Ubuntu ISO already runs changes to system-wide configs, we don't need to care about user preferences.
+# 	ISO: This is the chroot environment used to build the ISO, it already runs changes globally; we don't need to care about user preferences.
 #	Post-Install: If a user runs this script after they install their system, then only changing system defaults doesn't help, we also have to change their
-#	current settings.
+#	current settings. (HEAVILY NEGLECTED AS OF NOW)
 if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ] && getent passwd "$SUDO_USER" >/dev/null 2>&1; then
 	ENV_MODE="POST"
 	TARGET_USER="$SUDO_USER"
@@ -19,16 +19,21 @@ else
 	echo "Environment: Ubuntu ISO Chroot (Configuring for future users only)"
 fi
 
+# Wrapper to avoid useless hiccups due to missing -y
 install_packages() {
 	apt-get install -y "$@"
 }
 
+# Presumably added due to an issue with installing libcanberra
 apt_get_update() {
 	apt-get update || echo "Some repos failed, but we should be still fine..."
 }
 
+# To avoid any interactive prompts
 export DEBIAN_FRONTEND=noninteractive
 
+# Add the sources.list file usually found on Ubuntu systems but wouldn't be the same on a debootstrap'd system (it isn't created by any apt
+#	package, and so will presumably have the sources provided to debootstrap; we need to change it in all cases)
 (cat << 'EOF'
 # Ubuntu sources have moved to the /etc/apt/sources.list.d/ubuntu.sources
 # file, which uses the deb822 format. Use deb822-formatted .sources files
@@ -37,6 +42,8 @@ export DEBIAN_FRONTEND=noninteractive
 EOF
 ) | sudo tee /etc/apt/sources.list
 
+# Add the standard Ubuntu 26.04 repositories, this wouldn't be there at all on a debootstrap'd system, which could cause some issues down the
+#	line since there is no guarantee of debootstrap figuring out all the correct Suites and URIs.
 (cat << 'EOF'
 # See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to
 # newer versions of the distribution.
@@ -87,7 +94,9 @@ EOF
 
 apt_get_update
 
-# Package seeding happens here now, since Debootstrap doesn't install recommends of packages
+# Package seeding happens here now instead of in the host (with debootstrap), since debootstrap doesn't install recommends of packages...
+#	These packages are specified from the standard Ubuntu seeds (e.g., https://static-reports.ubuntu.com/seeds/ubuntu.resolute/desktop-minimal),
+#	the `*.manifest.full` files in the `casper/` directory on official ISOs, as well as the packages found in live Ubuntu environments.
 if [ "$ENV_MODE" == "ISO" ]; then
 	install_packages adcli \
 	base-files \
