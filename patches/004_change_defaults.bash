@@ -8,6 +8,18 @@ curl "https://brave-browser-apt-release.s3.brave.com/brave-browser.sources" |\
     sudo install -DTm644 /dev/stdin "/etc/apt/sources.list.d/brave-browser-release.sources"
 apt_get_update
 install_packages brave-browser
+#
+#	! Running Brave on the live ISO does not work, and gives this output:
+#		[6611:6611:0804/130457.772606:FATAL:sandbox/linux/services/credentials.cc:131] Check failed: . : Permission denied (13)
+#		[0804/130458.000648:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+#		[0804/130458.000853:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+#		/usr/bin/brave-browser: line 30: 6611 Trace/breakpoint trap	(core dumped) "$HERE/brave" "$@"
+#
+#	https://askubuntu.com/questions/1533668/upgrading-to-ubuntu-24-04-lts-breaks-chrome-apparmor-issue is a potential fix
+#
+sudo aa-status
+sudo systemctl status apparmor
+sudo systemctl enable apparmor
 
 # Configure Brave command-line args
 BRAVE_DESKTOP="/usr/share/applications/brave-browser.desktop"
