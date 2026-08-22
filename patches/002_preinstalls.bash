@@ -67,7 +67,7 @@ install_packages language-pack-en \
 
 # TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
 # TODO: Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu, also only available as Flatpak
-install_packages gdebi \
+install_packages \
 				gnome-tweaks gnome-shell-extension-manager \
 				gnome-calendar gnome-music showtime gnome-snapshot \
 				deja-dup
