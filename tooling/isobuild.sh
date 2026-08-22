@@ -98,8 +98,8 @@ mksquashfs "$NO_LANGS_DIR" "$ISO_DIR/casper/filesystem.no-languages.squashfs" -c
 FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
 printf '%s' "$FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.size"
-FILESYSTEM_SIZE=$(du -sx --block-size=1 "$NO_LANGS_DIR" | cut -f1)
-printf '%s' "$FILESYSTEM_SIZE" \
+NO_LANG_FILESYSTEM_SIZE=$(du -sx --block-size=1 "$NO_LANGS_DIR" | cut -f1)
+printf '%s' "$NO_LANG_FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.no-languages.size"
 rm -rf "$NO_LANGS_DIR"
 
