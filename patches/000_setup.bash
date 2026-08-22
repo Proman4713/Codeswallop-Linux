@@ -101,23 +101,13 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	install_packages adcli \
 	base-files \
 	btrfs-progs \
-	curl \
-	deja-dup \
 	dracut \
 	efibootmgr \
-	ffmpegthumbnailer \
 	file-roller \
 	finalrd \
 	gawk \
-	gdebi \
 	gdb \
 	git \
-	gnome-calendar \
-	gnome-music \
-	gnome-session-canberra \
-	gnome-shell-extension-manager \
-	gnome-snapshot \
-	gnome-tweaks \
 	gparted \
 	grub-common \
 	grub-efi-amd64-bin \
@@ -128,9 +118,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	grub2-common \
 	gst-audio-thumbnailer \
 	gst-video-thumbnailer \
-	htop \
 	keyutils \
-	libfuse2t64 \
 	linux-generic-hwe-24.04 \
 	linux-generic-hwe-26.04 \
 	linux-libc-dev \
@@ -142,13 +130,11 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	python3-pil \
 	realmd \
 	shim-signed \
-	showtime \
 	snapd \
 	sssd \
 	ubuntu-desktop-minimal \
 	ubuntu-restricted-extras \
 	ubuntu-standard \
-	unzip \
 	user-setup \
 	wget \
 	xfsprogs \
