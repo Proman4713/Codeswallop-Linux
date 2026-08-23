@@ -88,8 +88,8 @@ umount --lazy "$CHROOT_DIR/dev"
 
 # Make squashfs
 
-NO_LANGS_DIR="/workspace/no-langs"
 mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
+NO_LANGS_DIR="/workspace/no-langs"
 mkdir -p "$NO_LANGS_DIR"
 mksquashfs "$NO_LANGS_DIR" "$ISO_DIR/casper/filesystem.no-languages.squashfs" -comp xz -noappend -e boot # Just for subiquity
 
