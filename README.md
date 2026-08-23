@@ -29,8 +29,8 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 ## Disclaimers & Agreements
 - This project is **not** designed for personal use by anyone other than myself. <b>Use it at your own risk;</b> I claim no liability for anything it may do to your system at the moment. Potential issues include, but are not limited to, system instability, broken packages, or failure to boot. Please test only on spare systems or virtual machines.
 - I do not make the ISOs easily accessible for download on the repository's homepage for multiple reasons:
-	1. The OS is largely untested; it's neither feature-complete nor bug-free.
-	2. The OS has not yet been completely rid of Ubuntu branding. So it may not be entirely outside the scope of Canonical's trademarks, which need to be removed before this project is ready for distribution.
+	1. the OS is largely untested; it's neither feature-complete nor bug-free.
+	2. the OS has not yet been completely rid of Ubuntu branding. So it may not be entirely outside the scope of Canonical's trademarks, which need to be removed before this project is ready for distribution.
 	3. I'm not claiming any rights over Canonical/Ubuntu brand elements that are still user-facing and not yet removed, and I'm not suggesting that this is a project made by Canonical/Ubuntu. It is simply a matter of time before the situation changes.
 - The ISOs have not been tested with offline installations.
 - The bash scripts available in my [releases](https://github.com/Proman4713/Utile-OS/releases) are not intended for use on a long-running system. They assume a specific Ubuntu version based on their filename and that they are the *first thing* run on your system, so most customisations you may have applied **will be overridden**.
