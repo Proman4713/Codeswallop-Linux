@@ -80,7 +80,7 @@ Any references to 'OOBE' in the comments in this code are short for 'Out-of-the-
 
 ## Building
 ### Prerequisite Explanation
-This OS's composition could be incredibly confusing at first glance. However, as it turns out, there's rarely any documentation at all for many of the things covered in this project. As far as I'm concerned, no other Linux distribution properly documents its building process for the public. If you're new to this realm and want to contribute, check out the [Guide for New Contributors](#guide-for-new-contributors) down below.
+This OS's composition could be incredibly confusing at first glance. However, as it turns out, there's rarely any documentation at all for many of the things covered in this project. As far as I'm concerned, no other Linux distribution properly documents its building process for the public. If you're new to this realm and want to contribute, check out the [Guide for New Contributors](#guide-for-new-contributors) below.
 
 Now, and for the foreseeable future, there will only be a few things that make Utile OS what it is instead of a clone of Ubuntu:
 * APT Sources
@@ -90,19 +90,19 @@ Now, and for the foreseeable future, there will only be a few things that make U
 * ISO packing
 * ISO-level or system-level configuration files and/or deletions
 * Systemd configuration
-* ISO-level initramfs
+* ISO-level InitRAMFS
 * Snap pre-seeding
 
 Although that may seem like a lot, many of them are closely related.
 
-APT Sources, package pinning, and new Debian packages cover *everything* related to user settings, extensions, defaults, apps, and system metadata; I won't explain these uses here because they are fundamentally irrelevant to the general concepts outlined above.
+APT Sources, package pinning, and new Debian packages cover *everything* related to user settings, extensions, defaults, apps, and system metadata; I won't explain these uses here because they're irrelevant to the general concepts outlined above.
 
-Now, for the ISO structure, we have some explaining to do&hellip;
+Now that that's covered, for the ISO structure, we have some explaining to do&hellip;
 
 #### ISO packing
-It may surprise you, if you've never worked on similar things before, that a standard Ubuntu or Linux Mint ISO is only a bare-bones bootable device for your device's firmware. It contains no actual root filesystem&hellip; *That* resides inside the `casper/` directory as a compressed file with the `.squashfs` extension, usually written [SquashFS](https://en.wikipedia.org/wiki/SquashFS) (short for *Squashed Filesystem*), which contains the actual [root filesystem](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03.html) that gives you the live USB environment. That SquashFS is [created](https://manpages.ubuntu.com/manpages/resolute/man1/mksquashfs.1.html) for [`casper`](https://manpages.ubuntu.com/manpages/resolute/man7/casper.7.html) (the name of the folder) to extract into RAM and mount it as the root filesystem.
+It may surprise you, if you've never worked on similar things before, that a standard Ubuntu or Linux Mint ISO is only a bare-bones bootable device for your device's firmware. It contains no actual root filesystem&hellip; *That* resides inside the `casper/` directory as a compressed file with the `.squashfs` extension, usually written [SquashFS](https://en.wikipedia.org/wiki/SquashFS) (short for *Squashed Filesystem*), which contains the actual [root filesystem](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03.html) that gives you the live USB environment. That SquashFS is [created](https://manpages.ubuntu.com/manpages/resolute/man1/mksquashfs.1.html) for [`casper`](https://manpages.ubuntu.com/manpages/resolute/man7/casper.7.html) (the name of the folder) to extract into RAM and mount as the root filesystem.
 
-*Casper* is an [InitramFS](https://wiki.archlinux.org/title/Arch_boot_process#initramfs) hook (more on how that happens later) made by Canonical for Ubuntu ISOs. It is therefore used both by Utile OS and Linux Mint, which we can call 'sibling distributions' in relation to Ubuntu Desktop. In Ubuntu ISOs, the `casper/` directory contains *multiple* .squashfs files with different names, because Ubuntu uses a more complicated *layered filesystem* layout than both Utile OS and Linux Mint's single `filesystem.squashfs` files.
+*Casper* is an [InitRAMFS](https://wiki.archlinux.org/title/Arch_boot_process#initramfs) hook (more on how that happens later) made by Canonical for Ubuntu ISOs. It is therefore used by Utile OS and Linux Mint, which we can call 'sibling distributions' in relation to Ubuntu Desktop. In Ubuntu ISOs, the `casper/` directory contains *multiple* .squashfs files with different names, because Ubuntu uses a more complicated *layered filesystem* layout than Utile OS and Linux Mint's single `filesystem.squashfs` files.
 
 The `casper/` directory contains a few other files:
 * `filesystem.manifest`
@@ -112,14 +112,14 @@ The `casper/` directory contains a few other files:
 * `initrd`
 * `install-sources.yaml`
 
-`filesystem.manifest` contains a sorted `dpkg-query` of all the packages installed on the squashfs; there is no clear documentation on what `casper` uses it for, but Ubuntu ISOs also list the installed *snap* packages at the end of their `.manifest` files. It could rather be used by the installer, where Linux Mint uses Ubiquity (Ubuntu's old installer), and Utile OS [currently] uses Ubuntu Desktop Bootstrap (Ubuntu's more modern, Flutter-based installer).
+`filesystem.manifest` contains a sorted `dpkg-query` of all the packages installed on the squashfs; there is no clear documentation on what `casper` uses it for, but Ubuntu ISOs also list the installed *snap* packages at the end of their `.manifest` files. It could rather be used by the installer, where Linux Mint uses Ubiquity (Ubuntu's old installer), and Utile OS currently uses Ubuntu Desktop Bootstrap (Ubuntu's more modern, Flutter-based installer).
 
-*filesystem.size* contains the size (in bytes) of the target system root (before it is compressed into SquashFS). Or, at least, that's what it appears to be from Ubuntu, Mint, and Utile's ISOs.
+*filesystem.size* contains the size (in bytes) of the target system root before it is compressed into SquashFS. Or, at least, that's what it appears to be from Ubuntu, Mint, and Utile's ISOs.
 ##### Note: Previously, Utile OS was 'built' by downloading an Ubuntu 26.04 ISO and modifying it; during that time, a new `.squashfs` was generated, and the build script calculated its size in bytes for the `.size` file. The system installed successfully, and that `.size` value didn't cause any issues. I speculate that *this file is used for the Ubuntu installer to give a 'not enough disk space' warning when the user's disk doesn't have enough space*
 
 `filesystem.manifest-remove` has never been tested for Utile OS because, as I mentioned, I haven't added it to our ISOs yet.
 
-`vmlinuz` and `initrd` are the most complicated. In essence, they are just a compressed image of the Linux kernel and an InitramFS, respectively. What's complicated, though, is how they *end up* in the ISO's `casper/` directory when *no functional Linux system exists there.* More on that later.
+`vmlinuz` and `initrd` are the most complicated. In essence, they are just a compressed image of the Linux kernel and an InitRAMFS, respectively. What's complicated, though, is how they *end up* in the ISO's `casper/` directory when *no functional Linux system exists there.* We'll talk about that in [the build process](#the-build-process).
 
 The `install-sources.yaml` file is yet another [undocumented bit of Canonical magic](https://discourse.ubuntu.com/t/automated-server-installer-config-file-reference/16613/46); this is its value for Utile OS 26 (Ubuntu 26.04.1):
 ```yaml
@@ -146,7 +146,7 @@ sources:
 version: 2
 
 ```
-`$FILESYSTEM_SIZE` is referring to the value in `filesystem.size`. And the `stat` command returns the size of the `.squashfs` file in bytes. As the link above mentions, without this file the Ubuntu installer would believe that it's installing an Ubuntu Server instance (*why*, you may ask, when it is clearly a desktop GUI installer? The answer is: Ubuntu Desktop Bootstrap uses Subiquity, the same installer backend Ubuntu Server uses, and only surfaces it through a GUI). So I added this file to make the installer show 'Standard Selection' (which *does* seem a bit pointless, considering that Utile OS only offers one selection of apps. But we currently have no control over our installation process, and that should change) instead.
+`$FILESYSTEM_SIZE` refers to the value in `filesystem.size`. The `stat` command returns the size of the `.squashfs` file in bytes. As the link above mentions, without this file the Ubuntu installer would believe that it's installing an Ubuntu Server instance (*why*, you may ask, when it is clearly a desktop GUI installer? The answer is: Ubuntu Desktop Bootstrap uses Subiquity, the same installer backend Ubuntu Server uses, and only surfaces it through a GUI). So I added this file to make the installer show 'Standard Selection' instead, even though Utile OS only offers one selection of apps, but we currently have no control over our installation process, and that should change.
 
 #### ISO- or system-level configurations
 Regarding those configurations, such as the GRUB config for the ISO or Debian repository keyrings for the system, everything is pretty straightforward: I hardcode them, and that's the only way to do it.
@@ -163,11 +163,11 @@ Anyway, this file is simply hardcoded into Utile OS installations and doesn't re
 #### Systemd
 Changes in enabled/disabled systemd units compared to Ubuntu Desktop. Currently, the only systemd unit whose status we try to enforce is `apparmor`, where we run `systemctl enable apparmor` as a potential solution to Brave's apparmor issues when preinstalled on Utile OS (rather than post-installed).
 
-#### ISO InitramFS
-That one, the `initrd` file in the `casper/` directory&hellip; It's there so that the GRUB bootloader on the ISO uses it and the kernel (`vmlinuz`) to start *a* Linux system (very bare-bones), and the aforementioned Casper hook in that InitramFS looks for the `filesystem.squashfs` (or whatever you configure it to look for) and loads it.
+#### ISO InitRAMFS
+That one, the `initrd` file in the `casper/` directory&hellip; It's there so that the GRUB bootloader on the ISO uses it and the kernel (`vmlinuz`) to start *a* Linux system, very bare-bones. The aforementioned Casper hook in that InitRAMFS then looks for the `filesystem.squashfs` (or whatever you configure it to look for) and loads it.
 
-That InitramFS isn't as bare-bones as you might think, however, since it contains Systemd, Plymouth, Snap seeding hooks (more on it soon), Casper, and other things that make it behave like an Ubuntu system until the actual SquashFS loads and the system inside *it* starts booting.\
-Have you ever noticed your Ubuntu Live USB flickering for a moment, just to show an identical boot splash? That's likely why. In fact, in Utile OS's early days, when we modified an existing Ubuntu ISO, I wasn't aware of the complexities around this `initrd`, so when I changed the Ubuntu logos in the boot splash screen *inside* the SquashFS, the change didn't reflect in the ISO's `initrd`, so the Ubuntu logo would show briefly before the screen flickered and Utile's logo appeared.
+That InitRAMFS isn't as bare-bones as you might think, however, since it contains Systemd, Plymouth, Snap seeding hooks (more on it soon), Casper, and other things that make it behave like an Ubuntu system until the actual SquashFS loads and the system inside *it* starts booting.\
+Have you ever noticed your Ubuntu Live USB flickering for a moment, just to show an identical boot splash? That's likely why. In fact, in Utile OS's early days, when we modified an existing Ubuntu ISO, I wasn't aware of the complexities around this `initrd`, so when I changed the Ubuntu logos in the boot splash screen *inside* the SquashFS, the change didn't reflect in the ISO's `initrd`, and the Ubuntu logo would show briefly before the screen flickered and Utile's logo appeared.
 
 #### Snap Seeding
 *Somehow*, I consider this the most complicated topic we've talked about. The Snap ecosystem is *incredibly* undocumented, and that alone honestly makes me want to remove it from Utile OS more than any other reason Ubuntu-based distros often choose to remove it. However, Utile still doesn't have superb alternatives to Ubuntu's system snaps, so we're keeping them.
