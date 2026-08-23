@@ -111,7 +111,7 @@ jobs:
             -w /workspace \
             ubuntu:26.04 /bin/bash /workspace/tooling/isobuild.sh
 
-      - name: Upload script to GitHub Releases
+      - name: Create new GitHub Release
         uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: ${{ env.TAG_NAME }}
