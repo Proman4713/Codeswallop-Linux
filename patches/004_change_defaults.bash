@@ -18,7 +18,7 @@ install_packages brave-browser
 #	https://askubuntu.com/questions/1533668/upgrading-to-ubuntu-24-04-lts-breaks-chrome-apparmor-issue is a potential fix
 #
 sudo aa-status
-sudo systemctl enable apparmor
+sudo systemctl enable apparmor # TODO: move to patch 006
 
 # Configure Brave command-line args
 BRAVE_DESKTOP="/usr/share/applications/brave-browser.desktop"
