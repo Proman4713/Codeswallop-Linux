@@ -3,6 +3,11 @@ name: Build Utile OS 26 AMD64
 on:
   push:
     branches: [ "main" ]
+    paths-ignore: 
+        - '*.md'
+        - '.gitignore'
+        - 'resources/**'
+        - '.vscode/**'
   workflow_dispatch:
 
 jobs:
