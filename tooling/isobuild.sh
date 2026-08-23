@@ -148,7 +148,7 @@ version: 2" > "$ISO_DIR/casper/install-sources.yaml"
 
 # .disk/ and boot/
 if [ -d /workspace/tooling/iso_overlay ]; then
-	cp -r /workspace/tooling/iso_overlay/* "$ISO_DIR"
+	cp -r /workspace/tooling/iso_overlay/. "$ISO_DIR"
 fi
 
 #* From this point onward, a lot of stuff is inspired by the livecd-rootfs package
