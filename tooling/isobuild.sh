@@ -50,9 +50,7 @@ rm -f "$CHROOT_DIR/opt/${SH_NAME}"
 mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
-ls -lah "$CHROOT_DIR/var/lib/snapd/" # Before
 /usr/lib/snapd/snap-preseed "$CHROOT_DIR"
-ls -lah "$CHROOT_DIR/var/lib/snapd/" # After
 chroot "$CHROOT_DIR" /bin/bash -xlc "export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.squashfs
 update-initramfs -c -k all" #! This is redundant with 006_systemd.sh, should potentially be improved; snap preseeding should add files to /etc/.
