@@ -234,7 +234,7 @@ The first thing that happens when I type 'git push' (or 'Sync Changes' through V
 The workflow in [`build-amd64.yml`](./.github/workflows/build-amd64.yml) prepares the environment; it:
 * installs the necessary [pnpm packages](package.json) and the [Snapcraft Snap](https://snapcraft.io/snapcraft) to log in with Utile OS's Snapcraft brand.
 * imports the appropriate GnuPG keys for signing Snap models. This is currently unused but was used briefly.
-* runs [`preseed-snaps.js`](./src/preseed-snaps.js) to preseed the required Snaps into `tooling/seed`, which is used `/var/lib/snapd/seed` inside the `chroot`.
+* runs [`preseed-snaps.js`](./src/preseed-snaps.js) to preseed the required Snaps into `tooling/seed`, which is used as `/var/lib/snapd/seed` inside the `chroot`.
 * debugs the seed using `validate-seed`.
 * runs [`compile.js`](./src/compile.js) to create **the build script** and extracts the appropriate names from the filename printed by the script.
 * runs [`inject-disk-release.js`](./src/inject-disk-release.js) to create the contents of the `.disk/` directory on the ISO in the overlay directory, which is copied into the ISO during the build.
