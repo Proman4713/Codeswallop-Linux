@@ -146,8 +146,7 @@ sources:
       size: $(stat -c %s "$ISO_DIR/casper/filesystem.squashfs")
 version: 2" > "$ISO_DIR/casper/install-sources.yaml"
 
-# .disk/ and iso_overlay/
-cp -r /workspace/tooling/.disk "$ISO_DIR"
+# .disk/ and boot/
 if [ -d /workspace/tooling/iso_overlay ]; then
 	cp -r /workspace/tooling/iso_overlay/* "$ISO_DIR"
 fi
