@@ -31,7 +31,7 @@ EOF
 	# Prioritise Utile packages over Ubuntu ones. Why not `utile.pref`? Not sure, `utile.pref` felt too short and unprofessional, so I followed Mint's lead.
 	(cat << 'EOF'
 Package: *
-Pin: release o="Utile OS",c=upstream
+Pin: release o=Utile OS,c=upstream
 Pin-Priority: 700
 EOF
 ) | sudo tee /etc/apt/preferences.d/official-package-repositories.pref
