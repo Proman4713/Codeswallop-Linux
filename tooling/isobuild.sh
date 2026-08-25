@@ -112,8 +112,8 @@ wrapup_chroot "$CHROOT_DIR"
 MERGED_CHROOT_DIR="/workspace/merged"
 mkdir -p /workspace/live-upper /workspace/live-work "$MERGED_CHROOT_DIR"
 mount -t overlay overlay \
-    -o lowerdir="$CHROOT_DIR",upperdir=/workspace/live-upper,workdir=/workspace/live-work \
-    "$MERGED_CHROOT_DIR"
+	-o lowerdir="$CHROOT_DIR",upperdir=/workspace/live-upper,workdir=/workspace/live-work \
+	"$MERGED_CHROOT_DIR"
 
 setup_chroot "$MERGED_CHROOT_DIR"
 
@@ -178,8 +178,8 @@ wrapup_chroot "$MERGED_CHROOT_DIR"
 
 # Make squashfs
 
-mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
-mksquashfs "/workspace/live-upper" "$ISO_DIR/casper/filesystem.live.squashfs" -comp xz -noappend -e boot
+mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend
+mksquashfs "/workspace/live-upper" "$ISO_DIR/casper/filesystem.live.squashfs" -comp xz -noappend
 
 # Casper metadata
 
@@ -288,6 +288,125 @@ mcopy -s -i /tmp/efi.img "$ISO_DIR/EFI/" ::/.
 # md5sum
 (cd "$ISO_DIR" && find . -type f ! -name "md5sum.txt" ! -name "eltorito.img" ! -name "grub.cfg" -print0 | sort -z | xargs -0 md5sum > "$ISO_DIR/md5sum.txt")
 
+#^ ISO Debian Repository
+# TODO: big stuff right here, should leave it alone until tested. This could probably end up making a copy of the filesystem we already have since we don't check if
+# TODO: 	the dependencies are already available
+# echo "Creating cdrom repository..."
+# # https://static-reports.ubuntu.com/seeds/ubuntu.resolute/ship-live
+# cat > /workspace/packages.txt <<'EOF'
+# sl-modem-daemon
+# intel-microcode
+# amd64-microcode
+# setserial
+# b43-fwcutter
+# broadcom-sta-dkms
+# openssh-server
+# wpasupplicant
+# bcache-tools
+# btrfs-progs
+# cryptsetup
+# e2fsprogs
+# jfsutils
+# lvm2
+# mdadm
+# ntfs-3g
+# open-iscsi
+# reiserfsprogs
+# xfsprogs
+# zfsutils-linux
+# multipath-tools-boot
+# grub-efi-amd64
+# grub-efi-amd64-signed
+# grub-pc
+# shim-signed
+# efibootmgr
+# mdadm
+# zfs-dracut
+# sssd
+# realmd
+# /^oem-.+-meta$/
+# /^linux-modules-iwlwifi-generic-hwe-26.04$/
+# /^linux-modules-ipu6-generic-hwe-26.04$/
+# /^linux-modules-ipu7-generic-hwe-26.04$/
+# /^nvidia-driver-580$/
+# /^nvidia-driver-595$/
+# /^linux-modules-nvidia-580-generic-hwe-26.04$/
+# /^linux-modules-nvidia-595-generic-hwe-26.04$/
+# nvidia-prime
+# EOF
+# mapfile -t PACKAGES < <(grep -vE '^\s*#|^\s*$' /workspace/packages.txt)
+
+# add-apt-repository restricted -y
+# apt-get update && apt-get install -y apt-rdepends
+
+# POOL_DIR="$ISO_DIR/pool"
+# components=(main restricted)
+
+# mkdir -p "$POOL_DIR"
+
+# mapfile -t MATCHED_REGEX < <(
+# 	for pkg in "${PACKAGES[@]}"; do
+# 		[[ "$pkg" =~ ^[[:space:]]*# ]] && continue # Comments
+
+# 		if [[ "$pkg" =~ ^/(.*)/$ ]]; then
+# 			pattern="${BASH_REMATCH[1]}"
+# 			apt-cache pkgnames | grep -E "^${pattern}$"
+# 		else
+# 			echo "$pkg"
+# 		fi
+# 	done | sort -u
+# )
+
+# mapfile -t FULL_LIST < <(
+# 	for pkg in "${MATCHED_REGEX[@]}"; do
+# 		apt-rdepends "$pkg" 2>/dev/null | grep -v "^ "
+# 	done | sort -u
+# )
+
+# for pkg in "${FULL_LIST[@]}"; do
+# 	pkg_info=$(apt-cache show "$pkg" 2>/dev/null)
+
+# 	path=$(echo "$pkg_info" | awk '/^Filename:/{print $2; exit}')
+# 	component=$(echo "$path" | cut -d'/' -f2)
+
+# 	if [[ "$component" != "main" && "$component" != "restricted" ]]; then # Some NVIDIA drivers come from multiverse, but are still in restricted on the ISOs
+#         path="pool/restricted/${path#pool/"$component"/}"
+#     fi
+
+# 	dest="$ISO_DIR/$(dirname "$path")"
+# 	mkdir -p "$dest"
+# 	( cd "$dest" && apt-get download "$pkg" 2>/dev/null ) || echo "Failed to download $pkg" >&2
+# done
+
+# for component in "${components[@]}"; do
+# 	component_dir="$POOL_DIR/$component"
+
+# 	binary_dir="$ISO_DIR/dists/resolute/$component/binary-amd64"
+# 	mkdir -p "$binary_dir"
+
+# 	apt-ftparchive packages "$component_dir" > "$binary_dir/Packages"
+# 	gzip -k -f "$binary_dir/Packages"
+# done
+
+# cat > "$ISO_DIR/dists/resolute/Release" <<EOF
+# Origin: Ubuntu
+# Label: Ubuntu
+# Suite: resolute
+# Version: 26.04
+# Codename: resolute
+# Date: $(date -u +"%a, %d %b %Y %H:%M:%S UTC")
+# Architectures: amd64
+# Components: main restricted
+# Description: Ubuntu Resolute 26.04
+# EOF
+
+# apt-ftparchive --no-md5 --no-sha1 release . >> "$ISO_DIR/dists/resolute/Release"
+# ln -sf "$ISO_DIR/dists/resolute" "$ISO_DIR/dists/stable" && ln -sf "$ISO_DIR/dists/resolute" "$ISO_DIR/dists/unstable"
+
+# echo "Finished creating cdrom repository"
+# tree "$ISO_DIR/pool" "$ISO_DIR/dists"
+
+#^ Packing
 xorriso -as mkisofs \
 	-iso-level 3 \
 	-J -joliet-long \
