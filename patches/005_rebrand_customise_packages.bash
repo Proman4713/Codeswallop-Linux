@@ -56,3 +56,6 @@ EOF
 	install_packages utile-desktop && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
 	chmod +x /etc/grub.d/30_os-prober
 fi
+
+apt-get autoremove -y --purge
+apt-get clean

@@ -176,7 +176,7 @@ mksquashfs "/workspace/live-upper" "$ISO_DIR/casper/filesystem.live.squashfs" -c
 FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
 printf '%s' "$FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.size"
-LIVE_FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
+LIVE_FILESYSTEM_SIZE=$(du -sx --block-size=1 "$MERGED_CHROOT_DIR" | cut -f1)
 printf '%s' "$LIVE_FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.live.size"
 
