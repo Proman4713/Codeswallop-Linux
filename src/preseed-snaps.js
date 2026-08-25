@@ -254,10 +254,8 @@ main().then(() => {
 			.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
 			.forEach(filename => {
 				let filepath = path.join(LIVE_BASE_SEED_DIR, filename);
-				if (!fs.existsSync(filepath)) return;
-				fs.rmSync(filepath, {
-					recursive: fs.statSync(filepath).isDirectory()
-				})
+				if (!fs.existsSync(filepath) || fs.statSync(filepath).isDirectory()) return; // we don't want to delete directories, their names wouldn't match
+				fs.rmSync(filepath)
 			})
 	});
 });
