@@ -136,3 +136,11 @@ jobs:
 
           # Upload checksum to Gofile
           curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso.sha256sum" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload-eu-par.gofile.io/contents/uploadfile"
+
+          # Sign sum
+          echo '${{ secrets.ISO_SIGNING_KEY }}' | gpg --import
+          gpg -u AD2B8A9E1D1C31B2 --detach-sign --armor ${{ env.ISO_NAME }}-amd64.iso.sha256sum
+          mv ${{ env.ISO_NAME }}-amd64.iso.sha256sum.asc ${{ env.ISO_NAME }}-amd64.iso.sha256sum.gpg
+
+          # Upload signature to Gofile
+          curl --progress-bar --retry 3 -X POST -F "file=@${{ env.ISO_NAME }}-amd64.iso.sha256sum.gpg" -F "folderId=fcaef33b-8e99-4a74-b4cc-8949bdbfb6c6" -H "Authorization: Bearer ${{ env.GOFILE_KEY }}" "https://upload-eu-par.gofile.io/contents/uploadfile"
