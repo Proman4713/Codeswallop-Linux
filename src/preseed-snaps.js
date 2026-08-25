@@ -244,16 +244,20 @@ async function main(isLiveLayer=false) {
 	console.log('\nGenerated /var/lib/snapd/seed/seed.yaml');
 }
 
-main();
-main(true).then(() => {
-	// Remove duplicates
-	fs.readdirSync(LIVE_BASE_SEED_DIR, {
-			withFileTypes: false,
-			recursive: true
-		})
-		.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
-		.forEach(filename => {
-			let filepath = path.join(LIVE_BASE_SEED_DIR, filename);
-			fs.rmSync(filepath, { recursive: fs.statSync(filepath).isDirectory() })
-		})
+main().then(() => {
+	main(true).then(() => {
+		// Remove duplicates
+		fs.readdirSync(LIVE_BASE_SEED_DIR, {
+				withFileTypes: false,
+				recursive: true
+			})
+			.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
+			.forEach(filename => {
+				let filepath = path.join(LIVE_BASE_SEED_DIR, filename);
+				if (!fs.existsSync(filepath)) return;
+				fs.rmSync(filepath, {
+					recursive: fs.statSync(filepath).isDirectory()
+				})
+			})
+	});
 });
