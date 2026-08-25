@@ -46,6 +46,8 @@ let requestCache = {};
 
 fs.mkdirSync(SNAPS_DIR, { recursive: true });
 fs.mkdirSync(ASSERTIONS_DIR, { recursive: true });
+fs.mkdirSync(LIVE_SNAPS_DIR, { recursive: true });
+fs.mkdirSync(LIVE_ASSERTIONS_DIR, { recursive: true });
 
 /**
  * 
@@ -243,9 +245,12 @@ async function main(isLiveLayer=false) {
 }
 
 main();
-main(true);
-
-// Remove duplicates
-fs.readdirSync(LIVE_BASE_SEED_DIR, { withFileTypes: false, recursive: true })
-	.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
-	.forEach(filename => fs.rmSync(filename))
+main(true).then(() => {
+	// Remove duplicates
+	fs.readdirSync(LIVE_BASE_SEED_DIR, {
+			withFileTypes: false,
+			recursive: true
+		})
+		.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
+		.forEach(filename => fs.rmSync(filename))
+});
