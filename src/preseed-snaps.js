@@ -252,5 +252,8 @@ main(true).then(() => {
 			recursive: true
 		})
 		.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
-		.forEach(filename => fs.rmSync(filename))
+		.forEach(filename => {
+			let filepath = path.join(LIVE_BASE_SEED_DIR, filename);
+			fs.rmSync(filepath, { recursive: fs.statSync(filepath).isDirectory() })
+		})
 });
