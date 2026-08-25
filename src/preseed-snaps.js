@@ -31,6 +31,10 @@ const SIGN_KEY_REGEX = /^sign-key-sha3-384:\s*(\S+)/m;
 const BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed');
 const SNAPS_DIR = path.join(BASE_SEED_DIR, 'snaps');
 const ASSERTIONS_DIR = path.join(BASE_SEED_DIR, 'assertions');
+const LIVE_BASE_SEED_DIR = path.join(__dirname, '..', 'tooling', 'seed-live');
+const LIVE_SNAPS_DIR = path.join(LIVE_BASE_SEED_DIR, 'snaps');
+const LIVE_ASSERTIONS_DIR = path.join(LIVE_BASE_SEED_DIR, 'assertions');
+
 const DOWNLOAD_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
 
@@ -152,21 +156,24 @@ async function fetchAssertion(assertionType, path, outputPath) {
 	return assertion;
 }
 
-async function main() {
+async function main(isLiveLayer=false) {
+	const assertionsDir = isLiveLayer ? LIVE_ASSERTIONS_DIR : ASSERTIONS_DIR;
+	const snapsDir = isLiveLayer ? LIVE_SNAPS_DIR : SNAPS_DIR;
+
 	//* Model and account assertions
 	try {
-		const modelAssertionFile = path.join(ASSERTIONS_DIR, 'model');
+		const modelAssertionFile = path.join(assertionsDir, 'model');
 		let modelAssertion = await fetchAssertion('model', `${SNAP_SERIES}/generic/generic-classic`);
 		fs.writeFileSync(modelAssertionFile, modelAssertion);
 		console.log(`Saved ${modelAssertionFile}`);
 
 		// Get account signing key
-		const accountKeyFile = path.join(ASSERTIONS_DIR, `account-key`);
+		const accountKeyFile = path.join(assertionsDir, `account-key`);
 		const modelAccountKeyAssertion = await fetchAssertion('account-key', modelAssertion.match(SIGN_KEY_REGEX)[1]);
 		fs.writeFileSync(accountKeyFile, modelAccountKeyAssertion);
 		console.log(`Saved ${accountKeyFile}`);
 
-		const accountAssertionFile = path.join(ASSERTIONS_DIR, `account`);
+		const accountAssertionFile = path.join(assertionsDir, `account`);
 		const accountAssertion = await fetchAssertion('account', `generic`);
 		fs.writeFileSync(accountAssertionFile, accountAssertion);
 		console.log(`Saved ${accountAssertionFile}`);
@@ -181,6 +188,7 @@ async function main() {
 
 	for (const snapQuery of SNAPS) {
 		const [snapName, snapOptions, snapChannel] = snapQuery.split('?');
+		if (!isLiveLayer && snapName === 'ubuntu-desktop-bootstrap') continue;
 
 		console.log(`\nProcessing: ${snapName}...`);
 		try {
@@ -189,8 +197,8 @@ async function main() {
 
 			const snapFile = `${snapName}_${info.revision}`;
 
-			const snapPath = path.join(SNAPS_DIR, `${snapFile}.snap`);
-			const assertPath = path.join(ASSERTIONS_DIR, `${snapFile}.assert`);
+			const snapPath = path.join(snapsDir, `${snapFile}.snap`);
+			const assertPath = path.join(assertionsDir, `${snapFile}.assert`);
 
 			console.log(`Downloading snap...`);
 			await downloadSnap(info.downloadUrl, snapPath);
@@ -230,8 +238,14 @@ async function main() {
 	}
 
 	const yamlStr = yaml.dump(seedManifest,).replaceAll('- ', '-\n    ');
-	fs.writeFileSync(path.join(BASE_SEED_DIR, 'seed.yaml'), yamlStr);
+	fs.writeFileSync(path.join(isLiveLayer ? LIVE_BASE_SEED_DIR : BASE_SEED_DIR, 'seed.yaml'), yamlStr);
 	console.log('\nGenerated /var/lib/snapd/seed/seed.yaml');
 }
 
 main();
+main(true);
+
+// Remove duplicates
+fs.readdirSync(LIVE_BASE_SEED_DIR, { withFileTypes: false, recursive: true })
+	.filter(filename => filename !== 'seed.yaml' && !filename.includes('ubuntu-desktop-bootstrap'))
+	.forEach(filename => fs.rmSync(filename))

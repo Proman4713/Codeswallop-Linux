@@ -65,6 +65,19 @@ wrapup_chroot() {
 	umount --lazy "$1/dev"
 }
 
+# This structure is deducted from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
+#	uses these configurations.
+initramfstools_casper_gen="export CASPER_GENERATE_UUID=1
+export LAYERFS_PATH=filesystem.live.squashfs
+mkdir -p \"etc/initramfs-tools/conf.d\"
+cat > etc/initramfs-tools/conf.d/casperize.conf <<EOF
+export CASPER_GENERATE_UUID=1
+EOF
+cat <<EOF > /etc/initramfs-tools/conf.d/default-layer.conf
+LAYERFS_PATH=filesystem.live.squashfs
+EOF
+update-initramfs -c -k all"
+
 export CHROOT_DIR="/workspace/chroot"
 mkdir -p "$CHROOT_DIR"
 debootstrap \
@@ -110,18 +123,7 @@ apt-get install -y cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tool
 # ~c matches all removed packages with remaining configuration files
 apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but isn't cleaned up, so we do that instead of manually removing it.
 
-# This structure is deducted from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
-#	uses these configurations.
-export CASPER_GENERATE_UUID=1
-export LAYERFS_PATH=filesystem.squashfs
-mkdir -p \"etc/initramfs-tools/conf.d\"
-cat > etc/initramfs-tools/conf.d/casperize.conf <<EOF
-export CASPER_GENERATE_UUID=1
-EOF
-cat <<EOF > /etc/initramfs-tools/conf.d/default-layer.conf
-LAYERFS_PATH=filesystem.squashfs
-EOF
-update-initramfs -c -k all"
+$initramfstools_casper_gen"
 
 # Additional packages
 chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y \
@@ -154,6 +156,13 @@ zfs-zed
 
 apt-get autoremove -y --purge
 apt-get clean"
+
+#^ Ubuntu Desktop Bootstrap
+cp -r /workspace/tooling/seed-live/* "$MERGED_CHROOT_DIR/var/lib/snapd/seed/"
+
+/usr/lib/snapd/snap-preseed "$MERGED_CHROOT_DIR"
+chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "$initramfstools_casper_gen" # Update InitRAMFS since Snap seeding adds files to /etc/
+tree "$MERGED_CHROOT_DIR/var/lib/snapd/"
 
 # Kernel and INITRD
 
@@ -194,7 +203,7 @@ chroot "$CHROOT_DIR" echo \
 sed 's/^/+/' "$ISO_DIR/casper/filesystem.manifest.full" \
 	>> "$ISO_DIR/casper/filesystem.manifest"
 
-diff -u "$ISO_DIR/casper/filesystem.manifest.full" "$ISO_DIR/casper/filesystem.live.manifest.full" | grep -v "^@@" \
+diff -U 0 "$ISO_DIR/casper/filesystem.manifest.full" "$ISO_DIR/casper/filesystem.live.manifest.full" | grep -v "^@@" \
 	> "$ISO_DIR/casper/filesystem.live.manifest" || true
 
 echo "kernel:

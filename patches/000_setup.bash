@@ -110,7 +110,6 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	grub2-common \
 	gst-audio-thumbnailer \
 	gst-video-thumbnailer \
-	keyutils \
 	linux-generic-hwe-24.04 \
 	linux-generic-hwe-26.04 \
 	linux-libc-dev \
