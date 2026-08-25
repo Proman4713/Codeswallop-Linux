@@ -92,6 +92,14 @@ Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
 ) | sudo tee /etc/apt/sources.list.d/ubuntu.sources
 
+# Source: https://github.com/canonical/subiquity/blob/main/subiquity/server/apt.py#L277-L288
+(cat << 'EOF'
+## Utile OS does not ship with a portable Debian repository on its bootable images.
+##
+## This file is only here to prevent Subiquity from configuring 'file:///cdrom' as an APT source during installation.
+EOF
+) | sudo tee /etc/apt/sources.list.d/cdrom.sources
+
 apt_get_update
 
 # Package seeding happens here now instead of in the host (with debootstrap), since debootstrap doesn't install recommends of packages...
