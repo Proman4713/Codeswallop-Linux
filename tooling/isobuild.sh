@@ -160,6 +160,7 @@ apt-get clean"
 #^ Ubuntu Desktop Bootstrap
 cp -r /workspace/tooling/seed-live/* "$MERGED_CHROOT_DIR/var/lib/snapd/seed/"
 
+/usr/lib/snapd/snap-preseed --reset "$MERGED_CHROOT_DIR"
 /usr/lib/snapd/snap-preseed "$MERGED_CHROOT_DIR"
 chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "$initramfstools_casper_gen" # Update InitRAMFS since Snap seeding adds files to /etc/
 tree "$MERGED_CHROOT_DIR/var/lib/snapd/"
