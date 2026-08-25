@@ -254,7 +254,7 @@ Now, inside that **Docker container,** a *lot* happens before the rest of the wo
 * copies from `/workspace/tooling/seed` into `/var/lib/snapd/seed`, runs `/usr/lib/snap-preseed`, then regenerates the InitRAMFS (with casper) for `snapd`'s hooks.
 * creates a new empty working directory for the ISO image's contents.
 * copies `vmlinuz-*` and `initrd.img-*` *out* of the chroot's `/boot/` and into the ISO's `casper/` directory as `vmlinuz` and `initrd`.
-* uninstalls `casper` and `initramfs-tools`, along with its companion packages, from the chroot, then restores `dracut` and regenerates a new InitRAMFS *inside* the chroot after moving the old one onto the ISO.
+* (NEEDS REWRITING) uninstalls `casper` and `initramfs-tools`, along with its companion packages, from the chroot, then restores `dracut` and regenerates a new InitRAMFS *inside* the chroot after moving the old one onto the ISO.
 	* Yep, it's an elegant move. I initially highly doubted the idea would work, but I later found that the `livecd-rootfs` package did pretty much what I was thinking, and learnt more about casper from that source code.
 * undoes network access configuration and unmounts virtual filesystems from the chroot.
 * compresses the chroot directory to `casper/filesystem.squashfs` in the ISO working directory.
@@ -267,7 +267,7 @@ Now, inside that **Docker container,** a *lot* happens before the rest of the wo
 * overlays `/workspace/tooling/iso_overlay/` onto the ISO working directory.
 * adds `.disk/base_installable` and `.disk/cd_type` to the ISO workdir to match Ubuntu ISOs.
 * extracts `casper/initrd` to get the value for `.disk/casper-uuid-generic` from `*/conf/uuid.conf` inside the InitRAMFS.
-	* I believe the `export CASPER_GENERATE_UUID=1` line when generating the casper InitRAMFS is what creates this file. I recall that this fixed some boot issues, but not how I found this file.
+	* I believe the `export CASPER_GENERATE_UUID=1` line when generating the casper InitRAMFS is what creates this file. I recall that this fixed some boot issues. I found this file while diffing between both Utile OS and Ubuntu's `casper/initrd`s since theirs was multitudes larger than mine at one point.
 * downloads the `shim-signed`, `grub-efi-amd64-signed`, `grub-pc-bin`, `grub-efi-amd64-bin` and `grub2-common` packages and extracts them to a common directory to simulate where the files would be on a real system.
 * copies Canonical's official, signed GRUB images and accompanying files from the common directory into the ISO workdir's `/boot/` and `/EFI/` directories for BIOS and UEFI.
 	* Before I found out about `livecd-rootfs`, GRUB had some issues and didn't work with Secure Boot. So I decided to try to use Canonical's signed images, hoping they'd work with Secure Boot and include certain built-in configurations to help me avoid doing things manually. I spent a few hours comparing relevant packages to the files on an Ubuntu ISO; I eventually realised I was comparing 24.04 packages with a 26.04 ISO. After downloading the right `.deb`s from MIT's Ubuntu archive mirror, I got a fair idea of what should go where, and `livecd-rootfs` confirmed it when I found out about it soon after.

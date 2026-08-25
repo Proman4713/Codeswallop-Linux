@@ -98,21 +98,13 @@ apt_get_update
 #	These packages are specified from the standard Ubuntu seeds (e.g., https://static-reports.ubuntu.com/seeds/ubuntu.resolute/desktop-minimal),
 #	the `*.manifest.full` files in the `casper/` directory on official ISOs, as well as the packages found in live Ubuntu environments.
 if [ "$ENV_MODE" == "ISO" ]; then
-	install_packages adcli \
+	install_packages \
 	base-files \
-	btrfs-progs \
 	dracut \
-	efibootmgr \
 	file-roller \
-	finalrd \
-	gawk \
 	gdb \
 	git \
-	gparted \
 	grub-common \
-	grub-efi-amd64-bin \
-	grub-efi-amd64-signed \
-	grub-efi-amd64-unsigned \
 	grub-gfxpayload-lists \
 	grub-pc \
 	grub2-common \
@@ -122,22 +114,14 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	linux-generic-hwe-24.04 \
 	linux-generic-hwe-26.04 \
 	linux-libc-dev \
-	localechooser-data \
-	lvm2 \
 	m17n-db \
-	mdadm \
 	media-player-info \
 	python3-pil \
-	realmd \
-	shim-signed \
 	snapd \
 	sssd \
 	ubuntu-desktop-minimal \
 	ubuntu-restricted-extras \
 	ubuntu-standard \
-	user-setup \
 	wget \
-	xfsprogs \
-	xorriso \
-	zfsutils-linux
+	xorriso
 fi

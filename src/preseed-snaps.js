@@ -192,23 +192,23 @@ async function main() {
 			const snapPath = path.join(SNAPS_DIR, `${snapFile}.snap`);
 			const assertPath = path.join(ASSERTIONS_DIR, `${snapFile}.assert`);
 
-			console.log(`Downloading snap...`);
-			await downloadSnap(info.downloadUrl, snapPath);
+			// console.log(`Downloading snap...`);
+			// await downloadSnap(info.downloadUrl, snapPath);
 
-			console.log(`Downloading snap assertion...`);
+			// console.log(`Downloading snap assertion...`);
 
-			const snapDeclarationAssertion = await fetchAssertion('snap-declaration', `${SNAP_SERIES}/${info.snapId}`);
+			// const snapDeclarationAssertion = await fetchAssertion('snap-declaration', `${SNAP_SERIES}/${info.snapId}`);
 
-			// Get Canonical account key assertion (since we're using official snaps) among any others if we use third-party snaps
-			const accountKeyAssertion = await fetchAssertion('account-key', snapDeclarationAssertion.match(SIGN_KEY_REGEX)[1]);
+			// // Get Canonical account key assertion (since we're using official snaps) among any others if we use third-party snaps
+			// const accountKeyAssertion = await fetchAssertion('account-key', snapDeclarationAssertion.match(SIGN_KEY_REGEX)[1]);
 
-			// Get the assertion
-			const snapFileBuffer = fs.readFileSync(snapPath);
-			const snapRevisionHash = crypto.createHash('sha3-384').update(snapFileBuffer).digest('base64url');
-			//dbg console.log(snapRevisionHash);
-			const snapRevisionAssertion = await fetchAssertion('snap-revision', snapRevisionHash);
+			// // Get the assertion
+			// const snapFileBuffer = fs.readFileSync(snapPath);
+			// const snapRevisionHash = crypto.createHash('sha3-384').update(snapFileBuffer).digest('base64url');
+			// //dbg console.log(snapRevisionHash);
+			// const snapRevisionAssertion = await fetchAssertion('snap-revision', snapRevisionHash);
 
-			fs.writeFileSync(assertPath, accountKeyAssertion + '\n' + snapDeclarationAssertion + '\n' + snapRevisionAssertion);
+			// fs.writeFileSync(assertPath, accountKeyAssertion + '\n' + snapDeclarationAssertion + '\n' + snapRevisionAssertion);
 
 			let extraOptions = JSON.parse(snapOptions);
 			//dbg console.log(extraOptions)

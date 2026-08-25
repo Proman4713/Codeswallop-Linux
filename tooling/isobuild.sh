@@ -17,6 +17,54 @@ apt-get update && apt-get install -y \
 	ubuntu-keyring \
 	xorriso
 
+generate_chroot_manifest_full() {
+	local debian_pkgs=$(
+		chroot "$1" dpkg-query \
+			-W --showformat='${Package}	${Version}\n' | sort
+	)
+	local snap_pkgs=$(
+		# shellcheck disable=SC2016
+		chroot "$1" awk -F': *' '
+  $1 ~ /name/    { name = $2 }
+  $1 ~ /channel/ { channel = $2 }
+  $1 ~ /file/    { 
+    split($2, parts, "[._]"); 
+    rev = parts[length(parts)-1]; 
+    print "snap:" name "\t" channel "\t" rev 
+  }
+' /var/lib/snapd/seed/seed.yaml | sort
+	)
+
+	echo -e "$debian_pkgs\n$snap_pkgs"
+}
+
+setup_chroot() {
+	# Mount host directories inside chroot
+	mount --bind /dev "$1/dev"
+	mount --bind /dev/pts "$1/dev/pts"
+	mount -t proc /proc "$1/proc"
+	mount -t sysfs /sys "$1/sys"
+	mount --bind /run "$1/run"
+	mount --rbind /sys/kernel/security "$1/sys/kernel/security" # For snap-preseed
+
+	# Place host resolv.conf for network access
+	rm -f "$1/etc/resolv.conf"
+	cp -L /etc/resolv.conf "$1/etc/resolv.conf"
+}
+
+wrapup_chroot() {
+	# Restore original resolv.conf
+	rm -f "$1/etc/resolv.conf"
+	chroot "$1" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+
+	umount --lazy "$1/sys/kernel/security" --recursive
+	umount --lazy "$1/run"
+	umount --lazy "$1/sys"
+	umount --lazy "$1/proc"
+	umount --lazy "$1/dev/pts"
+	umount --lazy "$1/dev"
+}
+
 export CHROOT_DIR="/workspace/chroot"
 mkdir -p "$CHROOT_DIR"
 debootstrap \
@@ -28,17 +76,7 @@ debootstrap \
 	"$CHROOT_DIR" \
 	http://archive.ubuntu.com/ubuntu
 
-# Mount host directories inside chroot
-mount --bind /dev "$CHROOT_DIR/dev"
-mount --bind /dev/pts "$CHROOT_DIR/dev/pts"
-mount -t proc /proc "$CHROOT_DIR/proc"
-mount -t sysfs /sys "$CHROOT_DIR/sys"
-mount --bind /run "$CHROOT_DIR/run"
-mount --rbind /sys/kernel/security "$CHROOT_DIR/sys/kernel/security" # For snap-preseed
-
-# Place host resolv.conf for network access
-rm -f "$CHROOT_DIR/etc/resolv.conf"
-cp -L /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
+setup_chroot "$CHROOT_DIR"
 
 #^ Copy setup script to chroot, run it, and then remove it
 cp /workspace/dist/${SH_NAME} "$CHROOT_DIR/opt/"
@@ -51,78 +89,113 @@ mkdir -p "$CHROOT_DIR/var/lib/snapd/seed/"
 cp -r /workspace/tooling/seed/* "$CHROOT_DIR/var/lib/snapd/seed/"
 
 /usr/lib/snapd/snap-preseed "$CHROOT_DIR"
-chroot "$CHROOT_DIR" /bin/bash -xlc "export CASPER_GENERATE_UUID=1
-export LAYERFS_PATH=filesystem.squashfs
-update-initramfs -c -k all" #! This is redundant with 006_systemd.sh, should potentially be improved; snap preseeding should add files to /etc/.
+chroot "$CHROOT_DIR" /bin/bash -xlc "dracut --force" # Update InitRAMFS since Snap seeding adds files to /etc/
 tree "$CHROOT_DIR/var/lib/snapd/"
+
+wrapup_chroot "$CHROOT_DIR"
+
+#^ Live Layer
+
+MERGED_CHROOT_DIR="/workspace/merged"
+mkdir -p /workspace/live-upper /workspace/live-work "$MERGED_CHROOT_DIR"
+mount -t overlay overlay \
+    -o lowerdir="$CHROOT_DIR",upperdir=/workspace/live-upper,workdir=/workspace/live-work \
+    "$MERGED_CHROOT_DIR"
+
+setup_chroot "$MERGED_CHROOT_DIR"
+
+# InitRAMFS changes
+chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y casper
+apt-get install -y cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools
+# ~c matches all removed packages with remaining configuration files
+apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but isn't cleaned up, so we do that instead of manually removing it.
+
+# This structure is deducted from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
+#	uses these configurations.
+export CASPER_GENERATE_UUID=1
+export LAYERFS_PATH=filesystem.squashfs
+mkdir -p \"etc/initramfs-tools/conf.d\"
+cat > etc/initramfs-tools/conf.d/casperize.conf <<EOF
+export CASPER_GENERATE_UUID=1
+EOF
+cat <<EOF > /etc/initramfs-tools/conf.d/default-layer.conf
+LAYERFS_PATH=filesystem.squashfs
+EOF
+update-initramfs -c -k all"
+
+# Additional packages
+chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y \
+adcli \
+btrfs-progs \
+cifs-utils \
+dmeventd \
+efibootmgr \
+finalrd \
+gawk \
+gparted \
+grub-efi-amd64-bin \
+grub-efi-amd64-signed \
+grub-efi-amd64-unsigned \
+gtk-im-libthai \
+ibus-hangul \
+ibus-mozc \
+ibus-unikey \
+jfsutils \
+keyutils \
+localechooser-data \
+lvm2 \
+mdadm \
+realmd \
+shim-signed \
+thin-provisioning-tools \
+user-setup \
+xfsprogs \
+zfs-zed
+
+apt-get autoremove -y --purge
+apt-get clean"
 
 # Kernel and INITRD
 
 export ISO_DIR="/workspace/custom-iso"
 mkdir -p "$ISO_DIR/casper"
-VMLINUZ=$(ls -1 "$CHROOT_DIR/boot/vmlinuz-"* | tail -n 1)
-INITRD=$(ls -1 "$CHROOT_DIR/boot/initrd.img-"* | tail -n 1)
+VMLINUZ=$(ls -1 "$MERGED_CHROOT_DIR/boot/vmlinuz-"* | tail -n 1)
+INITRD=$(ls -1 "$MERGED_CHROOT_DIR/boot/initrd.img-"* | tail -n 1)
 cp "$VMLINUZ" "$ISO_DIR/casper/vmlinuz"
 cp "$INITRD" "$ISO_DIR/casper/initrd"
 
-# Remove casper from inside the chroot after copying the casper-enabled initrd out of it and restore dracut
-chroot "$CHROOT_DIR" /bin/bash -xlc "export DEBIAN_FRONTEND=noninteractive \
-&& apt-get purge -y casper cryptsetup cryptsetup-bin cryptsetup-initramfs \
-&& apt-get install -y dracut \
-&& apt-get purge -y initramfs-tools \
-&& rm -rf etc/initramfs-tools/conf.d \
-&& apt-get autoremove -y --purge \
-&& apt-get clean \
-&& dracut --force"
-
-# Restore original resolv.conf
-rm -f "$CHROOT_DIR/etc/resolv.conf"
-chroot "$CHROOT_DIR" /bin/bash -xlc "ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
-
-umount --lazy "$CHROOT_DIR/sys/kernel/security" --recursive
-umount --lazy "$CHROOT_DIR/run"
-umount --lazy "$CHROOT_DIR/sys"
-umount --lazy "$CHROOT_DIR/proc"
-umount --lazy "$CHROOT_DIR/dev/pts"
-umount --lazy "$CHROOT_DIR/dev"
+wrapup_chroot "$MERGED_CHROOT_DIR"
 
 # Make squashfs
 
 mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend -e boot
-NO_LANGS_DIR="/workspace/no-langs"
-mkdir -p "$NO_LANGS_DIR"
-mksquashfs "$NO_LANGS_DIR" "$ISO_DIR/casper/filesystem.no-languages.squashfs" -comp xz -noappend -e boot # Just for subiquity
+mksquashfs "/workspace/live-upper" "$ISO_DIR/casper/filesystem.live.squashfs" -comp xz -noappend -e boot
 
 # Casper metadata
 
 FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
 printf '%s' "$FILESYSTEM_SIZE" \
 	> "$ISO_DIR/casper/filesystem.size"
-NO_LANG_FILESYSTEM_SIZE=$(du -sx --block-size=1 "$NO_LANGS_DIR" | cut -f1)
-printf '%s' "$NO_LANG_FILESYSTEM_SIZE" \
-	> "$ISO_DIR/casper/filesystem.no-languages.size"
-rm -rf "$NO_LANGS_DIR"
+LIVE_FILESYSTEM_SIZE=$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)
+printf '%s' "$LIVE_FILESYSTEM_SIZE" \
+	> "$ISO_DIR/casper/filesystem.live.size"
+
+generate_chroot_manifest_full "$CHROOT_DIR" \
+	> "$ISO_DIR/casper/filesystem.manifest.full"
+generate_chroot_manifest_full "$MERGED_CHROOT_DIR" \
+	> "$ISO_DIR/casper/filesystem.live.manifest.full"
 
 chroot "$CHROOT_DIR" echo \
 "--- /build/config/iso-dir/iso-root/casper/.manifest.full	1970-01-01 00:00:00.000000000 +0000
 +++ /build/config/iso-dir/iso-root/casper/filesystem.manifest.full	1970-01-01 00:00:00.000000000 +0000
 " > "$ISO_DIR/casper/filesystem.manifest"
 
-chroot "$CHROOT_DIR" dpkg-query \
-	-W --showformat='+${Package}	${Version}\n' | sort \
+# Prepend a + to each line
+sed 's/^/+/' "$ISO_DIR/casper/filesystem.manifest.full" \
 	>> "$ISO_DIR/casper/filesystem.manifest"
 
-chroot "$CHROOT_DIR" dpkg-query \
-	-W --showformat='${Package}	${Version}\n' | sort \
-	> "$ISO_DIR/casper/filesystem.manifest.full"
-chroot "$CHROOT_DIR" dpkg-query \
-	-W --showformat='${Package}	${Version}\n' | sort \
-	> "$ISO_DIR/casper/filesystem.no-languages.manifest.full"
-
-chroot "$CHROOT_DIR" echo \
-"--- /build/config/iso-dir/iso-root/casper/filesystem.manifest.full	$(stat -c '%w' "$ISO_DIR/casper/filesystem.manifest.full" || echo '1970-01-01 00:00:00.000000000 +0000')
-+++ /build/config/iso-dir/iso-root/casper/filesystem.no-languages.manifest.full	$(date +"%F %T.%N %z" || echo '1970-01-01 00:00:00.000000000 +0000')
-" > "$ISO_DIR/casper/filesystem.no-languages.manifest"
+diff -u "$ISO_DIR/casper/filesystem.manifest.full" "$ISO_DIR/casper/filesystem.live.manifest.full" | grep -v "^@@" \
+	> "$ISO_DIR/casper/filesystem.live.manifest" || true
 
 echo "kernel:
   default: linux-generic-hwe-24.04
@@ -135,10 +208,8 @@ sources:
   name:
     en: Standard
   path: filesystem.squashfs
-  preinstalled_langs:
-  - ''
   size: $FILESYSTEM_SIZE
-  type: fsimage
+  type: fsimage-layered
   variant: desktop
   variations:
     standard:
