@@ -15,6 +15,9 @@ apt-get purge -y transmission-gtk transmission-common \
 
 #! Actually not an accessibility risk much! Only some languages are there, which means that the system somehow would've done something else if I chose Arabic, for example.
 #!	So it seems like the installer somehow does something else depending on the language chosen for the installation.
+#!
+#! NOTE: Ubuntu preinstalls certain languages based on their user base; I already mentioned in the project documentation that we could potentially do something cleverer;
+#!	however, should font and ibus packages be removed after all? They aren't language packs...
 apt-get purge -y fonts-arphic-ukai \
 				fonts-arphic-uming \
 				gnome-user-docs-de \

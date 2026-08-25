@@ -127,7 +127,6 @@ if [ "$ENV_MODE" == "ISO" ]; then
 	snapd \
 	sssd \
 	ubuntu-desktop-minimal \
-	ubuntu-restricted-extras \
 	ubuntu-standard \
 	wget \
 	xorriso
