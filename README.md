@@ -37,7 +37,7 @@ Ubuntu derivative with Quality-of-Life and Aesthetic Improvements
 - This project has already modified enough that Ubuntu upgrades may not go smoothly. Even I am not willing to risk that on my own system; this shall change before the final release with a custom upgrade solution.
 - This project uninstalls crucial packages from the Extended Selection, so do not run the bash script on an Ubuntu extended installation.
 - Since this project mainly targets ISOs, the bash scripts are not [idempotent](https://en.wikipedia.org/wiki/Idempotence) and modify **both** system and user defaults, so creating a new user after running this project does not undo any changes.
-- This project is ***not*** endorsed or supported by Canonical, Ubuntu, or any other Linux distribution. It is a personal project somewhere between base Ubuntu and a custom Ubuntu derivative.
+- This project is ***not*** endorsed or supported by Canonical, Ubuntu, or any other Linux distribution. It is a personal project for an Ubuntu derivative.
 - I am the only maintainer of this project. If you have any suggestions, please open an issue on the [Issues](https://github.com/Proman4713/Utile-OS/issues) page, but don't expect much from me. This is largely a hobby project for me to learn more about Linux, while exploring UX improvements for the desktop experience. Technical information for contributors is in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - By using this project, you agree to the **[Microsoft Core Fonts EULA](https://corefonts.sourceforge.net/eula.htm)** because it is automatically accepted during the installation of LibreOffice on your system or onto the ISO.
 

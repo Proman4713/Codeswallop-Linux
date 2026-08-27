@@ -109,22 +109,25 @@ Now that that's covered, for the ISO structure, we have some explaining to do&he
 #### ISO packing
 It may surprise you, if you've never worked on similar things before, that a standard Ubuntu or Linux Mint ISO is only a bare-bones bootable device for your device's firmware. It contains no actual root filesystem&hellip; *That* resides inside the `casper/` directory as a compressed file with the `.squashfs` extension, usually written [SquashFS](https://en.wikipedia.org/wiki/SquashFS) (short for *Squashed Filesystem*), which contains the actual [root filesystem](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03.html) that gives you the live USB environment. That SquashFS is [created](https://manpages.ubuntu.com/manpages/resolute/man1/mksquashfs.1.html) for [`casper`](https://manpages.ubuntu.com/manpages/resolute/man7/casper.7.html) (the name of the folder) to extract into RAM and mount as the root filesystem.
 
-*Casper* is an [InitRAMFS](https://wiki.archlinux.org/title/Arch_boot_process#initramfs) hook (more on how that happens later) made by Canonical for Ubuntu ISOs. It is therefore used by Utile OS and Linux Mint, which we can call 'sibling distributions' in relation to Ubuntu Desktop. In Ubuntu ISOs, the `casper/` directory contains *multiple* .squashfs files with different names, because Ubuntu uses a more complicated *layered filesystem* layout than Utile OS and Linux Mint's single `filesystem.squashfs` files.
+*Casper* is an [InitRAMFS](https://wiki.archlinux.org/title/Arch_boot_process#initramfs) hook (more on how that happens later) made by Canonical for Ubuntu ISOs. It is therefore used by Utile OS and Linux Mint, which we can call 'sibling distributions' in relation to Ubuntu Desktop. In Ubuntu ISOs, the `casper/` directory contains *multiple* .squashfs files with different names, because Ubuntu uses a more complicated *layered filesystem* layout than Linux Mint's single `filesystem.squashfs` file.
+
+Linux Mint uses Ubuntu's previous installer, Ubiquity. But since Utile OS currently uses the Flutter-based, Snap-packaged Ubuntu Desktop Bootstrap installer, it's more practical for us also to use layered filesystems. However, unlike Ubuntu, we only use two layers: `filesystem.squashfs` and `filesystem.live.squashfs`. `filesystem` is what I've just described; it's the actual root filesystem that runs on the Live ISO and serves as the starter template for your actual installed system. `filesystem.live` is a squashed [*`OverlayFS`*](https://en.wikipedia.org/wiki/OverlayFS) that only contains *modifications* to `filesystem` specific to the Live USB (e.g., adding the installer and the package `user-setup` which is needed for the live environment to have a properly configured user). Casper overlays `filesystem.live` over `filesystem` before booting the Live environment, but the Ubuntu installer is clever enough to only copy `filesystem` when installing your system.
 
 The `casper/` directory contains a few other files:
-* `filesystem.manifest`
-* `filesystem.size`
-* `filesystem.manifest-remove` (soon to exist in Utile OS)
+* `filesystem.manifest` (and `filesystem.live.manifest`)
+* `filesystem.size` (and `filesystem.live.size`)
+* `filesystem.manifest-remove` (not in Utile OS)
 * `vmlinuz`
 * `initrd`
 * `install-sources.yaml`
 
-`filesystem.manifest` contains a sorted `dpkg-query` of all the packages installed on the squashfs; there is no clear documentation on what `casper` uses it for, but Ubuntu ISOs also list the installed *snap* packages at the end of their `.manifest` files. It could rather be used by the installer, where Linux Mint uses Ubiquity (Ubuntu's old installer), and Utile OS currently uses Ubuntu Desktop Bootstrap (Ubuntu's more modern, Flutter-based installer). `filesystem.manifest.full` also exists, it is used by Ubuntu's ISOs for multiple `.manifest`s, it's pointless for our purposes but is still there [for reasons you'll see later](#docker).
+`filesystem.manifest` contains a sorted `dpkg-query` of all the packages installed on each squashfs, and it happens to be in a `diff -U 0` format. There is no clear documentation on what `casper` uses it for, but Ubuntu and Utile OS ISOs also list the installed *Snap* packages at the end of their `.manifest` files. It could rather be used by Ubuntu's installers on Mint and Utile OS. `filesystem.manifest.full` also exists, it is used by Ubuntu ISOs with multiple `.manifest`s, such as Utile OS's two layers.
+##### Note: Each `.manifest` file is a `diff -U 0` between two `.manifest.full` files. For `filesystem` (as well as `minimal` on Ubuntu ISOs), the diff seems to be comparing between an empty `.manifest.full` file and `filesystem.manifest.full` in the ISO build directory with the `dpkg-query` output (+ the list of Snaps). Since that diff seems to be manufactured due to its date being the [1970 Unix Epoch](https://en.wikipedia.org/wiki/Unix_time), Utile OS simply appends a `+` before each line of `filesystem.manifest.full` and adds a fake diff header. For an overlay layer like `filesystem.live`, `filesystem.live.manifest` is a valid diff between `filesystem.manifest.full` and `filesystem.live.manifest.full`.
 
 *filesystem.size* contains the size (in bytes) of the target system root before it is compressed into SquashFS. Or, at least, that's what it appears to be from Ubuntu, Mint, and Utile's ISOs.
 ##### Note: Previously, Utile OS was 'built' by downloading an Ubuntu 26.04 ISO and modifying it; during that time, a new `.squashfs` was generated, and the build script calculated its size in bytes for the `.size` file. The system installed successfully, and that `.size` value didn't cause any issues. I speculate that *this file is used for the Ubuntu installer to give a 'not enough disk space' warning when the user's disk doesn't have enough space*
 
-`filesystem.manifest-remove` has never been tested for Utile OS because, as I mentioned, I haven't added it to our ISOs yet.
+`filesystem.manifest-remove` contains a list of packages to remove from the target system. It's only in Linux Mint in comparison with Ubuntu & Utile OS; their installer uses it. The `filesystem.live` layer serves the same purpose for Utile OS by never installing them on the target in the first place.
 
 `vmlinuz` and `initrd` are the most complicated. In essence, they are just a compressed image of the Linux kernel and an InitRAMFS, respectively. What's complicated, though, is how they *end up* in the ISO's `casper/` directory when *no functional Linux system exists there.* We'll talk about that in [the build process](#the-build-process).
 
@@ -141,10 +144,8 @@ sources:
   name:
     en: Standard
   path: filesystem.squashfs
-  preinstalled_langs:
-  - ''
   size: $FILESYSTEM_SIZE
-  type: fsimage
+  type: fsimage-layered
   variant: desktop
   variations:
     standard:
@@ -155,13 +156,15 @@ version: 2
 ```
 `$FILESYSTEM_SIZE` refers to the value in `filesystem.size`. The `stat` command returns the size of the `.squashfs` file in bytes. As the link above mentions, without this file, the Ubuntu installer would believe that it's installing an Ubuntu Server instance (*why*, you may ask, when it is clearly a desktop GUI installer? The answer is: Ubuntu Desktop Bootstrap uses Subiquity, the same installer backend Ubuntu Server uses, and only surfaces it through a GUI). So I added this file to make the installer show 'Standard Selection' instead, even though Utile OS only offers one selection of apps, but we currently have no control over our installation process, and that should change.
 
+We omitted the `preinstalled_langs` array from this file since it would require creating new `.squashfs` files, even if they're empty, and related metadata just to satisfy Subiquity. Even an empty string as the only element would require a `filesystem.no-languages` variant
+
 #### ISO- or system-level configurations
 Regarding those configurations, such as the GRUB config for the ISO or Debian repository keyrings for the system, everything is pretty straightforward: I hardcode them, and that's the only way to do it.
 
 Let's look at the `/etc/apt/preferences.d/official-package-repositories.pref` file in Utile OS; it wasn't always called that, but I changed the name to match Linux Mint's just because the previous `utile.pref` seemed a bit off:
 ```yaml
 Package: *
-Pin: release o="Utile OS",c=upstream
+Pin: release o=Utile OS,c=upstream
 Pin-Priority: 700
 ```
 Although this isn't important to our current topic, this file pins all Utile APT packages from the `upstream` component with a priority of `700` because these packages will conflict with Ubuntu/Debian upstreams; therefore, we need a way to tell APT to choose ours.\
@@ -224,24 +227,27 @@ You can run this program after you've created a basic system root filesystem (e.
 
 There is a good working example of most of these concepts in [`preseed-snaps.js`](./src/preseed-snaps.js).
 
+##### Note: You can only run `snap-preseed` *once* in a single `chroot`; the `snap-preseed` command has a `--reset` argument that you could use after modifying your Snap seed. You also need to run `snap-preseed` again after that.
+
 ### The Build Process
 Everything we've talked about so far culminates in this: how do we build an Ubuntu-based distribution such as Utile OS, why do some things but not others? This section covers the build process for Utile OS 26 AMD64. Utile OS's build process isn't expected to be perfect or foolproof, since it's still very much a work in progress&hellip;
 
 ---
 
 #### GitHub Actions
-The first thing that happens when I type 'git push' (or 'Sync Changes' through VSCode) is that GitHub Actions is triggered.\
+The first thing that happens when I type push a commit to this repository is that GitHub Actions is triggered.\
 The workflow in [`build-amd64.yml`](./.github/workflows/build-amd64.yml) prepares the environment; it:
 * installs the necessary [pnpm packages](package.json) and the [Snapcraft Snap](https://snapcraft.io/snapcraft) to log in with Utile OS's Snapcraft brand.
 * imports the appropriate GnuPG keys for signing Snap models. This is currently unused but was used briefly.
 * runs [`preseed-snaps.js`](./src/preseed-snaps.js) to preseed the required Snaps into `tooling/seed`, which is used as `/var/lib/snapd/seed` inside the `chroot`.
-* debugs the seed using `validate-seed`.
+	* A separate, incomplete `tooling/seed-live` seed is also created for the live overlay filesystem and only contains Ubuntu Desktop Bootstrap
+* debugs the main seed using `validate-seed`.
 * runs [`compile.js`](./src/compile.js) to create **the build script** and extracts the appropriate names from the filename printed by the script.
-* runs [`inject-disk-release.js`](./src/inject-disk-release.js) to create the contents of the `.disk/` directory on the ISO in the overlay directory, which is copied into the ISO during the build.
+* runs [`inject-disk-release.js`](./src/inject-disk-release.js) to create the contents of the `.disk/` directory on the ISO in the overlay directory (`tooling/iso_overlay/`), which is copied into the ISO during the build.
 * adds `boot/grub/grub.cfg` to the same overlay directory.
 * runs an **Ubuntu 26.04 Docker container** with unconfined AppArmor state and a mount to the GitHub runner's `/sys/kernel/security` for `snap-preseed`. This container is used because the latest GitHub Ubuntu runner doesn't always match the version Utile OS requires. It is given multiple environment variables and the `/workspace` directory to access the repository, then runs [**`isobuild.sh`**](./tooling/isobuild.sh).
 * uploads the aforementioned **build script,** as well as **`isobuild.sh`,** to [GitHub Releases](https://github.com/Proman4713/Utile-OS/releases).
-* uploads the ISO and its SHA-256 sum to GoFile. This is a temporary measure while we have no access to dedicated hosts.
+* uploads the ISO, its SHA-256 sum, and its signature to GoFile. GoFile is temporary while we have no access to dedicated hosts.
 
 #### Docker
 Now, inside that **Docker container,** a *lot* happens before the rest of the workflow proceeds. This is what **`isobuild.sh`** does:
@@ -250,24 +256,26 @@ Now, inside that **Docker container,** a *lot* happens before the rest of the wo
 	* There are no `--include`s in the `debootstrap` command, and we install Ubuntu Desktop base packages manually in the [`chroot`](#chroot), because `debootstrap` ignores recommends expected on an Ubuntu system.
 * mounts the required virtual filesystems to the Ubuntu chroot and configures network access.
 * runs **the build script** inside the chroot.
-	* This script ends by replacing Ubuntu 26.04's default `dracut` InitRAMFS generator with the older `initramfs-tools`, installing `casper` (which requires `initramfs-tools`), configuring it, and generating the InitRAMFS. This pays off in a moment.
-* copies from `/workspace/tooling/seed` into `/var/lib/snapd/seed`, runs `/usr/lib/snap-preseed`, then regenerates the InitRAMFS (with casper) for `snapd`'s hooks.
-* creates a new empty working directory for the ISO image's contents.
-* copies `vmlinuz-*` and `initrd.img-*` *out* of the chroot's `/boot/` and into the ISO's `casper/` directory as `vmlinuz` and `initrd`.
-* (NEEDS REWRITING) uninstalls `casper` and `initramfs-tools`, along with its companion packages, from the chroot, then restores `dracut` and regenerates a new InitRAMFS *inside* the chroot after moving the old one onto the ISO.
-	* Yep, it's an elegant move. I initially highly doubted the idea would work, but I later found that the `livecd-rootfs` package did pretty much what I was thinking, and learnt more about casper from that source code.
+* copies from `/workspace/tooling/seed` into `/var/lib/snapd/seed`, runs `/usr/lib/snapd/snap-preseed`, then regenerates the InitRAMFS for `snapd`'s hooks.
 * undoes network access configuration and unmounts virtual filesystems from the chroot.
-* compresses the chroot directory to `casper/filesystem.squashfs` in the ISO working directory.
-* makes a new empty directory and compresses it to `casper/filesystem.no-languages.squashfs`
-	* This is necessary for Subiquity, which we already talked about. It tries to access this `squashfs` when our `preinstalled_langs` array in `install-sources.yaml` contains an empty string.
-* calculates the contents of `filesystem.size` and `filesystem.no-languages.size` as previously explained.
-* runs `dpkg-query` for `filesystem.manifest`, `filesystem.manifest.full`, `filesystem.no-languages.manifest`, and `filesystem.no-languages.manifest.full`.
-	* This is largely pointless and can be avoided if `preinstalled_langs` can perhaps be an empty array.
+* creates a new empty directory for the live OverlayFS and an OverlayFS working directory, then overlay-mounts them over the base chroot in a merged chroot directory
+* sets it up like the base one
+* replaces Ubuntu 26.04's `dracut` InitRAMFS generator with the older `initramfs-tools` and installs `casper` (which requires `initramfs-tools`) into the merged chroot, then configures `casper` and regenerates the InitRAMFS
+	* `casper` is configured by setting `CASPER_GENERATE_UUID=1` (more on that in a moment) and `LAYERFS_PATH=filesystem.live.squashfs` in a few spots before regenerating the InitRAMFS with `initramfs-tools`. Although the base filesystem is `filesystem.squashfs`, and we specified `fsimage-layered` in `install-sources.yaml` (which could seem to imply that `casper` will know that other layers exist) rather than `fsimage`, these two things are unrelated. `install-sources.yaml` is used by Ubuntu's installation tech stack, while casper receives the topmost layer through that variable and strips away the second-to-last extension (`.live` in this case) and marks them for mounting until only two remain. In our case, this is only done once until we reach `filesystem.squashfs`.
+* installs other live system–only packages into the merged chroot
+* copies from `/workspace/tooling/seed-live` into `/var/lib/snapd/seed`, runs `/usr/lib/snapd/snap-preseed` once with `--reset` and another without, then regenerates the InitRAMFS (with casper)
+* creates a new empty working directory for the ISO image's contents.
+* copies `vmlinuz-*` and `initrd.img-*` *out* of the *merged* chroot's `/boot/` and into the ISO's `casper/` directory as `vmlinuz` and `initrd`.
+* wraps up the merged chroot, leaving `casper` and `initramfs-tools`, along with the other live environment packages and the installer Snap, out of the base chroot that's installed on target systems and only in the overlay directory.
+	* Yep, it's an elegant move. I initially highly doubted the idea would work, but I later found that the `livecd-rootfs` package did pretty much what I was thinking, and learnt more about casper from that source code, but I still continued to only use one SquashFS layer to implement this (by installing the required casper packages inside the chroot, moving `vmlinuz` and `initrd` out of it, then going back inside the chroot to remove them), which wasn't ideal (for example, since casper was only in the `initrd` on the ISO and didn't exist in the live environment, several checks couldn't run and the `Please remove the installation medium, then press ENTER:` prompt wouldn't show upon restarting or shutting down), until late August 2026.
+* compresses the base chroot directory to `casper/filesystem.squashfs` in the ISO working directory, and the overlay directory to `casper/filesystem.live.squashfs`.
+* calculates the contents of `filesystem.size` and `filesystem.live.size` as previously explained.
+* runs `dpkg-query` and parses `/var/lib/snapd/seed/seed.yaml` for `filesystem.manifest`, `filesystem.manifest.full`, `filesystem.live.manifest`, and `filesystem.live.manifest.full`.
 * writes `install-sources.yaml` to `casper/`.
 * overlays `/workspace/tooling/iso_overlay/` onto the ISO working directory.
 * adds `.disk/base_installable` and `.disk/cd_type` to the ISO workdir to match Ubuntu ISOs.
 * extracts `casper/initrd` to get the value for `.disk/casper-uuid-generic` from `*/conf/uuid.conf` inside the InitRAMFS.
-	* I believe the `export CASPER_GENERATE_UUID=1` line when generating the casper InitRAMFS is what creates this file. I recall that this fixed some boot issues. I found this file while diffing between both Utile OS and Ubuntu's `casper/initrd`s since theirs was multitudes larger than mine at one point.
+	* I believe the `export CASPER_GENERATE_UUID=1` line when generating the casper InitRAMFS is what creates this file. I recall that this fixed some boot issues. I found this file while diffing between both Utile OS and Ubuntu's `casper/initrd`s since theirs was multitudes larger than mine at that point.
 * downloads the `shim-signed`, `grub-efi-amd64-signed`, `grub-pc-bin`, `grub-efi-amd64-bin` and `grub2-common` packages and extracts them to a common directory to simulate where the files would be on a real system.
 * copies Canonical's official, signed GRUB images and accompanying files from the common directory into the ISO workdir's `/boot/` and `/EFI/` directories for BIOS and UEFI.
 	* Before I found out about `livecd-rootfs`, GRUB had some issues and didn't work with Secure Boot. So I decided to try to use Canonical's signed images, hoping they'd work with Secure Boot and include certain built-in configurations to help me avoid doing things manually. I spent a few hours comparing relevant packages to the files on an Ubuntu ISO; I eventually realised I was comparing 24.04 packages with a 26.04 ISO. After downloading the right `.deb`s from MIT's Ubuntu archive mirror, I got a fair idea of what should go where, and `livecd-rootfs` confirmed it when I found out about it soon after.
@@ -290,7 +298,7 @@ The only process that runs inside the chroot, besides the individual commands de
 	* This is also mainly for running systems, though some apps come with base packages.
 * removes peculiarly pre-included language packs, which are apparently determined based on Ubuntu's user base&hellip;
 	* With Windows, you choose the language before downloading an ISO or while using the Media Creation Tool, which isn't very practical on Ubuntu given the ISO structure I just explained.\
-	Still, I *think* we could do something creative with Utile OS (once we have our own installation workflow) and have a different gzipped (or xzipped) archive of language pack `.deb`s based on the language chosen while downloading an ISO and a way for the installer to know which language it is, or create a small Debian repository on the ISO like Ubuntu ISOs, and install the `.deb`s before running the installer.
+	Still, I *think* we could do something creative with Utile OS (once we have our own installation workflow) and have a different gzipped (or xzipped) archive of language pack `.deb`s based on the language chosen while downloading an ISO and a way for the installer to know which language it is, or create a small Debian repository on the ISO like Ubuntu ISOs, and install the `.deb`s before running the installer (which again, needs us to know which packages are there, somehow).
 * installs additional GNOME apps, browsers, office tools, system utilities, codecs and proprietary software.
 * configures Utile OS's Debian repository keyrings and sources, then installs [Utile OS-specific packages](https://github.com/Proman4713/Utile-OS-debian).
 * configures systemd units.
