@@ -65,7 +65,7 @@ wrapup_chroot() {
 	umount --lazy "$1/dev"
 }
 
-# This structure is deducted from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
+# This structure is deduced from livecd-rootfs's source code, but no sufficient documentation is provided on how casper
 #	uses these configurations.
 initramfstools_casper_gen="export CASPER_GENERATE_UUID=1
 export LAYERFS_PATH=filesystem.live.squashfs
@@ -110,9 +110,10 @@ wrapup_chroot "$CHROOT_DIR"
 #^ Live Layer
 
 MERGED_CHROOT_DIR="/workspace/merged"
-mkdir -p /workspace/live-upper /workspace/live-work "$MERGED_CHROOT_DIR"
+LIVE_OVERLAY_DIR="/workspace/live-upper"
+mkdir -p "$LIVE_OVERLAY_DIR" /workspace/live-work "$MERGED_CHROOT_DIR"
 mount -t overlay overlay \
-	-o lowerdir="$CHROOT_DIR",upperdir=/workspace/live-upper,workdir=/workspace/live-work \
+	-o lowerdir="$CHROOT_DIR",upperdir="$LIVE_OVERLAY_DIR",workdir=/workspace/live-work \
 	"$MERGED_CHROOT_DIR"
 
 setup_chroot "$MERGED_CHROOT_DIR"
@@ -125,7 +126,8 @@ apt-get autoremove -y --purge && apt-get purge -y '~c' # dracut is removed but i
 
 $initramfstools_casper_gen"
 
-# Additional packages
+# Additional packages (https://static-reports.ubuntu.com/seeds/ubuntu.resolute/live contains some, but not all, of these, so our reference is
+#	`casper/minimal.standard.live.manifest` on official ISOs)
 chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y \
 adcli \
 btrfs-progs \
@@ -167,7 +169,7 @@ tree "$MERGED_CHROOT_DIR/var/lib/snapd/"
 
 # Kernel and INITRD
 
-export ISO_DIR="/workspace/custom-iso"
+export ISO_DIR="/workspace/utile-iso"
 mkdir -p "$ISO_DIR/casper"
 VMLINUZ=$(ls -1 "$MERGED_CHROOT_DIR/boot/vmlinuz-"* | tail -n 1)
 INITRD=$(ls -1 "$MERGED_CHROOT_DIR/boot/initrd.img-"* | tail -n 1)
@@ -179,7 +181,7 @@ wrapup_chroot "$MERGED_CHROOT_DIR"
 # Make squashfs
 
 mksquashfs "$CHROOT_DIR" "$ISO_DIR/casper/filesystem.squashfs" -comp xz -noappend
-mksquashfs "/workspace/live-upper" "$ISO_DIR/casper/filesystem.live.squashfs" -comp xz -noappend
+mksquashfs "$LIVE_OVERLAY_DIR" "$ISO_DIR/casper/filesystem.live.squashfs" -comp xz -noappend
 
 # Casper metadata
 
@@ -196,8 +198,8 @@ generate_chroot_manifest_full "$MERGED_CHROOT_DIR" \
 	> "$ISO_DIR/casper/filesystem.live.manifest.full"
 
 chroot "$CHROOT_DIR" echo \
-"--- /build/config/iso-dir/iso-root/casper/.manifest.full	1970-01-01 00:00:00.000000000 +0000
-+++ /build/config/iso-dir/iso-root/casper/filesystem.manifest.full	1970-01-01 00:00:00.000000000 +0000
+"--- $ISO_DIR/casper/.manifest.full	1970-01-01 00:00:00.000000000 +0000
++++ $ISO_DIR/casper/filesystem.manifest.full	1970-01-01 00:00:00.000000000 +0000
 " > "$ISO_DIR/casper/filesystem.manifest"
 
 # Prepend a + to each line

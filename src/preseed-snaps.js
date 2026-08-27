@@ -190,7 +190,7 @@ async function main(isLiveLayer=false) {
 
 	for (const snapQuery of SNAPS) {
 		const [snapName, snapOptions, snapChannel] = snapQuery.split('?');
-		if (!isLiveLayer && snapName === 'ubuntu-desktop-bootstrap') continue;
+		if (!isLiveLayer && ['ubuntu-desktop-bootstrap'].includes(snapName)) continue;
 
 		console.log(`\nProcessing: ${snapName}...`);
 		try {
