@@ -235,7 +235,7 @@ Everything we've talked about so far culminates in this: how do we build an Ubun
 ---
 
 #### GitHub Actions
-The first thing that happens when I type push a commit to this repository is that GitHub Actions is triggered.\
+The first thing that happens when I push a commit to this repository is that GitHub Actions is triggered.\
 The workflow in [`build-amd64.yml`](./.github/workflows/build-amd64.yml) prepares the environment; it:
 * installs the necessary [pnpm packages](package.json) and the [Snapcraft Snap](https://snapcraft.io/snapcraft) to log in with Utile OS's Snapcraft brand.
 * imports the appropriate GnuPG keys for signing Snap models. This is currently unused but was used briefly.
