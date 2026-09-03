@@ -104,4 +104,4 @@ This project serves as a container for everything that I dare to try to address 
 
 ## Rights & Licensing
 - This project is licensed under the well-known GPL v3, which covers all the code and shell scripts written here. The license is available inside [`LICENSE.md`](LICENSE.md).
-- Media files available in [`resources/`](resources/) are licensed under Creative Commons, which covers images, designs, audio, video, and anything else in that folder as long as it includes the same Creative Commons license. The license is available at [`resources/LICENSE.md`](resources/LICENSE.md).
+- Media files available in [`resources/`](resources/) are licensed under Creative Commons Attribution-NonCommercial-NoDerivatives 4.0, which covers images, designs, audio, video, and anything else in that folder as long as it includes the same Creative Commons license. The license is available at [`resources/LICENSE.md`](resources/LICENSE.md).
