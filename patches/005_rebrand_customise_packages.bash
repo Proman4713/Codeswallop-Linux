@@ -42,6 +42,7 @@ EOF
 	#! NOTE: According to https://github.com/canonical/subiquity/blob/main/subiquity/common/os.py#L110-L112, which I inspected for our Calamares ubuntu-drivers module,
 	#!	/etc/lsb-release *has been removed* from Ubuntu 26.10 (Stonking), this means we will eventually need to adapt...
 	# Release Info and logos
+	apt-cache policy base-files
 	if ! apt-get install --only-upgrade -y base-files; then
 		echo "Error: Failed to upgrade base-files package" >&2
 		exit 1
