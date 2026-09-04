@@ -42,8 +42,8 @@ EOF
 	#! NOTE: According to https://github.com/canonical/subiquity/blob/main/subiquity/common/os.py#L110-L112, which I inspected for our Calamares ubuntu-drivers module,
 	#!	/etc/lsb-release *has been removed* from Ubuntu 26.10 (Stonking), this means we will eventually need to adapt...
 	# Release Info and logos
-	apt-cache policy base-files
-	if ! apt-get install --only-upgrade -y base-files; then
+	# We specify the suite so that APT accepts the downgrade, since Ubuntu's built-in `base-files` by `debootstrap` will be a newer version most of the time.
+	if ! apt-get install --allow-downgrades -y base-files/abstract; then
 		echo "Error: Failed to upgrade base-files package" >&2
 		exit 1
 	fi
