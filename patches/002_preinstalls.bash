@@ -3,7 +3,7 @@
 #	Not even Windows 11 comes with things other than Solitaire nowadays...
 apt-get purge -y transmission-gtk transmission-common \
 				shotwell shotwell-common \
-				gnome-mines gnome-sudoku gnome-mahjongg aisleriot gnome-terminal \
+				gnome-mines gnome-sudoku gnome-mahjongg aisleriot gnome-terminal gnome-music \
 				remmina* \
 				simple-scan \
 				usb-creator* \
@@ -68,11 +68,11 @@ install_packages language-pack-en \
 				language-pack-gnome-en \
 				language-pack-gnome-en-base
 
-# TODO: Build Amberol from source since it looks better than gnome music but is sadly only available as Flatpak
 # TODO: Fotema is a gallery app, something that is surprisingly missing from stock Ubuntu, also only available as Flatpak
+# Our default music player is now Utile Music, which is provided by utile-desktop.
 install_packages \
 				gnome-tweaks gnome-shell-extension-manager \
-				gnome-calendar gnome-music showtime gnome-snapshot \
+				gnome-calendar showtime gnome-snapshot \
 				deja-dup
 
 #^ Tools
