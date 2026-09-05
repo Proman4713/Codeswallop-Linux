@@ -118,6 +118,30 @@ mount -t overlay overlay \
 
 setup_chroot "$MERGED_CHROOT_DIR"
 
+# This is a well-known workaround for Chromium browsers showing permission errors:
+#		[6611:6611:0804/130457.772606:FATAL:sandbox/linux/services/credentials.cc:131] Check failed: . : Permission denied (13)
+#		[0804/130458.000648:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+#		[0804/130458.000853:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+#		/usr/bin/brave-browser: line 30: 6611 Trace/breakpoint trap	(core dumped) "$HERE/brave" "$@"
+#
+# For some reason, Brave only worked after installing the system, but not inside the live environment. We previously couldn't do anything about this; however, now
+# that we properly use multi-layered filesystems, we can do the unsecure workaround in the live layer, and keep everything intact for the base system image.
+#
+#? NOTE: After initially thinking of this solution way long ago when it first appeared, I had considered it a bad idea security-wise; however, I did not re-think through
+#? 	it after we switched to multi-layered filesystems, and only now did an LLM (yes, just hang on for a second) re-surface this idea to me.
+#!	BIG HOWEVER, I *did* do my due diligence, and looked through the live layer on an official Ubuntu ISO, only to be surprised that /etc/sysctl.d/20-apparmor.conf DID
+#!	exist there, with one more rule than what I'd originally planned. I decided to therefore just copy that file, since it seems to be a needed workaround for browsers
+#!	in general, not just Chromium (Ubuntu uses Firefox).
+mkdir -p "$MERGED_CHROOT_DIR/etc/sysctl.d"
+cat > "$MERGED_CHROOT_DIR/etc/sysctl.d/20-apparmor.conf" <<'EOF'
+# AppArmor restrictions of unprivileged user namespaces
+
+# Disables AppArmor user namespace restrictions on the live ISO.
+kernel.apparmor_restrict_unprivileged_userns = 0
+kernel.apparmor_restrict_unprivileged_unconfined = 1
+
+EOF
+
 # InitRAMFS changes
 chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y casper
 apt-get install -y cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools

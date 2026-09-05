@@ -260,6 +260,11 @@ Now, inside that **Docker container,** a *lot* happens before the rest of the wo
 * undoes network access configuration and unmounts virtual filesystems from the chroot.
 * creates a new empty directory for the live OverlayFS and an OverlayFS working directory, then overlay-mounts them over the base chroot in a merged chroot directory
 * sets it up like the base one
+* creates a new file onto the merged chroot at `/etc/sysctl.d/20-apparmor.conf` to allow browsers to work without errors in the live environment
+	* It's still unclear to me why Brave and Firefox, Ubuntu's default — or browsers in general — require this additional compromising configuration on the live layer, but magically work properly once the user's system is installed; however, trying to run Brave Browser in the live environment before this was done would result in Apport popping up, and running it from the terminal would show this:
+	```
+	[6611:6611:0804/130457.772606:FATAL:sandbox/linux/services/credentials.cc:131] Check failed: . : Permission denied (13)
+	```
 * replaces Ubuntu 26.04's `dracut` InitRAMFS generator with the older `initramfs-tools` and installs `casper` (which requires `initramfs-tools`) into the merged chroot, then configures `casper` and regenerates the InitRAMFS
 	* `casper` is configured by setting `CASPER_GENERATE_UUID=1` (more on that in a moment) and `LAYERFS_PATH=filesystem.live.squashfs` in a few spots before regenerating the InitRAMFS with `initramfs-tools`. Although the base filesystem is `filesystem.squashfs`, and we specified `fsimage-layered` in `install-sources.yaml` (which could seem to imply that `casper` will know that other layers exist) rather than `fsimage`, these two things are unrelated. `install-sources.yaml` is used by Ubuntu's installation tech stack, while casper receives the topmost layer through that variable and strips away the second-to-last extension (`.live` in this case) and marks them for mounting until only two remain. In our case, this is only done once until we reach `filesystem.squashfs`.
 * installs other live system–only packages into the merged chroot
