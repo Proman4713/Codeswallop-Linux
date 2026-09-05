@@ -3,6 +3,15 @@
 #	TODO: with upstream and is ready for the upgrade first.
 
 if [ "$ENV_MODE" == "ISO" ]; then
+	# We specify the suite so that APT accepts the downgrade, since Ubuntu's built-in `base-files` by `debootstrap` will be a newer version most of the time.
+	OVERRIDE_PKG_LIST=(
+		#! NOTE: According to https://github.com/canonical/subiquity/blob/main/subiquity/common/os.py#L110-L112, which I inspected for our Calamares ubuntu-drivers module,
+		#!	/etc/lsb-release *has been removed* from Ubuntu 26.10 (Stonking), this means we will eventually need to adapt...
+		# Release Info and logos
+		"base-files/abstract"
+		"python3-apt/abstract"
+	)
+
 	# APT Repository, GPG key is later overridden by the `utile-keyring` package depended on by `utile-desktop`, this is just here so that our first installs are trusted
 	if ! curl -fsSL https://proman4713.github.io/Utile-OS-apt/public.key | sudo gpg --dearmour -o /usr/share/keyrings/utile-archive-keyring.gpg; then
 		echo "Error: Failed to download or install Utile GPG key" >&2
@@ -39,14 +48,20 @@ EOF
 	# Reflect the changes
 	apt_get_update
 
-	#! NOTE: According to https://github.com/canonical/subiquity/blob/main/subiquity/common/os.py#L110-L112, which I inspected for our Calamares ubuntu-drivers module,
-	#!	/etc/lsb-release *has been removed* from Ubuntu 26.10 (Stonking), this means we will eventually need to adapt...
-	# Release Info and logos
-	# We specify the suite so that APT accepts the downgrade, since Ubuntu's built-in `base-files` by `debootstrap` will be a newer version most of the time.
-	if ! apt-get install --allow-downgrades -y base-files/abstract; then
-		echo "Error: Failed to upgrade base-files package" >&2
-		exit 1
-	fi
+	to_install=()
+	for target in "${OVERRIDE_PKG_LIST[@]}"; do
+		pkg_name="${target%/*}"
+
+		if dpkg-query -W -f='${Status}' "$pkg_name" 2>/dev/null | grep -q "ok installed"; then
+			to_install+=("$target")
+		fi
+	done
+
+	if ! apt-get install --allow-downgrades -y "${to_install[@]}"; then
+        echo "Error: Failed to override packages: ${to_install[*]}" >&2
+        exit 1
+    fi
+
 	echo "Release $(lsb_release -a)"
 
 	# Desktop metapackage (GRUB Theme, Wallpapers, GNOME extensions, default configurations, etc.)
@@ -54,7 +69,7 @@ EOF
 	export GRUB_DISABLE_OS_PROBER=true
 	# Also remove all ubuntu-wallpapers packages, ubuntu-wallpapers is already conflicted by utile-wallpapers, which should uninstall the main package,
 	#	However, release-specific packages such as ubuntu-wallpapers-{noble,resolute,stonking} also exist.
-	install_packages utile-desktop && apt-get remove --purge -y ubuntu-wallpapers ubuntu-wallpapers*
+	install_packages utile-desktop && apt-get remove --purge -y ubuntu-wallpapers '^ubuntu-wallpapers.*'
 	chmod +x /etc/grub.d/30_os-prober
 fi
 

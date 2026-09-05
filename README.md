@@ -63,6 +63,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li><strike>Override upstream's <code>base-files</code> package to provide logos and release metadata.</strike></li>
 		<li><strike>Change bashrc to use a lighter colour for the <code>user@computer</code> text.</strike></li>
 		<li><strike>Either contribute my distribution's ASCII symbol to <code>fastfetch</code> or include it in a Debian package and set the <code>--logo</code> argument in a bashrc alias of <code>fastfetch</code>/<code>neofetch</code>.</strike></li>
+		<li>Research and implement a package similar to Linux Mint's `mintsources` source package, since our current patches to `python-apt` are neither sufficient nor robust enough to handle two layers of repositories.</li>
 		<li>Implement icon theme overrides to the Yaru theme to remove Ubuntu's trademarks from many places.</li>
 		<li>Implement an installer that follows Utile OS's minimum-friction philosophy while also requiring the user to accept codecs to avoid legal grey areas.</li>
 		<li>Implement my own Plymouth theme.</li>
@@ -88,6 +89,7 @@ Before starting this project, I detailed a specific plan in [an older readme](./
 		<li>Similarly, what about the 'Compiz alike magic lamp effect' extension? This could be too much, but maybe another extension that provides a springier minimise animation than the default?</li>
 		<li>Should I include auto-cpufreq/thermald by default for better battery life? Perhaps with an extension to provide a UI for that as well?</li>
 		<li>The average user does not have NAS devices and doesn't use <a href="https://ubuntu.com/server/docs/how-to/networking/install-nfs/">NFS</a>; should I disable the NetworkManager-wait-online.service to speed up boot time? What are the tradeoffs? Could I do it and perhaps provide a Settings toggle like 'Enable networking features on start-up' in whatever Settings app Utile OS will have (which could be GNOME Control Centre or something custom), so that users could easily be directed there instead of having to run terminal commands?</li>
+		<li>Should I include the 'Gnome 4x, 5x UI Improvements' extension?</li>
 	</ol>
 </details>
 
