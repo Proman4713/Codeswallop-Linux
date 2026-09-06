@@ -131,7 +131,7 @@ jobs:
           echo "Uploaded ISO to Gofile with ID: $CONTENT_ID"
 
           # calculate sha256 checksum
-          sha256sum ${{ env.ISO_NAME }}-amd64.iso > ${{ env.ISO_NAME }}-amd64.iso.sha256sum
+          sha256sum -b ${{ env.ISO_NAME }}-amd64.iso > ${{ env.ISO_NAME }}-amd64.iso.sha256sum
           echo "sha256sum: $(cat ${{ env.ISO_NAME }}-amd64.iso.sha256sum)"
 
           # Upload checksum to Gofile

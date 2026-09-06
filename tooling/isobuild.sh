@@ -142,6 +142,8 @@ kernel.apparmor_restrict_unprivileged_unconfined = 1
 
 EOF
 
+# TODO: Fix user needing to enter a password (or leaving it blank) when launching Brave
+
 # InitRAMFS changes
 chroot "$MERGED_CHROOT_DIR" /bin/bash -xlc "apt-get install -y casper
 apt-get install -y cryptsetup cryptsetup-bin cryptsetup-initramfs initramfs-tools
