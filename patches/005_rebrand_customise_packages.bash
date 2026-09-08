@@ -10,6 +10,7 @@ if [ "$ENV_MODE" == "ISO" ]; then
 		# Release Info and logos
 		"base-files/abstract"
 		"python3-apt/abstract"
+		"gnome-initial-setup/abstract" # Our modded welcome dialogue, with our branding and changes to text and links to our website, etc.
 	)
 
 	# APT Repository, GPG key is later overridden by the `utile-keyring` package depended on by `utile-desktop`, this is just here so that our first installs are trusted
